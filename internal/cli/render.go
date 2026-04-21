@@ -2,9 +2,8 @@ package cli
 
 import (
 	"fmt"
-	"strings"
-
 	"pesca/internal/presentation"
+	"strings"
 )
 
 const clearSequence = ansiCursorHome + ansiClearScreen

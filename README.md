@@ -47,3 +47,9 @@ Motor de juego en Go para un duelo de pesca por rondas. El proyecto esta separad
 - `presentation` convierte estado tecnico a contenido mostrable.
 - `app` coordina el flujo.
 - `cmd/...` solo compone dependencias.
+
+## Calidad de codigo
+
+- Ejecuta `go test ./...` para validar la suite.
+- Ejecuta `$(go env GOPATH)/bin/golangci-lint run` para revisar formato, estilo, errores comunes, complejidad y seguridad.
+- La configuracion versionada vive en `.golangci.yml`.

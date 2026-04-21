@@ -2,7 +2,6 @@ package app
 
 import (
 	"fmt"
-
 	"pesca/internal/domain"
 	"pesca/internal/game"
 	"pesca/internal/presentation"

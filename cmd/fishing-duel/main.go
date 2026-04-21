@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
-	"time"
-
 	"pesca/internal/app"
 	"pesca/internal/cli"
 	"pesca/internal/deck"
@@ -16,6 +14,7 @@ import (
 	"pesca/internal/presentation"
 	"pesca/internal/progression"
 	"pesca/internal/rules"
+	"time"
 )
 
 func main() {
@@ -34,8 +33,7 @@ func main() {
 
 	encounterState, err := encounter.NewState(encounter.DefaultConfig())
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error inicializando encuentro: %v\n", err)
-		os.Exit(1)
+		exitWithError("error inicializando encuentro", err)
 	}
 
 	engine, err := game.NewEngine(
@@ -46,19 +44,21 @@ func main() {
 		game.State{Encounter: encounterState},
 	)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error inicializando partida: %v\n", err)
-		os.Exit(1)
+		exitWithError("error inicializando partida", err)
 	}
 
 	presenter := presentation.NewPresenter(presentation.DefaultCatalog())
 	session, err := app.NewSession(engine, cli.NewUI(os.Stdin, os.Stdout), presenter)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error creando sesion: %v\n", err)
-		os.Exit(1)
+		exitWithError("error creando sesion", err)
 	}
 
 	if err := session.Run(); err != nil {
-		fmt.Fprintf(os.Stderr, "error ejecutando partida: %v\n", err)
-		os.Exit(1)
+		exitWithError("error ejecutando partida", err)
 	}
+}
+
+func exitWithError(message string, err error) {
+	_, _ = fmt.Fprintf(os.Stderr, "%s: %v\n", message, err)
+	os.Exit(1)
 }

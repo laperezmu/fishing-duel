@@ -4,11 +4,10 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"strconv"
-	"strings"
-
 	"pesca/internal/domain"
 	"pesca/internal/presentation"
+	"strconv"
+	"strings"
 )
 
 type UI struct {
