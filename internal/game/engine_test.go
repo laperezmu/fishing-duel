@@ -122,7 +122,7 @@ func newEngineForTest(t *testing.T, cards []domain.Move, config encounter.Config
 
 	engine, err := game.NewEngine(
 		deck.NewManager(cards, func([]domain.Move) {}, deck.RemoveCardsRecyclePolicy{CardsToRemove: 3}),
-		rules.ClassicEvaluator{},
+		rules.NewClassicEvaluator(rules.NewFishCombatProfile()),
 		progression.TrackPolicy{},
 		endings.EncounterCondition{},
 		game.State{Encounter: encounterState},

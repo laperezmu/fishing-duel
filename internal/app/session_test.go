@@ -35,7 +35,7 @@ func TestSessionRunsThroughAbstractUI(t *testing.T) {
 
 	engine, err := game.NewEngine(
 		manager,
-		rules.ClassicEvaluator{},
+		rules.NewClassicEvaluator(rules.NewFishCombatProfile()),
 		progression.TrackPolicy{},
 		endings.EncounterCondition{},
 		game.State{Encounter: encounterState},

@@ -14,6 +14,8 @@ Implementation should not start without at least this minimum planning step.
 ## Delivery Process
 
 After implementation is complete:
+- Create a new git branch for the implementation
+- Name the branch after the implementation plan document
 - Create a pull request in the repository
 - Include a detailed description of the integrated changes in the PR body
 
@@ -72,3 +74,20 @@ Minimum required sections before implementation starts:
 - Objetivo
 - Criterios de aceptacion
 - Scope
+
+## Plan Storage Convention
+
+Every new feature plan must:
+- Be stored under the root `docs/` directory
+- Be enumerated with a sequential numeric prefix
+- Use the feature plan template defined in this file
+
+Recommended naming format:
+- `docs/001-nombre-corto.md`
+- `docs/002-nombre-corto.md`
+
+The numbering is part of the workflow and should advance with each new plan.
+
+Implementation branch naming:
+- `docs/001-nombre-corto.md` -> branch `001-nombre-corto`
+- `docs/002-nombre-corto.md` -> branch `002-nombre-corto`
