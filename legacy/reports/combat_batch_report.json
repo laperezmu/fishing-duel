@@ -1,0 +1,7203 @@
+{
+  "Options": {
+    "Simulations": 3000,
+    "Seed": 42
+  },
+  "Scenarios": [
+    {
+      "Scenario": {
+        "Name": "baseline-slot-3-black",
+        "Category": "baseline",
+        "Config": {
+          "InitialTrackPos": 3,
+          "Fish": {
+            "Kind": 0,
+            "Colors": [
+              0,
+              0
+            ]
+          },
+          "BaitGuardAvailable": false,
+          "RodMods": {
+            "Offensive": 0,
+            "Defensive": 0
+          }
+        }
+      },
+      "InitialActionEV": [
+        0.9664221938775509,
+        0.9664221938775509,
+        0.9664221938775509
+      ],
+      "PolicyResults": {
+        "heuristic": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 3,
+              "Fish": {
+                "Kind": 0,
+                "Colors": [
+                  0,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "heuristic",
+            "Simulations": 3000,
+            "Seed": 1059
+          },
+          "Policy": "heuristic",
+          "CaptureRate": 0.9623333333333334,
+          "EscapeRate": 0.03766666666666667,
+          "AvgRounds": 8.521333333333333,
+          "AvgFatigues": 0.36333333333333334,
+          "ActionUsage": [
+            8625,
+            10191,
+            6748
+          ],
+          "InitialActionEV": [
+            0.9664221938775509,
+            0.9664221938775509,
+            0.9664221938775509
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 1,
+            "track_capture": 2886,
+            "track_escape": 113
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        "optimal": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 3,
+              "Fish": {
+                "Kind": 0,
+                "Colors": [
+                  0,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "optimal",
+            "Simulations": 3000,
+            "Seed": 1042
+          },
+          "Policy": "optimal",
+          "CaptureRate": 0.9646666666666667,
+          "EscapeRate": 0.035333333333333335,
+          "AvgRounds": 9.716666666666667,
+          "AvgFatigues": 0.686,
+          "ActionUsage": [
+            17480,
+            6318,
+            5352
+          ],
+          "InitialActionEV": [
+            0.9664221938775509,
+            0.9664221938775509,
+            0.9664221938775509
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 318,
+            "track_capture": 2576,
+            "track_escape": 106
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        "random": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 3,
+              "Fish": {
+                "Kind": 0,
+                "Colors": [
+                  0,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "random",
+            "Simulations": 3000,
+            "Seed": 1076
+          },
+          "Policy": "random",
+          "CaptureRate": 0.5093333333333333,
+          "EscapeRate": 0.49066666666666664,
+          "AvgRounds": 9.278666666666666,
+          "AvgFatigues": 0.636,
+          "ActionUsage": [
+            9330,
+            9224,
+            9282
+          ],
+          "InitialActionEV": [
+            0.9664221938775509,
+            0.9664221938775509,
+            0.9664221938775509
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 124,
+            "track_capture": 1404,
+            "track_escape": 1472
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        }
+      },
+      "ForcedActionResults": [
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 3,
+              "Fish": {
+                "Kind": 0,
+                "Colors": [
+                  0,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 2742
+          },
+          "Policy": "forzar",
+          "CaptureRate": 0.605,
+          "EscapeRate": 0.395,
+          "AvgRounds": 13.721,
+          "AvgFatigues": 1.5226666666666666,
+          "ActionUsage": [
+            41163,
+            0,
+            0
+          ],
+          "InitialActionEV": [
+            0.9664221938775509,
+            0.9664221938775509,
+            0.9664221938775509
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 634,
+            "track_capture": 1181,
+            "track_escape": 1185
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 3,
+              "Fish": {
+                "Kind": 0,
+                "Colors": [
+                  0,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 2759
+          },
+          "Policy": "tensar",
+          "CaptureRate": 0.6003333333333334,
+          "EscapeRate": 0.39966666666666667,
+          "AvgRounds": 13.599666666666666,
+          "AvgFatigues": 1.494,
+          "ActionUsage": [
+            0,
+            40799,
+            0
+          ],
+          "InitialActionEV": [
+            0.9664221938775509,
+            0.9664221938775509,
+            0.9664221938775509
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 625,
+            "track_capture": 1176,
+            "track_escape": 1199
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 3,
+              "Fish": {
+                "Kind": 0,
+                "Colors": [
+                  0,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 2776
+          },
+          "Policy": "soltar",
+          "CaptureRate": 0.604,
+          "EscapeRate": 0.396,
+          "AvgRounds": 13.695333333333334,
+          "AvgFatigues": 1.5063333333333333,
+          "ActionUsage": [
+            0,
+            0,
+            41086
+          ],
+          "InitialActionEV": [
+            0.9664221938775509,
+            0.9664221938775509,
+            0.9664221938775509
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 618,
+            "track_capture": 1194,
+            "track_escape": 1188
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        }
+      ],
+      "BestForcedAction": 0,
+      "BestForcedRate": 0.605
+    },
+    {
+      "Scenario": {
+        "Name": "baseline-slot-3-red",
+        "Category": "baseline",
+        "Config": {
+          "InitialTrackPos": 3,
+          "Fish": {
+            "Kind": 1,
+            "Colors": [
+              1,
+              0
+            ]
+          },
+          "BaitGuardAvailable": false,
+          "RodMods": {
+            "Offensive": 0,
+            "Defensive": 0
+          }
+        }
+      },
+      "InitialActionEV": [
+        0.8714919926303852,
+        0.9549698837868479,
+        0.9366982001133785
+      ],
+      "PolicyResults": {
+        "heuristic": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 3,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  1,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "heuristic",
+            "Simulations": 3000,
+            "Seed": 2059
+          },
+          "Policy": "heuristic",
+          "CaptureRate": 0.939,
+          "EscapeRate": 0.061,
+          "AvgRounds": 9.115,
+          "AvgFatigues": 0.497,
+          "ActionUsage": [
+            4336,
+            12699,
+            10310
+          ],
+          "InitialActionEV": [
+            0.8714919926303852,
+            0.9549698837868479,
+            0.9366982001133785
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 11,
+            "track_capture": 2806,
+            "track_escape": 183
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        "optimal": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 3,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  1,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "optimal",
+            "Simulations": 3000,
+            "Seed": 2042
+          },
+          "Policy": "optimal",
+          "CaptureRate": 0.965,
+          "EscapeRate": 0.035,
+          "AvgRounds": 10.301666666666666,
+          "AvgFatigues": 0.8373333333333334,
+          "ActionUsage": [
+            5929,
+            15512,
+            9464
+          ],
+          "InitialActionEV": [
+            0.8714919926303852,
+            0.9549698837868479,
+            0.9366982001133785
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 446,
+            "track_capture": 2449,
+            "track_escape": 105
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        "random": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 3,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  1,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "random",
+            "Simulations": 3000,
+            "Seed": 2076
+          },
+          "Policy": "random",
+          "CaptureRate": 0.336,
+          "EscapeRate": 0.664,
+          "AvgRounds": 8.512,
+          "AvgFatigues": 0.5183333333333333,
+          "ActionUsage": [
+            8466,
+            8561,
+            8509
+          ],
+          "InitialActionEV": [
+            0.8714919926303852,
+            0.9549698837868479,
+            0.9366982001133785
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 66,
+            "track_capture": 942,
+            "track_escape": 1992
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        }
+      },
+      "ForcedActionResults": [
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 3,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  1,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 3742
+          },
+          "Policy": "forzar",
+          "CaptureRate": 0.013,
+          "EscapeRate": 0.987,
+          "AvgRounds": 6.212,
+          "AvgFatigues": 0,
+          "ActionUsage": [
+            18636,
+            0,
+            0
+          ],
+          "InitialActionEV": [
+            0.8714919926303852,
+            0.9549698837868479,
+            0.9366982001133785
+          ],
+          "TerminalReasonBreakdown": {
+            "track_capture": 39,
+            "track_escape": 2961
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 3,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  1,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 3759
+          },
+          "Policy": "tensar",
+          "CaptureRate": 0.5966666666666667,
+          "EscapeRate": 0.4033333333333333,
+          "AvgRounds": 13.704333333333333,
+          "AvgFatigues": 1.5276666666666667,
+          "ActionUsage": [
+            0,
+            41113,
+            0
+          ],
+          "InitialActionEV": [
+            0.8714919926303852,
+            0.9549698837868479,
+            0.9366982001133785
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 655,
+            "track_capture": 1135,
+            "track_escape": 1210
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 3,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  1,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 3776
+          },
+          "Policy": "soltar",
+          "CaptureRate": 0.605,
+          "EscapeRate": 0.395,
+          "AvgRounds": 13.637,
+          "AvgFatigues": 1.5003333333333333,
+          "ActionUsage": [
+            0,
+            0,
+            40911
+          ],
+          "InitialActionEV": [
+            0.8714919926303852,
+            0.9549698837868479,
+            0.9366982001133785
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 626,
+            "track_capture": 1189,
+            "track_escape": 1185
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        }
+      ],
+      "BestForcedAction": 2,
+      "BestForcedRate": 0.605
+    },
+    {
+      "Scenario": {
+        "Name": "baseline-slot-3-blue",
+        "Category": "baseline",
+        "Config": {
+          "InitialTrackPos": 3,
+          "Fish": {
+            "Kind": 1,
+            "Colors": [
+              2,
+              0
+            ]
+          },
+          "BaitGuardAvailable": false,
+          "RodMods": {
+            "Offensive": 0,
+            "Defensive": 0
+          }
+        }
+      },
+      "InitialActionEV": [
+        0.9366982001133785,
+        0.8714919926303853,
+        0.9549698837868479
+      ],
+      "PolicyResults": {
+        "heuristic": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 3,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  2,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "heuristic",
+            "Simulations": 3000,
+            "Seed": 3059
+          },
+          "Policy": "heuristic",
+          "CaptureRate": 0.9443333333333334,
+          "EscapeRate": 0.05566666666666667,
+          "AvgRounds": 9.106333333333334,
+          "AvgFatigues": 0.5113333333333333,
+          "ActionUsage": [
+            12943,
+            3441,
+            10935
+          ],
+          "InitialActionEV": [
+            0.9366982001133785,
+            0.8714919926303853,
+            0.9549698837868479
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 14,
+            "track_capture": 2819,
+            "track_escape": 167
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        "optimal": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 3,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  2,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "optimal",
+            "Simulations": 3000,
+            "Seed": 3042
+          },
+          "Policy": "optimal",
+          "CaptureRate": 0.9603333333333334,
+          "EscapeRate": 0.03966666666666667,
+          "AvgRounds": 10.028,
+          "AvgFatigues": 0.7493333333333333,
+          "ActionUsage": [
+            14472,
+            2019,
+            13593
+          ],
+          "InitialActionEV": [
+            0.9366982001133785,
+            0.8714919926303853,
+            0.9549698837868479
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 352,
+            "track_capture": 2529,
+            "track_escape": 119
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        "random": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 3,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  2,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "random",
+            "Simulations": 3000,
+            "Seed": 3076
+          },
+          "Policy": "random",
+          "CaptureRate": 0.331,
+          "EscapeRate": 0.669,
+          "AvgRounds": 8.402333333333333,
+          "AvgFatigues": 0.5086666666666667,
+          "ActionUsage": [
+            8407,
+            8421,
+            8379
+          ],
+          "InitialActionEV": [
+            0.9366982001133785,
+            0.8714919926303853,
+            0.9549698837868479
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 66,
+            "track_capture": 927,
+            "track_escape": 2007
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        }
+      },
+      "ForcedActionResults": [
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 3,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  2,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 4742
+          },
+          "Policy": "forzar",
+          "CaptureRate": 0.6036666666666667,
+          "EscapeRate": 0.3963333333333333,
+          "AvgRounds": 13.763333333333334,
+          "AvgFatigues": 1.5303333333333333,
+          "ActionUsage": [
+            41290,
+            0,
+            0
+          ],
+          "InitialActionEV": [
+            0.9366982001133785,
+            0.8714919926303853,
+            0.9549698837868479
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 653,
+            "track_capture": 1158,
+            "track_escape": 1189
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 3,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  2,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 4759
+          },
+          "Policy": "tensar",
+          "CaptureRate": 0.01,
+          "EscapeRate": 0.99,
+          "AvgRounds": 6.207333333333334,
+          "AvgFatigues": 0,
+          "ActionUsage": [
+            0,
+            18622,
+            0
+          ],
+          "InitialActionEV": [
+            0.9366982001133785,
+            0.8714919926303853,
+            0.9549698837868479
+          ],
+          "TerminalReasonBreakdown": {
+            "track_capture": 30,
+            "track_escape": 2970
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 3,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  2,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 4776
+          },
+          "Policy": "soltar",
+          "CaptureRate": 0.592,
+          "EscapeRate": 0.408,
+          "AvgRounds": 13.701,
+          "AvgFatigues": 1.5153333333333334,
+          "ActionUsage": [
+            0,
+            0,
+            41103
+          ],
+          "InitialActionEV": [
+            0.9366982001133785,
+            0.8714919926303853,
+            0.9549698837868479
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 634,
+            "track_capture": 1142,
+            "track_escape": 1224
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        }
+      ],
+      "BestForcedAction": 0,
+      "BestForcedRate": 0.6036666666666667
+    },
+    {
+      "Scenario": {
+        "Name": "baseline-slot-3-yellow",
+        "Category": "baseline",
+        "Config": {
+          "InitialTrackPos": 3,
+          "Fish": {
+            "Kind": 1,
+            "Colors": [
+              3,
+              0
+            ]
+          },
+          "BaitGuardAvailable": false,
+          "RodMods": {
+            "Offensive": 0,
+            "Defensive": 0
+          }
+        }
+      },
+      "InitialActionEV": [
+        0.9549698837868479,
+        0.9366982001133786,
+        0.8714919926303853
+      ],
+      "PolicyResults": {
+        "heuristic": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 3,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  3,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "heuristic",
+            "Simulations": 3000,
+            "Seed": 4059
+          },
+          "Policy": "heuristic",
+          "CaptureRate": 0.931,
+          "EscapeRate": 0.069,
+          "AvgRounds": 9.101,
+          "AvgFatigues": 0.49566666666666664,
+          "ActionUsage": [
+            10436,
+            13767,
+            3100
+          ],
+          "InitialActionEV": [
+            0.9549698837868479,
+            0.9366982001133786,
+            0.8714919926303853
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 10,
+            "track_capture": 2783,
+            "track_escape": 207
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        "optimal": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 3,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  3,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "optimal",
+            "Simulations": 3000,
+            "Seed": 4042
+          },
+          "Policy": "optimal",
+          "CaptureRate": 0.9533333333333334,
+          "EscapeRate": 0.04666666666666667,
+          "AvgRounds": 10.029333333333334,
+          "AvgFatigues": 0.7366666666666667,
+          "ActionUsage": [
+            18719,
+            9738,
+            1631
+          ],
+          "InitialActionEV": [
+            0.9549698837868479,
+            0.9366982001133786,
+            0.8714919926303853
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 310,
+            "track_capture": 2550,
+            "track_escape": 140
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        "random": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 3,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  3,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "random",
+            "Simulations": 3000,
+            "Seed": 4076
+          },
+          "Policy": "random",
+          "CaptureRate": 0.336,
+          "EscapeRate": 0.664,
+          "AvgRounds": 8.425666666666666,
+          "AvgFatigues": 0.5086666666666667,
+          "ActionUsage": [
+            8312,
+            8487,
+            8478
+          ],
+          "InitialActionEV": [
+            0.9549698837868479,
+            0.9366982001133786,
+            0.8714919926303853
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 66,
+            "track_capture": 942,
+            "track_escape": 1992
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        }
+      },
+      "ForcedActionResults": [
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 3,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  3,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 5742
+          },
+          "Policy": "forzar",
+          "CaptureRate": 0.5976666666666667,
+          "EscapeRate": 0.4023333333333333,
+          "AvgRounds": 13.625,
+          "AvgFatigues": 1.5016666666666667,
+          "ActionUsage": [
+            40875,
+            0,
+            0
+          ],
+          "InitialActionEV": [
+            0.9549698837868479,
+            0.9366982001133786,
+            0.8714919926303853
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 620,
+            "track_capture": 1173,
+            "track_escape": 1207
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 3,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  3,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 5759
+          },
+          "Policy": "tensar",
+          "CaptureRate": 0.601,
+          "EscapeRate": 0.399,
+          "AvgRounds": 13.677666666666667,
+          "AvgFatigues": 1.507,
+          "ActionUsage": [
+            0,
+            41033,
+            0
+          ],
+          "InitialActionEV": [
+            0.9549698837868479,
+            0.9366982001133786,
+            0.8714919926303853
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 623,
+            "track_capture": 1180,
+            "track_escape": 1197
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 3,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  3,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 5776
+          },
+          "Policy": "soltar",
+          "CaptureRate": 0.013666666666666667,
+          "EscapeRate": 0.9863333333333333,
+          "AvgRounds": 6.27,
+          "AvgFatigues": 0,
+          "ActionUsage": [
+            0,
+            0,
+            18810
+          ],
+          "InitialActionEV": [
+            0.9549698837868479,
+            0.9366982001133786,
+            0.8714919926303853
+          ],
+          "TerminalReasonBreakdown": {
+            "track_capture": 41,
+            "track_escape": 2959
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        }
+      ],
+      "BestForcedAction": 1,
+      "BestForcedRate": 0.601
+    },
+    {
+      "Scenario": {
+        "Name": "baseline-slot-3-red-yellow",
+        "Category": "baseline",
+        "Config": {
+          "InitialTrackPos": 3,
+          "Fish": {
+            "Kind": 2,
+            "Colors": [
+              1,
+              3
+            ]
+          },
+          "BaitGuardAvailable": false,
+          "RodMods": {
+            "Offensive": 0,
+            "Defensive": 0
+          }
+        }
+      },
+      "InitialActionEV": [
+        0.7782808956916099,
+        0.8910923327664398,
+        0.7229822137188208
+      ],
+      "PolicyResults": {
+        "heuristic": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 3,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  1,
+                  3
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "heuristic",
+            "Simulations": 3000,
+            "Seed": 5059
+          },
+          "Policy": "heuristic",
+          "CaptureRate": 0.8796666666666667,
+          "EscapeRate": 0.12033333333333333,
+          "AvgRounds": 10.100333333333333,
+          "AvgFatigues": 0.7116666666666667,
+          "ActionUsage": [
+            5937,
+            20018,
+            4346
+          ],
+          "InitialActionEV": [
+            0.7782808956916099,
+            0.8910923327664398,
+            0.7229822137188208
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 64,
+            "track_capture": 2575,
+            "track_escape": 361
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        "optimal": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 3,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  1,
+                  3
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "optimal",
+            "Simulations": 3000,
+            "Seed": 5042
+          },
+          "Policy": "optimal",
+          "CaptureRate": 0.8883333333333333,
+          "EscapeRate": 0.11166666666666666,
+          "AvgRounds": 10.631,
+          "AvgFatigues": 0.928,
+          "ActionUsage": [
+            6196,
+            21516,
+            4181
+          ],
+          "InitialActionEV": [
+            0.7782808956916099,
+            0.8910923327664398,
+            0.7229822137188208
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 414,
+            "track_capture": 2251,
+            "track_escape": 335
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        "random": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 3,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  1,
+                  3
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "random",
+            "Simulations": 3000,
+            "Seed": 5076
+          },
+          "Policy": "random",
+          "CaptureRate": 0.19666666666666666,
+          "EscapeRate": 0.8033333333333333,
+          "AvgRounds": 7.342333333333333,
+          "AvgFatigues": 0.3486666666666667,
+          "ActionUsage": [
+            7424,
+            7375,
+            7228
+          ],
+          "InitialActionEV": [
+            0.7782808956916099,
+            0.8910923327664398,
+            0.7229822137188208
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 30,
+            "track_capture": 560,
+            "track_escape": 2410
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        }
+      },
+      "ForcedActionResults": [
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 3,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  1,
+                  3
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 6742
+          },
+          "Policy": "forzar",
+          "CaptureRate": 0.009666666666666667,
+          "EscapeRate": 0.9903333333333333,
+          "AvgRounds": 6.233333333333333,
+          "AvgFatigues": 0,
+          "ActionUsage": [
+            18700,
+            0,
+            0
+          ],
+          "InitialActionEV": [
+            0.7782808956916099,
+            0.8910923327664398,
+            0.7229822137188208
+          ],
+          "TerminalReasonBreakdown": {
+            "track_capture": 29,
+            "track_escape": 2971
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 3,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  1,
+                  3
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 6759
+          },
+          "Policy": "tensar",
+          "CaptureRate": 0.6016666666666667,
+          "EscapeRate": 0.3983333333333333,
+          "AvgRounds": 13.730666666666666,
+          "AvgFatigues": 1.5153333333333334,
+          "ActionUsage": [
+            0,
+            41192,
+            0
+          ],
+          "InitialActionEV": [
+            0.7782808956916099,
+            0.8910923327664398,
+            0.7229822137188208
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 621,
+            "track_capture": 1184,
+            "track_escape": 1195
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 3,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  1,
+                  3
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 6776
+          },
+          "Policy": "soltar",
+          "CaptureRate": 0.012,
+          "EscapeRate": 0.988,
+          "AvgRounds": 6.322666666666667,
+          "AvgFatigues": 0,
+          "ActionUsage": [
+            0,
+            0,
+            18968
+          ],
+          "InitialActionEV": [
+            0.7782808956916099,
+            0.8910923327664398,
+            0.7229822137188208
+          ],
+          "TerminalReasonBreakdown": {
+            "track_capture": 36,
+            "track_escape": 2964
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        }
+      ],
+      "BestForcedAction": 1,
+      "BestForcedRate": 0.6016666666666667
+    },
+    {
+      "Scenario": {
+        "Name": "baseline-slot-3-blue-red",
+        "Category": "baseline",
+        "Config": {
+          "InitialTrackPos": 3,
+          "Fish": {
+            "Kind": 2,
+            "Colors": [
+              2,
+              1
+            ]
+          },
+          "BaitGuardAvailable": false,
+          "RodMods": {
+            "Offensive": 0,
+            "Defensive": 0
+          }
+        }
+      },
+      "InitialActionEV": [
+        0.7229822137188208,
+        0.7782808956916099,
+        0.8910923327664398
+      ],
+      "PolicyResults": {
+        "heuristic": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 3,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  2,
+                  1
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "heuristic",
+            "Simulations": 3000,
+            "Seed": 6059
+          },
+          "Policy": "heuristic",
+          "CaptureRate": 0.8786666666666667,
+          "EscapeRate": 0.12133333333333333,
+          "AvgRounds": 9.956,
+          "AvgFatigues": 0.6936666666666667,
+          "ActionUsage": [
+            8069,
+            3484,
+            18315
+          ],
+          "InitialActionEV": [
+            0.7229822137188208,
+            0.7782808956916099,
+            0.8910923327664398
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 55,
+            "track_capture": 2581,
+            "track_escape": 364
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        "optimal": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 3,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  2,
+                  1
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "optimal",
+            "Simulations": 3000,
+            "Seed": 6042
+          },
+          "Policy": "optimal",
+          "CaptureRate": 0.892,
+          "EscapeRate": 0.108,
+          "AvgRounds": 10.764333333333333,
+          "AvgFatigues": 0.987,
+          "ActionUsage": [
+            8991,
+            3238,
+            20064
+          ],
+          "InitialActionEV": [
+            0.7229822137188208,
+            0.7782808956916099,
+            0.8910923327664398
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 489,
+            "track_capture": 2187,
+            "track_escape": 324
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        "random": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 3,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  2,
+                  1
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "random",
+            "Simulations": 3000,
+            "Seed": 6076
+          },
+          "Policy": "random",
+          "CaptureRate": 0.21266666666666667,
+          "EscapeRate": 0.7873333333333333,
+          "AvgRounds": 7.445,
+          "AvgFatigues": 0.37,
+          "ActionUsage": [
+            7433,
+            7432,
+            7470
+          ],
+          "InitialActionEV": [
+            0.7229822137188208,
+            0.7782808956916099,
+            0.8910923327664398
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 27,
+            "track_capture": 611,
+            "track_escape": 2362
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        }
+      },
+      "ForcedActionResults": [
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 3,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  2,
+                  1
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 7742
+          },
+          "Policy": "forzar",
+          "CaptureRate": 0.008,
+          "EscapeRate": 0.992,
+          "AvgRounds": 6.180666666666666,
+          "AvgFatigues": 0,
+          "ActionUsage": [
+            18542,
+            0,
+            0
+          ],
+          "InitialActionEV": [
+            0.7229822137188208,
+            0.7782808956916099,
+            0.8910923327664398
+          ],
+          "TerminalReasonBreakdown": {
+            "track_capture": 24,
+            "track_escape": 2976
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 3,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  2,
+                  1
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 7759
+          },
+          "Policy": "tensar",
+          "CaptureRate": 0.013,
+          "EscapeRate": 0.987,
+          "AvgRounds": 6.144,
+          "AvgFatigues": 0,
+          "ActionUsage": [
+            0,
+            18432,
+            0
+          ],
+          "InitialActionEV": [
+            0.7229822137188208,
+            0.7782808956916099,
+            0.8910923327664398
+          ],
+          "TerminalReasonBreakdown": {
+            "track_capture": 39,
+            "track_escape": 2961
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 3,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  2,
+                  1
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 7776
+          },
+          "Policy": "soltar",
+          "CaptureRate": 0.6043333333333333,
+          "EscapeRate": 0.39566666666666667,
+          "AvgRounds": 13.822,
+          "AvgFatigues": 1.5406666666666666,
+          "ActionUsage": [
+            0,
+            0,
+            41466
+          ],
+          "InitialActionEV": [
+            0.7229822137188208,
+            0.7782808956916099,
+            0.8910923327664398
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 655,
+            "track_capture": 1158,
+            "track_escape": 1187
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        }
+      ],
+      "BestForcedAction": 2,
+      "BestForcedRate": 0.6043333333333333
+    },
+    {
+      "Scenario": {
+        "Name": "baseline-slot-3-blue-yellow",
+        "Category": "baseline",
+        "Config": {
+          "InitialTrackPos": 3,
+          "Fish": {
+            "Kind": 2,
+            "Colors": [
+              2,
+              3
+            ]
+          },
+          "BaitGuardAvailable": false,
+          "RodMods": {
+            "Offensive": 0,
+            "Defensive": 0
+          }
+        }
+      },
+      "InitialActionEV": [
+        0.8910923327664398,
+        0.7229822137188207,
+        0.7782808956916099
+      ],
+      "PolicyResults": {
+        "heuristic": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 3,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  2,
+                  3
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "heuristic",
+            "Simulations": 3000,
+            "Seed": 7059
+          },
+          "Policy": "heuristic",
+          "CaptureRate": 0.8696666666666667,
+          "EscapeRate": 0.13033333333333333,
+          "AvgRounds": 10.023,
+          "AvgFatigues": 0.7016666666666667,
+          "ActionUsage": [
+            21534,
+            5661,
+            2874
+          ],
+          "InitialActionEV": [
+            0.8910923327664398,
+            0.7229822137188207,
+            0.7782808956916099
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 48,
+            "track_capture": 2561,
+            "track_escape": 391
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        "optimal": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 3,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  2,
+                  3
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "optimal",
+            "Simulations": 3000,
+            "Seed": 7042
+          },
+          "Policy": "optimal",
+          "CaptureRate": 0.8983333333333333,
+          "EscapeRate": 0.10166666666666667,
+          "AvgRounds": 10.670333333333334,
+          "AvgFatigues": 0.917,
+          "ActionUsage": [
+            25265,
+            4662,
+            2084
+          ],
+          "InitialActionEV": [
+            0.8910923327664398,
+            0.7229822137188207,
+            0.7782808956916099
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 418,
+            "track_capture": 2277,
+            "track_escape": 305
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        "random": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 3,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  2,
+                  3
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "random",
+            "Simulations": 3000,
+            "Seed": 7076
+          },
+          "Policy": "random",
+          "CaptureRate": 0.21666666666666667,
+          "EscapeRate": 0.7833333333333333,
+          "AvgRounds": 7.325,
+          "AvgFatigues": 0.358,
+          "ActionUsage": [
+            7375,
+            7212,
+            7388
+          ],
+          "InitialActionEV": [
+            0.8910923327664398,
+            0.7229822137188207,
+            0.7782808956916099
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 32,
+            "track_capture": 618,
+            "track_escape": 2350
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        }
+      },
+      "ForcedActionResults": [
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 3,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  2,
+                  3
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 8742
+          },
+          "Policy": "forzar",
+          "CaptureRate": 0.604,
+          "EscapeRate": 0.396,
+          "AvgRounds": 13.593,
+          "AvgFatigues": 1.5053333333333334,
+          "ActionUsage": [
+            40779,
+            0,
+            0
+          ],
+          "InitialActionEV": [
+            0.8910923327664398,
+            0.7229822137188207,
+            0.7782808956916099
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 630,
+            "track_capture": 1182,
+            "track_escape": 1188
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 3,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  2,
+                  3
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 8759
+          },
+          "Policy": "tensar",
+          "CaptureRate": 0.012,
+          "EscapeRate": 0.988,
+          "AvgRounds": 6.234666666666667,
+          "AvgFatigues": 0,
+          "ActionUsage": [
+            0,
+            18704,
+            0
+          ],
+          "InitialActionEV": [
+            0.8910923327664398,
+            0.7229822137188207,
+            0.7782808956916099
+          ],
+          "TerminalReasonBreakdown": {
+            "track_capture": 36,
+            "track_escape": 2964
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 3,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  2,
+                  3
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 8776
+          },
+          "Policy": "soltar",
+          "CaptureRate": 0.011666666666666667,
+          "EscapeRate": 0.9883333333333333,
+          "AvgRounds": 6.204666666666666,
+          "AvgFatigues": 0,
+          "ActionUsage": [
+            0,
+            0,
+            18614
+          ],
+          "InitialActionEV": [
+            0.8910923327664398,
+            0.7229822137188207,
+            0.7782808956916099
+          ],
+          "TerminalReasonBreakdown": {
+            "track_capture": 35,
+            "track_escape": 2965
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        }
+      ],
+      "BestForcedAction": 0,
+      "BestForcedRate": 0.604
+    },
+    {
+      "Scenario": {
+        "Name": "baseline-slot-4-black",
+        "Category": "baseline",
+        "Config": {
+          "InitialTrackPos": 4,
+          "Fish": {
+            "Kind": 0,
+            "Colors": [
+              0,
+              0
+            ]
+          },
+          "BaitGuardAvailable": false,
+          "RodMods": {
+            "Offensive": 0,
+            "Defensive": 0
+          }
+        }
+      },
+      "InitialActionEV": [
+        0.8188318452380952,
+        0.818831845238095,
+        0.8188318452380952
+      ],
+      "PolicyResults": {
+        "heuristic": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 4,
+              "Fish": {
+                "Kind": 0,
+                "Colors": [
+                  0,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "heuristic",
+            "Simulations": 3000,
+            "Seed": 8059
+          },
+          "Policy": "heuristic",
+          "CaptureRate": 0.8113333333333334,
+          "EscapeRate": 0.18866666666666668,
+          "AvgRounds": 8.629666666666667,
+          "AvgFatigues": 0.46,
+          "ActionUsage": [
+            9296,
+            9829,
+            6764
+          ],
+          "InitialActionEV": [
+            0.8188318452380952,
+            0.818831845238095,
+            0.8188318452380952
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 4,
+            "track_capture": 2430,
+            "track_escape": 566
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        "optimal": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 4,
+              "Fish": {
+                "Kind": 0,
+                "Colors": [
+                  0,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "optimal",
+            "Simulations": 3000,
+            "Seed": 8042
+          },
+          "Policy": "optimal",
+          "CaptureRate": 0.8126666666666666,
+          "EscapeRate": 0.18733333333333332,
+          "AvgRounds": 9.817666666666666,
+          "AvgFatigues": 0.7956666666666666,
+          "ActionUsage": [
+            16532,
+            6979,
+            5942
+          ],
+          "InitialActionEV": [
+            0.8188318452380952,
+            0.818831845238095,
+            0.8188318452380952
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 403,
+            "track_capture": 2035,
+            "track_escape": 562
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        "random": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 4,
+              "Fish": {
+                "Kind": 0,
+                "Colors": [
+                  0,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "random",
+            "Simulations": 3000,
+            "Seed": 8076
+          },
+          "Policy": "random",
+          "CaptureRate": 0.353,
+          "EscapeRate": 0.647,
+          "AvgRounds": 8.568666666666667,
+          "AvgFatigues": 0.5976666666666667,
+          "ActionUsage": [
+            8587,
+            8606,
+            8513
+          ],
+          "InitialActionEV": [
+            0.8188318452380952,
+            0.818831845238095,
+            0.8188318452380952
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 135,
+            "track_capture": 924,
+            "track_escape": 1941
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        }
+      },
+      "ForcedActionResults": [
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 4,
+              "Fish": {
+                "Kind": 0,
+                "Colors": [
+                  0,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 9742
+          },
+          "Policy": "forzar",
+          "CaptureRate": 0.223,
+          "EscapeRate": 0.777,
+          "AvgRounds": 9.597666666666667,
+          "AvgFatigues": 0.8033333333333333,
+          "ActionUsage": [
+            28793,
+            0,
+            0
+          ],
+          "InitialActionEV": [
+            0.8188318452380952,
+            0.818831845238095,
+            0.8188318452380952
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 84,
+            "track_capture": 585,
+            "track_escape": 2331
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 4,
+              "Fish": {
+                "Kind": 0,
+                "Colors": [
+                  0,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 9759
+          },
+          "Policy": "tensar",
+          "CaptureRate": 0.22466666666666665,
+          "EscapeRate": 0.7753333333333333,
+          "AvgRounds": 9.702666666666667,
+          "AvgFatigues": 0.808,
+          "ActionUsage": [
+            0,
+            29108,
+            0
+          ],
+          "InitialActionEV": [
+            0.8188318452380952,
+            0.818831845238095,
+            0.8188318452380952
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 70,
+            "track_capture": 604,
+            "track_escape": 2326
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 4,
+              "Fish": {
+                "Kind": 0,
+                "Colors": [
+                  0,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 9776
+          },
+          "Policy": "soltar",
+          "CaptureRate": 0.21733333333333332,
+          "EscapeRate": 0.7826666666666666,
+          "AvgRounds": 9.622666666666667,
+          "AvgFatigues": 0.8036666666666666,
+          "ActionUsage": [
+            0,
+            0,
+            28868
+          ],
+          "InitialActionEV": [
+            0.8188318452380952,
+            0.818831845238095,
+            0.8188318452380952
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 71,
+            "track_capture": 581,
+            "track_escape": 2348
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        }
+      ],
+      "BestForcedAction": 1,
+      "BestForcedRate": 0.22466666666666665
+    },
+    {
+      "Scenario": {
+        "Name": "baseline-slot-4-red",
+        "Category": "baseline",
+        "Config": {
+          "InitialTrackPos": 4,
+          "Fish": {
+            "Kind": 1,
+            "Colors": [
+              1,
+              0
+            ]
+          },
+          "BaitGuardAvailable": false,
+          "RodMods": {
+            "Offensive": 0,
+            "Defensive": 0
+          }
+        }
+      },
+      "InitialActionEV": [
+        0.6316152919501132,
+        0.7729836309523808,
+        0.7465777352607708
+      ],
+      "PolicyResults": {
+        "heuristic": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 4,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  1,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "heuristic",
+            "Simulations": 3000,
+            "Seed": 9059
+          },
+          "Policy": "heuristic",
+          "CaptureRate": 0.7546666666666667,
+          "EscapeRate": 0.24533333333333332,
+          "AvgRounds": 8.966,
+          "AvgFatigues": 0.551,
+          "ActionUsage": [
+            4137,
+            12137,
+            10624
+          ],
+          "InitialActionEV": [
+            0.6316152919501132,
+            0.7729836309523808,
+            0.7465777352607708
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 19,
+            "track_capture": 2245,
+            "track_escape": 736
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        "optimal": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 4,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  1,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "optimal",
+            "Simulations": 3000,
+            "Seed": 9042
+          },
+          "Policy": "optimal",
+          "CaptureRate": 0.767,
+          "EscapeRate": 0.233,
+          "AvgRounds": 10.173333333333334,
+          "AvgFatigues": 0.931,
+          "ActionUsage": [
+            6159,
+            13937,
+            10424
+          ],
+          "InitialActionEV": [
+            0.6316152919501132,
+            0.7729836309523808,
+            0.7465777352607708
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 511,
+            "track_capture": 1790,
+            "track_escape": 699
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        "random": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 4,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  1,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "random",
+            "Simulations": 3000,
+            "Seed": 9076
+          },
+          "Policy": "random",
+          "CaptureRate": 0.19066666666666668,
+          "EscapeRate": 0.8093333333333333,
+          "AvgRounds": 6.9736666666666665,
+          "AvgFatigues": 0.37933333333333336,
+          "ActionUsage": [
+            7004,
+            7009,
+            6908
+          ],
+          "InitialActionEV": [
+            0.6316152919501132,
+            0.7729836309523808,
+            0.7465777352607708
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 45,
+            "track_capture": 527,
+            "track_escape": 2428
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        }
+      },
+      "ForcedActionResults": [
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 4,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  1,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 10742
+          },
+          "Policy": "forzar",
+          "CaptureRate": 0,
+          "EscapeRate": 1,
+          "AvgRounds": 4.178,
+          "AvgFatigues": 0,
+          "ActionUsage": [
+            12534,
+            0,
+            0
+          ],
+          "InitialActionEV": [
+            0.6316152919501132,
+            0.7729836309523808,
+            0.7465777352607708
+          ],
+          "TerminalReasonBreakdown": {
+            "track_escape": 3000
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 4,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  1,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 10759
+          },
+          "Policy": "tensar",
+          "CaptureRate": 0.211,
+          "EscapeRate": 0.789,
+          "AvgRounds": 9.559,
+          "AvgFatigues": 0.7976666666666666,
+          "ActionUsage": [
+            0,
+            28677,
+            0
+          ],
+          "InitialActionEV": [
+            0.6316152919501132,
+            0.7729836309523808,
+            0.7465777352607708
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 71,
+            "track_capture": 562,
+            "track_escape": 2367
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 4,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  1,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 10776
+          },
+          "Policy": "soltar",
+          "CaptureRate": 0.229,
+          "EscapeRate": 0.771,
+          "AvgRounds": 9.597666666666667,
+          "AvgFatigues": 0.7996666666666666,
+          "ActionUsage": [
+            0,
+            0,
+            28793
+          ],
+          "InitialActionEV": [
+            0.6316152919501132,
+            0.7729836309523808,
+            0.7465777352607708
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 73,
+            "track_capture": 614,
+            "track_escape": 2313
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        }
+      ],
+      "BestForcedAction": 2,
+      "BestForcedRate": 0.229
+    },
+    {
+      "Scenario": {
+        "Name": "baseline-slot-4-blue",
+        "Category": "baseline",
+        "Config": {
+          "InitialTrackPos": 4,
+          "Fish": {
+            "Kind": 1,
+            "Colors": [
+              2,
+              0
+            ]
+          },
+          "BaitGuardAvailable": false,
+          "RodMods": {
+            "Offensive": 0,
+            "Defensive": 0
+          }
+        }
+      },
+      "InitialActionEV": [
+        0.7465777352607708,
+        0.6316152919501132,
+        0.7729836309523807
+      ],
+      "PolicyResults": {
+        "heuristic": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 4,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  2,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "heuristic",
+            "Simulations": 3000,
+            "Seed": 10059
+          },
+          "Policy": "heuristic",
+          "CaptureRate": 0.747,
+          "EscapeRate": 0.253,
+          "AvgRounds": 8.943,
+          "AvgFatigues": 0.5536666666666666,
+          "ActionUsage": [
+            12938,
+            2954,
+            10937
+          ],
+          "InitialActionEV": [
+            0.7465777352607708,
+            0.6316152919501132,
+            0.7729836309523807
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 16,
+            "track_capture": 2225,
+            "track_escape": 759
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        "optimal": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 4,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  2,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "optimal",
+            "Simulations": 3000,
+            "Seed": 10042
+          },
+          "Policy": "optimal",
+          "CaptureRate": 0.767,
+          "EscapeRate": 0.233,
+          "AvgRounds": 10.078333333333333,
+          "AvgFatigues": 0.891,
+          "ActionUsage": [
+            16446,
+            2060,
+            11729
+          ],
+          "InitialActionEV": [
+            0.7465777352607708,
+            0.6316152919501132,
+            0.7729836309523807
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 439,
+            "track_capture": 1862,
+            "track_escape": 699
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        "random": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 4,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  2,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "random",
+            "Simulations": 3000,
+            "Seed": 10076
+          },
+          "Policy": "random",
+          "CaptureRate": 0.19733333333333333,
+          "EscapeRate": 0.8026666666666666,
+          "AvgRounds": 7.123,
+          "AvgFatigues": 0.3903333333333333,
+          "ActionUsage": [
+            7135,
+            7119,
+            7115
+          ],
+          "InitialActionEV": [
+            0.7465777352607708,
+            0.6316152919501132,
+            0.7729836309523807
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 47,
+            "track_capture": 545,
+            "track_escape": 2408
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        }
+      },
+      "ForcedActionResults": [
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 4,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  2,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 11742
+          },
+          "Policy": "forzar",
+          "CaptureRate": 0.221,
+          "EscapeRate": 0.779,
+          "AvgRounds": 9.591666666666667,
+          "AvgFatigues": 0.793,
+          "ActionUsage": [
+            28775,
+            0,
+            0
+          ],
+          "InitialActionEV": [
+            0.7465777352607708,
+            0.6316152919501132,
+            0.7729836309523807
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 65,
+            "track_capture": 598,
+            "track_escape": 2337
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 4,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  2,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 11759
+          },
+          "Policy": "tensar",
+          "CaptureRate": 0,
+          "EscapeRate": 1,
+          "AvgRounds": 4.199333333333334,
+          "AvgFatigues": 0,
+          "ActionUsage": [
+            0,
+            12598,
+            0
+          ],
+          "InitialActionEV": [
+            0.7465777352607708,
+            0.6316152919501132,
+            0.7729836309523807
+          ],
+          "TerminalReasonBreakdown": {
+            "track_escape": 3000
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 4,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  2,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 11776
+          },
+          "Policy": "soltar",
+          "CaptureRate": 0.21233333333333335,
+          "EscapeRate": 0.7876666666666666,
+          "AvgRounds": 9.612333333333334,
+          "AvgFatigues": 0.7996666666666666,
+          "ActionUsage": [
+            0,
+            0,
+            28837
+          ],
+          "InitialActionEV": [
+            0.7465777352607708,
+            0.6316152919501132,
+            0.7729836309523807
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 64,
+            "track_capture": 573,
+            "track_escape": 2363
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        }
+      ],
+      "BestForcedAction": 0,
+      "BestForcedRate": 0.221
+    },
+    {
+      "Scenario": {
+        "Name": "baseline-slot-4-yellow",
+        "Category": "baseline",
+        "Config": {
+          "InitialTrackPos": 4,
+          "Fish": {
+            "Kind": 1,
+            "Colors": [
+              3,
+              0
+            ]
+          },
+          "BaitGuardAvailable": false,
+          "RodMods": {
+            "Offensive": 0,
+            "Defensive": 0
+          }
+        }
+      },
+      "InitialActionEV": [
+        0.7729836309523809,
+        0.7465777352607709,
+        0.6316152919501133
+      ],
+      "PolicyResults": {
+        "heuristic": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 4,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  3,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "heuristic",
+            "Simulations": 3000,
+            "Seed": 11059
+          },
+          "Policy": "heuristic",
+          "CaptureRate": 0.7293333333333333,
+          "EscapeRate": 0.27066666666666667,
+          "AvgRounds": 8.658666666666667,
+          "AvgFatigues": 0.518,
+          "ActionUsage": [
+            10854,
+            12383,
+            2739
+          ],
+          "InitialActionEV": [
+            0.7729836309523809,
+            0.7465777352607709,
+            0.6316152919501133
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 9,
+            "track_capture": 2179,
+            "track_escape": 812
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        "optimal": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 4,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  3,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "optimal",
+            "Simulations": 3000,
+            "Seed": 11042
+          },
+          "Policy": "optimal",
+          "CaptureRate": 0.7696666666666667,
+          "EscapeRate": 0.23033333333333333,
+          "AvgRounds": 9.820333333333334,
+          "AvgFatigues": 0.8093333333333333,
+          "ActionUsage": [
+            17145,
+            10592,
+            1724
+          ],
+          "InitialActionEV": [
+            0.7729836309523809,
+            0.7465777352607709,
+            0.6316152919501133
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 343,
+            "track_capture": 1966,
+            "track_escape": 691
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        "random": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 4,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  3,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "random",
+            "Simulations": 3000,
+            "Seed": 11076
+          },
+          "Policy": "random",
+          "CaptureRate": 0.19266666666666668,
+          "EscapeRate": 0.8073333333333333,
+          "AvgRounds": 7.042666666666666,
+          "AvgFatigues": 0.3923333333333333,
+          "ActionUsage": [
+            6993,
+            7018,
+            7117
+          ],
+          "InitialActionEV": [
+            0.7729836309523809,
+            0.7465777352607709,
+            0.6316152919501133
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 47,
+            "track_capture": 531,
+            "track_escape": 2422
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        }
+      },
+      "ForcedActionResults": [
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 4,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  3,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 12742
+          },
+          "Policy": "forzar",
+          "CaptureRate": 0.21666666666666667,
+          "EscapeRate": 0.7833333333333333,
+          "AvgRounds": 9.611666666666666,
+          "AvgFatigues": 0.809,
+          "ActionUsage": [
+            28835,
+            0,
+            0
+          ],
+          "InitialActionEV": [
+            0.7729836309523809,
+            0.7465777352607709,
+            0.6316152919501133
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 76,
+            "track_capture": 574,
+            "track_escape": 2350
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 4,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  3,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 12759
+          },
+          "Policy": "tensar",
+          "CaptureRate": 0.21233333333333335,
+          "EscapeRate": 0.7876666666666666,
+          "AvgRounds": 9.483666666666666,
+          "AvgFatigues": 0.7933333333333333,
+          "ActionUsage": [
+            0,
+            28451,
+            0
+          ],
+          "InitialActionEV": [
+            0.7729836309523809,
+            0.7465777352607709,
+            0.6316152919501133
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 82,
+            "track_capture": 555,
+            "track_escape": 2363
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 4,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  3,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 12776
+          },
+          "Policy": "soltar",
+          "CaptureRate": 0,
+          "EscapeRate": 1,
+          "AvgRounds": 4.141333333333334,
+          "AvgFatigues": 0,
+          "ActionUsage": [
+            0,
+            0,
+            12424
+          ],
+          "InitialActionEV": [
+            0.7729836309523809,
+            0.7465777352607709,
+            0.6316152919501133
+          ],
+          "TerminalReasonBreakdown": {
+            "track_escape": 3000
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        }
+      ],
+      "BestForcedAction": 0,
+      "BestForcedRate": 0.21666666666666667
+    },
+    {
+      "Scenario": {
+        "Name": "baseline-slot-4-red-yellow",
+        "Category": "baseline",
+        "Config": {
+          "InitialTrackPos": 4,
+          "Fish": {
+            "Kind": 2,
+            "Colors": [
+              1,
+              3
+            ]
+          },
+          "BaitGuardAvailable": false,
+          "RodMods": {
+            "Offensive": 0,
+            "Defensive": 0
+          }
+        }
+      },
+      "InitialActionEV": [
+        0.5259814342403627,
+        0.620065192743764,
+        0.508860544217687
+      ],
+      "PolicyResults": {
+        "heuristic": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 4,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  1,
+                  3
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "heuristic",
+            "Simulations": 3000,
+            "Seed": 12059
+          },
+          "Policy": "heuristic",
+          "CaptureRate": 0.6036666666666667,
+          "EscapeRate": 0.3963333333333333,
+          "AvgRounds": 8.72,
+          "AvgFatigues": 0.5746666666666667,
+          "ActionUsage": [
+            5123,
+            17083,
+            3954
+          ],
+          "InitialActionEV": [
+            0.5259814342403627,
+            0.620065192743764,
+            0.508860544217687
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 36,
+            "track_capture": 1775,
+            "track_escape": 1189
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        "optimal": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 4,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  1,
+                  3
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "optimal",
+            "Simulations": 3000,
+            "Seed": 12042
+          },
+          "Policy": "optimal",
+          "CaptureRate": 0.6226666666666667,
+          "EscapeRate": 0.37733333333333335,
+          "AvgRounds": 9.472666666666667,
+          "AvgFatigues": 0.806,
+          "ActionUsage": [
+            5317,
+            18680,
+            4421
+          ],
+          "InitialActionEV": [
+            0.5259814342403627,
+            0.620065192743764,
+            0.508860544217687
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 339,
+            "track_capture": 1529,
+            "track_escape": 1132
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        "random": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 4,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  1,
+                  3
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "random",
+            "Simulations": 3000,
+            "Seed": 12076
+          },
+          "Policy": "random",
+          "CaptureRate": 0.107,
+          "EscapeRate": 0.893,
+          "AvgRounds": 5.773,
+          "AvgFatigues": 0.24666666666666667,
+          "ActionUsage": [
+            5838,
+            5799,
+            5682
+          ],
+          "InitialActionEV": [
+            0.5259814342403627,
+            0.620065192743764,
+            0.508860544217687
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 23,
+            "track_capture": 298,
+            "track_escape": 2679
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        }
+      },
+      "ForcedActionResults": [
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 4,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  1,
+                  3
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 13742
+          },
+          "Policy": "forzar",
+          "CaptureRate": 0,
+          "EscapeRate": 1,
+          "AvgRounds": 4.193333333333333,
+          "AvgFatigues": 0,
+          "ActionUsage": [
+            12580,
+            0,
+            0
+          ],
+          "InitialActionEV": [
+            0.5259814342403627,
+            0.620065192743764,
+            0.508860544217687
+          ],
+          "TerminalReasonBreakdown": {
+            "track_escape": 3000
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 4,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  1,
+                  3
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 13759
+          },
+          "Policy": "tensar",
+          "CaptureRate": 0.202,
+          "EscapeRate": 0.798,
+          "AvgRounds": 9.567666666666666,
+          "AvgFatigues": 0.796,
+          "ActionUsage": [
+            0,
+            28703,
+            0
+          ],
+          "InitialActionEV": [
+            0.5259814342403627,
+            0.620065192743764,
+            0.508860544217687
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 63,
+            "track_capture": 543,
+            "track_escape": 2394
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 4,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  1,
+                  3
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 13776
+          },
+          "Policy": "soltar",
+          "CaptureRate": 0,
+          "EscapeRate": 1,
+          "AvgRounds": 4.1546666666666665,
+          "AvgFatigues": 0,
+          "ActionUsage": [
+            0,
+            0,
+            12464
+          ],
+          "InitialActionEV": [
+            0.5259814342403627,
+            0.620065192743764,
+            0.508860544217687
+          ],
+          "TerminalReasonBreakdown": {
+            "track_escape": 3000
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        }
+      ],
+      "BestForcedAction": 1,
+      "BestForcedRate": 0.202
+    },
+    {
+      "Scenario": {
+        "Name": "baseline-slot-4-blue-red",
+        "Category": "baseline",
+        "Config": {
+          "InitialTrackPos": 4,
+          "Fish": {
+            "Kind": 2,
+            "Colors": [
+              2,
+              1
+            ]
+          },
+          "BaitGuardAvailable": false,
+          "RodMods": {
+            "Offensive": 0,
+            "Defensive": 0
+          }
+        }
+      },
+      "InitialActionEV": [
+        0.508860544217687,
+        0.5259814342403627,
+        0.620065192743764
+      ],
+      "PolicyResults": {
+        "heuristic": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 4,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  2,
+                  1
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "heuristic",
+            "Simulations": 3000,
+            "Seed": 13059
+          },
+          "Policy": "heuristic",
+          "CaptureRate": 0.589,
+          "EscapeRate": 0.411,
+          "AvgRounds": 8.568,
+          "AvgFatigues": 0.5443333333333333,
+          "ActionUsage": [
+            6836,
+            3068,
+            15800
+          ],
+          "InitialActionEV": [
+            0.508860544217687,
+            0.5259814342403627,
+            0.620065192743764
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 27,
+            "track_capture": 1740,
+            "track_escape": 1233
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        "optimal": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 4,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  2,
+                  1
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "optimal",
+            "Simulations": 3000,
+            "Seed": 13042
+          },
+          "Policy": "optimal",
+          "CaptureRate": 0.6133333333333333,
+          "EscapeRate": 0.38666666666666666,
+          "AvgRounds": 9.49,
+          "AvgFatigues": 0.821,
+          "ActionUsage": [
+            8603,
+            2623,
+            17244
+          ],
+          "InitialActionEV": [
+            0.508860544217687,
+            0.5259814342403627,
+            0.620065192743764
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 378,
+            "track_capture": 1462,
+            "track_escape": 1160
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        "random": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 4,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  2,
+                  1
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "random",
+            "Simulations": 3000,
+            "Seed": 13076
+          },
+          "Policy": "random",
+          "CaptureRate": 0.11266666666666666,
+          "EscapeRate": 0.8873333333333333,
+          "AvgRounds": 5.752,
+          "AvgFatigues": 0.24133333333333334,
+          "ActionUsage": [
+            5812,
+            5821,
+            5623
+          ],
+          "InitialActionEV": [
+            0.508860544217687,
+            0.5259814342403627,
+            0.620065192743764
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 19,
+            "track_capture": 319,
+            "track_escape": 2662
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        }
+      },
+      "ForcedActionResults": [
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 4,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  2,
+                  1
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 14742
+          },
+          "Policy": "forzar",
+          "CaptureRate": 0,
+          "EscapeRate": 1,
+          "AvgRounds": 4.204666666666666,
+          "AvgFatigues": 0,
+          "ActionUsage": [
+            12614,
+            0,
+            0
+          ],
+          "InitialActionEV": [
+            0.508860544217687,
+            0.5259814342403627,
+            0.620065192743764
+          ],
+          "TerminalReasonBreakdown": {
+            "track_escape": 3000
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 4,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  2,
+                  1
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 14759
+          },
+          "Policy": "tensar",
+          "CaptureRate": 0,
+          "EscapeRate": 1,
+          "AvgRounds": 4.148666666666666,
+          "AvgFatigues": 0,
+          "ActionUsage": [
+            0,
+            12446,
+            0
+          ],
+          "InitialActionEV": [
+            0.508860544217687,
+            0.5259814342403627,
+            0.620065192743764
+          ],
+          "TerminalReasonBreakdown": {
+            "track_escape": 3000
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 4,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  2,
+                  1
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 14776
+          },
+          "Policy": "soltar",
+          "CaptureRate": 0.214,
+          "EscapeRate": 0.786,
+          "AvgRounds": 9.509666666666666,
+          "AvgFatigues": 0.7973333333333333,
+          "ActionUsage": [
+            0,
+            0,
+            28529
+          ],
+          "InitialActionEV": [
+            0.508860544217687,
+            0.5259814342403627,
+            0.620065192743764
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 73,
+            "track_capture": 569,
+            "track_escape": 2358
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        }
+      ],
+      "BestForcedAction": 2,
+      "BestForcedRate": 0.214
+    },
+    {
+      "Scenario": {
+        "Name": "baseline-slot-4-blue-yellow",
+        "Category": "baseline",
+        "Config": {
+          "InitialTrackPos": 4,
+          "Fish": {
+            "Kind": 2,
+            "Colors": [
+              2,
+              3
+            ]
+          },
+          "BaitGuardAvailable": false,
+          "RodMods": {
+            "Offensive": 0,
+            "Defensive": 0
+          }
+        }
+      },
+      "InitialActionEV": [
+        0.6200651927437641,
+        0.508860544217687,
+        0.5259814342403628
+      ],
+      "PolicyResults": {
+        "heuristic": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 4,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  2,
+                  3
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "heuristic",
+            "Simulations": 3000,
+            "Seed": 14059
+          },
+          "Policy": "heuristic",
+          "CaptureRate": 0.595,
+          "EscapeRate": 0.405,
+          "AvgRounds": 8.664666666666667,
+          "AvgFatigues": 0.5716666666666667,
+          "ActionUsage": [
+            18017,
+            5797,
+            2180
+          ],
+          "InitialActionEV": [
+            0.6200651927437641,
+            0.508860544217687,
+            0.5259814342403628
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 25,
+            "track_capture": 1760,
+            "track_escape": 1215
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        "optimal": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 4,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  2,
+                  3
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "optimal",
+            "Simulations": 3000,
+            "Seed": 14042
+          },
+          "Policy": "optimal",
+          "CaptureRate": 0.6333333333333333,
+          "EscapeRate": 0.36666666666666664,
+          "AvgRounds": 9.340333333333334,
+          "AvgFatigues": 0.7703333333333333,
+          "ActionUsage": [
+            20767,
+            5024,
+            2230
+          ],
+          "InitialActionEV": [
+            0.6200651927437641,
+            0.508860544217687,
+            0.5259814342403628
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 303,
+            "track_capture": 1597,
+            "track_escape": 1100
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        "random": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 4,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  2,
+                  3
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "random",
+            "Simulations": 3000,
+            "Seed": 14076
+          },
+          "Policy": "random",
+          "CaptureRate": 0.10333333333333333,
+          "EscapeRate": 0.8966666666666666,
+          "AvgRounds": 5.764666666666667,
+          "AvgFatigues": 0.242,
+          "ActionUsage": [
+            5727,
+            5768,
+            5799
+          ],
+          "InitialActionEV": [
+            0.6200651927437641,
+            0.508860544217687,
+            0.5259814342403628
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 13,
+            "track_capture": 297,
+            "track_escape": 2690
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        }
+      },
+      "ForcedActionResults": [
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 4,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  2,
+                  3
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 15742
+          },
+          "Policy": "forzar",
+          "CaptureRate": 0.20833333333333334,
+          "EscapeRate": 0.7916666666666666,
+          "AvgRounds": 9.532,
+          "AvgFatigues": 0.7916666666666666,
+          "ActionUsage": [
+            28596,
+            0,
+            0
+          ],
+          "InitialActionEV": [
+            0.6200651927437641,
+            0.508860544217687,
+            0.5259814342403628
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 73,
+            "track_capture": 552,
+            "track_escape": 2375
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 4,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  2,
+                  3
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 15759
+          },
+          "Policy": "tensar",
+          "CaptureRate": 0,
+          "EscapeRate": 1,
+          "AvgRounds": 4.212,
+          "AvgFatigues": 0,
+          "ActionUsage": [
+            0,
+            12636,
+            0
+          ],
+          "InitialActionEV": [
+            0.6200651927437641,
+            0.508860544217687,
+            0.5259814342403628
+          ],
+          "TerminalReasonBreakdown": {
+            "track_escape": 3000
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 4,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  2,
+                  3
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 15776
+          },
+          "Policy": "soltar",
+          "CaptureRate": 0,
+          "EscapeRate": 1,
+          "AvgRounds": 4.188666666666666,
+          "AvgFatigues": 0,
+          "ActionUsage": [
+            0,
+            0,
+            12566
+          ],
+          "InitialActionEV": [
+            0.6200651927437641,
+            0.508860544217687,
+            0.5259814342403628
+          ],
+          "TerminalReasonBreakdown": {
+            "track_escape": 3000
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        }
+      ],
+      "BestForcedAction": 0,
+      "BestForcedRate": 0.20833333333333334
+    },
+    {
+      "Scenario": {
+        "Name": "baseline-slot-5-black",
+        "Category": "baseline",
+        "Config": {
+          "InitialTrackPos": 5,
+          "Fish": {
+            "Kind": 0,
+            "Colors": [
+              0,
+              0
+            ]
+          },
+          "BaitGuardAvailable": false,
+          "RodMods": {
+            "Offensive": 0,
+            "Defensive": 0
+          }
+        }
+      },
+      "InitialActionEV": [
+        0.4869908588435373,
+        0.4869908588435373,
+        0.4869908588435373
+      ],
+      "PolicyResults": {
+        "heuristic": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 0,
+                "Colors": [
+                  0,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "heuristic",
+            "Simulations": 3000,
+            "Seed": 15059
+          },
+          "Policy": "heuristic",
+          "CaptureRate": 0.47833333333333333,
+          "EscapeRate": 0.5216666666666666,
+          "AvgRounds": 5.992333333333334,
+          "AvgFatigues": 0.3333333333333333,
+          "ActionUsage": [
+            7188,
+            5627,
+            5162
+          ],
+          "InitialActionEV": [
+            0.4869908588435373,
+            0.4869908588435373,
+            0.4869908588435373
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 2,
+            "track_capture": 1433,
+            "track_escape": 1565
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        "optimal": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 0,
+                "Colors": [
+                  0,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "optimal",
+            "Simulations": 3000,
+            "Seed": 15042
+          },
+          "Policy": "optimal",
+          "CaptureRate": 0.49433333333333335,
+          "EscapeRate": 0.5056666666666667,
+          "AvgRounds": 6.816666666666666,
+          "AvgFatigues": 0.5516666666666666,
+          "ActionUsage": [
+            11058,
+            4762,
+            4630
+          ],
+          "InitialActionEV": [
+            0.4869908588435373,
+            0.4869908588435373,
+            0.4869908588435373
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 267,
+            "track_capture": 1216,
+            "track_escape": 1517
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        "random": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 0,
+                "Colors": [
+                  0,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "random",
+            "Simulations": 3000,
+            "Seed": 15076
+          },
+          "Policy": "random",
+          "CaptureRate": 0.18433333333333332,
+          "EscapeRate": 0.8156666666666667,
+          "AvgRounds": 5.526666666666666,
+          "AvgFatigues": 0.352,
+          "ActionUsage": [
+            5610,
+            5456,
+            5514
+          ],
+          "InitialActionEV": [
+            0.4869908588435373,
+            0.4869908588435373,
+            0.4869908588435373
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 87,
+            "track_capture": 466,
+            "track_escape": 2447
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        }
+      },
+      "ForcedActionResults": [
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 0,
+                "Colors": [
+                  0,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 16742
+          },
+          "Policy": "forzar",
+          "CaptureRate": 0.06166666666666667,
+          "EscapeRate": 0.9383333333333334,
+          "AvgRounds": 5.349666666666667,
+          "AvgFatigues": 0.352,
+          "ActionUsage": [
+            16049,
+            0,
+            0
+          ],
+          "InitialActionEV": [
+            0.4869908588435373,
+            0.4869908588435373,
+            0.4869908588435373
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 104,
+            "track_capture": 81,
+            "track_escape": 2815
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 0,
+                "Colors": [
+                  0,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 16759
+          },
+          "Policy": "tensar",
+          "CaptureRate": 0.06733333333333333,
+          "EscapeRate": 0.9326666666666666,
+          "AvgRounds": 5.384666666666667,
+          "AvgFatigues": 0.3606666666666667,
+          "ActionUsage": [
+            0,
+            16154,
+            0
+          ],
+          "InitialActionEV": [
+            0.4869908588435373,
+            0.4869908588435373,
+            0.4869908588435373
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 112,
+            "track_capture": 90,
+            "track_escape": 2798
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 0,
+                "Colors": [
+                  0,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 16776
+          },
+          "Policy": "soltar",
+          "CaptureRate": 0.06833333333333333,
+          "EscapeRate": 0.9316666666666666,
+          "AvgRounds": 5.325,
+          "AvgFatigues": 0.36033333333333334,
+          "ActionUsage": [
+            0,
+            0,
+            15975
+          ],
+          "InitialActionEV": [
+            0.4869908588435373,
+            0.4869908588435373,
+            0.4869908588435373
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 106,
+            "track_capture": 99,
+            "track_escape": 2795
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        }
+      ],
+      "BestForcedAction": 2,
+      "BestForcedRate": 0.06833333333333333
+    },
+    {
+      "Scenario": {
+        "Name": "baseline-slot-5-red",
+        "Category": "baseline",
+        "Config": {
+          "InitialTrackPos": 5,
+          "Fish": {
+            "Kind": 1,
+            "Colors": [
+              1,
+              0
+            ]
+          },
+          "BaitGuardAvailable": false,
+          "RodMods": {
+            "Offensive": 0,
+            "Defensive": 0
+          }
+        }
+      },
+      "InitialActionEV": [
+        0.29275191326530603,
+        0.41774518140589556,
+        0.4282139314058956
+      ],
+      "PolicyResults": {
+        "heuristic": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  1,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "heuristic",
+            "Simulations": 3000,
+            "Seed": 16059
+          },
+          "Policy": "heuristic",
+          "CaptureRate": 0.41533333333333333,
+          "EscapeRate": 0.5846666666666667,
+          "AvgRounds": 5.926666666666667,
+          "AvgFatigues": 0.335,
+          "ActionUsage": [
+            2814,
+            7967,
+            6999
+          ],
+          "InitialActionEV": [
+            0.29275191326530603,
+            0.41774518140589556,
+            0.4282139314058956
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 2,
+            "track_capture": 1244,
+            "track_escape": 1754
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        "optimal": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  1,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "optimal",
+            "Simulations": 3000,
+            "Seed": 16042
+          },
+          "Policy": "optimal",
+          "CaptureRate": 0.426,
+          "EscapeRate": 0.574,
+          "AvgRounds": 6.527333333333333,
+          "AvgFatigues": 0.5706666666666667,
+          "ActionUsage": [
+            4354,
+            7566,
+            7662
+          ],
+          "InitialActionEV": [
+            0.29275191326530603,
+            0.41774518140589556,
+            0.4282139314058956
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 319,
+            "track_capture": 959,
+            "track_escape": 1722
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        "random": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  1,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "random",
+            "Simulations": 3000,
+            "Seed": 16076
+          },
+          "Policy": "random",
+          "CaptureRate": 0.09333333333333334,
+          "EscapeRate": 0.9066666666666666,
+          "AvgRounds": 4.232,
+          "AvgFatigues": 0.20433333333333334,
+          "ActionUsage": [
+            4230,
+            4170,
+            4296
+          ],
+          "InitialActionEV": [
+            0.29275191326530603,
+            0.41774518140589556,
+            0.4282139314058956
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 33,
+            "track_capture": 247,
+            "track_escape": 2720
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        }
+      },
+      "ForcedActionResults": [
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  1,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 17742
+          },
+          "Policy": "forzar",
+          "CaptureRate": 0,
+          "EscapeRate": 1,
+          "AvgRounds": 2.118,
+          "AvgFatigues": 0,
+          "ActionUsage": [
+            6354,
+            0,
+            0
+          ],
+          "InitialActionEV": [
+            0.29275191326530603,
+            0.41774518140589556,
+            0.4282139314058956
+          ],
+          "TerminalReasonBreakdown": {
+            "track_escape": 3000
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  1,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 17759
+          },
+          "Policy": "tensar",
+          "CaptureRate": 0.06766666666666667,
+          "EscapeRate": 0.9323333333333333,
+          "AvgRounds": 5.414666666666666,
+          "AvgFatigues": 0.3626666666666667,
+          "ActionUsage": [
+            0,
+            16244,
+            0
+          ],
+          "InitialActionEV": [
+            0.29275191326530603,
+            0.41774518140589556,
+            0.4282139314058956
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 108,
+            "track_capture": 95,
+            "track_escape": 2797
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  1,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 17776
+          },
+          "Policy": "soltar",
+          "CaptureRate": 0.068,
+          "EscapeRate": 0.932,
+          "AvgRounds": 5.4046666666666665,
+          "AvgFatigues": 0.36766666666666664,
+          "ActionUsage": [
+            0,
+            0,
+            16214
+          ],
+          "InitialActionEV": [
+            0.29275191326530603,
+            0.41774518140589556,
+            0.4282139314058956
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 121,
+            "track_capture": 83,
+            "track_escape": 2796
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        }
+      ],
+      "BestForcedAction": 2,
+      "BestForcedRate": 0.068
+    },
+    {
+      "Scenario": {
+        "Name": "baseline-slot-5-blue",
+        "Category": "baseline",
+        "Config": {
+          "InitialTrackPos": 5,
+          "Fish": {
+            "Kind": 1,
+            "Colors": [
+              2,
+              0
+            ]
+          },
+          "BaitGuardAvailable": false,
+          "RodMods": {
+            "Offensive": 0,
+            "Defensive": 0
+          }
+        }
+      },
+      "InitialActionEV": [
+        0.4282139314058956,
+        0.29275191326530603,
+        0.41774518140589556
+      ],
+      "PolicyResults": {
+        "heuristic": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  2,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "heuristic",
+            "Simulations": 3000,
+            "Seed": 17059
+          },
+          "Policy": "heuristic",
+          "CaptureRate": 0.4216666666666667,
+          "EscapeRate": 0.5783333333333334,
+          "AvgRounds": 5.976333333333334,
+          "AvgFatigues": 0.36833333333333335,
+          "ActionUsage": [
+            8910,
+            2512,
+            6507
+          ],
+          "InitialActionEV": [
+            0.4282139314058956,
+            0.29275191326530603,
+            0.41774518140589556
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 13,
+            "track_capture": 1252,
+            "track_escape": 1735
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        "optimal": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  2,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "optimal",
+            "Simulations": 3000,
+            "Seed": 17042
+          },
+          "Policy": "optimal",
+          "CaptureRate": 0.41533333333333333,
+          "EscapeRate": 0.5846666666666667,
+          "AvgRounds": 6.394333333333333,
+          "AvgFatigues": 0.54,
+          "ActionUsage": [
+            11008,
+            1763,
+            6412
+          ],
+          "InitialActionEV": [
+            0.4282139314058956,
+            0.29275191326530603,
+            0.41774518140589556
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 269,
+            "track_capture": 977,
+            "track_escape": 1754
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        "random": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  2,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "random",
+            "Simulations": 3000,
+            "Seed": 17076
+          },
+          "Policy": "random",
+          "CaptureRate": 0.087,
+          "EscapeRate": 0.913,
+          "AvgRounds": 4.0536666666666665,
+          "AvgFatigues": 0.194,
+          "ActionUsage": [
+            4119,
+            4085,
+            3957
+          ],
+          "InitialActionEV": [
+            0.4282139314058956,
+            0.29275191326530603,
+            0.41774518140589556
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 27,
+            "track_capture": 234,
+            "track_escape": 2739
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        }
+      },
+      "ForcedActionResults": [
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  2,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 18742
+          },
+          "Policy": "forzar",
+          "CaptureRate": 0.07066666666666667,
+          "EscapeRate": 0.9293333333333333,
+          "AvgRounds": 5.483666666666666,
+          "AvgFatigues": 0.378,
+          "ActionUsage": [
+            16451,
+            0,
+            0
+          ],
+          "InitialActionEV": [
+            0.4282139314058956,
+            0.29275191326530603,
+            0.41774518140589556
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 121,
+            "track_capture": 91,
+            "track_escape": 2788
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  2,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 18759
+          },
+          "Policy": "tensar",
+          "CaptureRate": 0,
+          "EscapeRate": 1,
+          "AvgRounds": 2.08,
+          "AvgFatigues": 0,
+          "ActionUsage": [
+            0,
+            6240,
+            0
+          ],
+          "InitialActionEV": [
+            0.4282139314058956,
+            0.29275191326530603,
+            0.41774518140589556
+          ],
+          "TerminalReasonBreakdown": {
+            "track_escape": 3000
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  2,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 18776
+          },
+          "Policy": "soltar",
+          "CaptureRate": 0.06666666666666667,
+          "EscapeRate": 0.9333333333333333,
+          "AvgRounds": 5.383666666666667,
+          "AvgFatigues": 0.3556666666666667,
+          "ActionUsage": [
+            0,
+            0,
+            16151
+          ],
+          "InitialActionEV": [
+            0.4282139314058956,
+            0.29275191326530603,
+            0.41774518140589556
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 108,
+            "track_capture": 92,
+            "track_escape": 2800
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        }
+      ],
+      "BestForcedAction": 0,
+      "BestForcedRate": 0.07066666666666667
+    },
+    {
+      "Scenario": {
+        "Name": "baseline-slot-5-yellow",
+        "Category": "baseline",
+        "Config": {
+          "InitialTrackPos": 5,
+          "Fish": {
+            "Kind": 1,
+            "Colors": [
+              3,
+              0
+            ]
+          },
+          "BaitGuardAvailable": false,
+          "RodMods": {
+            "Offensive": 0,
+            "Defensive": 0
+          }
+        }
+      },
+      "InitialActionEV": [
+        0.4177451814058956,
+        0.4282139314058956,
+        0.29275191326530603
+      ],
+      "PolicyResults": {
+        "heuristic": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  3,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "heuristic",
+            "Simulations": 3000,
+            "Seed": 18059
+          },
+          "Policy": "heuristic",
+          "CaptureRate": 0.4086666666666667,
+          "EscapeRate": 0.5913333333333334,
+          "AvgRounds": 5.882333333333333,
+          "AvgFatigues": 0.3443333333333333,
+          "ActionUsage": [
+            7818,
+            8031,
+            1798
+          ],
+          "InitialActionEV": [
+            0.4177451814058956,
+            0.4282139314058956,
+            0.29275191326530603
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 3,
+            "track_capture": 1223,
+            "track_escape": 1774
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        "optimal": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  3,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "optimal",
+            "Simulations": 3000,
+            "Seed": 18042
+          },
+          "Policy": "optimal",
+          "CaptureRate": 0.44166666666666665,
+          "EscapeRate": 0.5583333333333333,
+          "AvgRounds": 6.536,
+          "AvgFatigues": 0.539,
+          "ActionUsage": [
+            10371,
+            7903,
+            1334
+          ],
+          "InitialActionEV": [
+            0.4177451814058956,
+            0.4282139314058956,
+            0.29275191326530603
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 263,
+            "track_capture": 1062,
+            "track_escape": 1675
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        "random": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  3,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "random",
+            "Simulations": 3000,
+            "Seed": 18076
+          },
+          "Policy": "random",
+          "CaptureRate": 0.07766666666666666,
+          "EscapeRate": 0.9223333333333333,
+          "AvgRounds": 4.177333333333333,
+          "AvgFatigues": 0.19733333333333333,
+          "ActionUsage": [
+            4117,
+            4149,
+            4266
+          ],
+          "InitialActionEV": [
+            0.4177451814058956,
+            0.4282139314058956,
+            0.29275191326530603
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 30,
+            "track_capture": 203,
+            "track_escape": 2767
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        }
+      },
+      "ForcedActionResults": [
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  3,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 19742
+          },
+          "Policy": "forzar",
+          "CaptureRate": 0.06833333333333333,
+          "EscapeRate": 0.9316666666666666,
+          "AvgRounds": 5.390333333333333,
+          "AvgFatigues": 0.363,
+          "ActionUsage": [
+            16171,
+            0,
+            0
+          ],
+          "InitialActionEV": [
+            0.4177451814058956,
+            0.4282139314058956,
+            0.29275191326530603
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 116,
+            "track_capture": 89,
+            "track_escape": 2795
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  3,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 19759
+          },
+          "Policy": "tensar",
+          "CaptureRate": 0.066,
+          "EscapeRate": 0.934,
+          "AvgRounds": 5.312333333333333,
+          "AvgFatigues": 0.3576666666666667,
+          "ActionUsage": [
+            0,
+            15937,
+            0
+          ],
+          "InitialActionEV": [
+            0.4177451814058956,
+            0.4282139314058956,
+            0.29275191326530603
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 113,
+            "track_capture": 85,
+            "track_escape": 2802
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  3,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 19776
+          },
+          "Policy": "soltar",
+          "CaptureRate": 0,
+          "EscapeRate": 1,
+          "AvgRounds": 2.09,
+          "AvgFatigues": 0,
+          "ActionUsage": [
+            0,
+            0,
+            6270
+          ],
+          "InitialActionEV": [
+            0.4177451814058956,
+            0.4282139314058956,
+            0.29275191326530603
+          ],
+          "TerminalReasonBreakdown": {
+            "track_escape": 3000
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        }
+      ],
+      "BestForcedAction": 0,
+      "BestForcedRate": 0.06833333333333333
+    },
+    {
+      "Scenario": {
+        "Name": "baseline-slot-5-red-yellow",
+        "Category": "baseline",
+        "Config": {
+          "InitialTrackPos": 5,
+          "Fish": {
+            "Kind": 2,
+            "Colors": [
+              1,
+              3
+            ]
+          },
+          "BaitGuardAvailable": false,
+          "RodMods": {
+            "Offensive": 0,
+            "Defensive": 0
+          }
+        }
+      },
+      "InitialActionEV": [
+        0.20966553287981854,
+        0.284203869047619,
+        0.27605300453514736
+      ],
+      "PolicyResults": {
+        "heuristic": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  1,
+                  3
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "heuristic",
+            "Simulations": 3000,
+            "Seed": 19059
+          },
+          "Policy": "heuristic",
+          "CaptureRate": 0.2623333333333333,
+          "EscapeRate": 0.7376666666666667,
+          "AvgRounds": 5.009333333333333,
+          "AvgFatigues": 0.264,
+          "ActionUsage": [
+            2251,
+            10040,
+            2737
+          ],
+          "InitialActionEV": [
+            0.20966553287981854,
+            0.284203869047619,
+            0.27605300453514736
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 15,
+            "track_capture": 772,
+            "track_escape": 2213
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        "optimal": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  1,
+                  3
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "optimal",
+            "Simulations": 3000,
+            "Seed": 19042
+          },
+          "Policy": "optimal",
+          "CaptureRate": 0.2733333333333333,
+          "EscapeRate": 0.7266666666666667,
+          "AvgRounds": 5.218666666666667,
+          "AvgFatigues": 0.384,
+          "ActionUsage": [
+            2664,
+            9698,
+            3294
+          ],
+          "InitialActionEV": [
+            0.20966553287981854,
+            0.284203869047619,
+            0.27605300453514736
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 172,
+            "track_capture": 648,
+            "track_escape": 2180
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        "random": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  1,
+                  3
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "random",
+            "Simulations": 3000,
+            "Seed": 19076
+          },
+          "Policy": "random",
+          "CaptureRate": 0.048,
+          "EscapeRate": 0.952,
+          "AvgRounds": 3.2443333333333335,
+          "AvgFatigues": 0.10733333333333334,
+          "ActionUsage": [
+            3196,
+            3261,
+            3276
+          ],
+          "InitialActionEV": [
+            0.20966553287981854,
+            0.284203869047619,
+            0.27605300453514736
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 10,
+            "track_capture": 134,
+            "track_escape": 2856
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        }
+      },
+      "ForcedActionResults": [
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  1,
+                  3
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 20742
+          },
+          "Policy": "forzar",
+          "CaptureRate": 0,
+          "EscapeRate": 1,
+          "AvgRounds": 2.038666666666667,
+          "AvgFatigues": 0,
+          "ActionUsage": [
+            6116,
+            0,
+            0
+          ],
+          "InitialActionEV": [
+            0.20966553287981854,
+            0.284203869047619,
+            0.27605300453514736
+          ],
+          "TerminalReasonBreakdown": {
+            "track_escape": 3000
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  1,
+                  3
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 20759
+          },
+          "Policy": "tensar",
+          "CaptureRate": 0.07,
+          "EscapeRate": 0.93,
+          "AvgRounds": 5.393666666666666,
+          "AvgFatigues": 0.35733333333333334,
+          "ActionUsage": [
+            0,
+            16181,
+            0
+          ],
+          "InitialActionEV": [
+            0.20966553287981854,
+            0.284203869047619,
+            0.27605300453514736
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 103,
+            "track_capture": 107,
+            "track_escape": 2790
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  1,
+                  3
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 20776
+          },
+          "Policy": "soltar",
+          "CaptureRate": 0,
+          "EscapeRate": 1,
+          "AvgRounds": 2.0766666666666667,
+          "AvgFatigues": 0,
+          "ActionUsage": [
+            0,
+            0,
+            6230
+          ],
+          "InitialActionEV": [
+            0.20966553287981854,
+            0.284203869047619,
+            0.27605300453514736
+          ],
+          "TerminalReasonBreakdown": {
+            "track_escape": 3000
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        }
+      ],
+      "BestForcedAction": 1,
+      "BestForcedRate": 0.07
+    },
+    {
+      "Scenario": {
+        "Name": "baseline-slot-5-blue-red",
+        "Category": "baseline",
+        "Config": {
+          "InitialTrackPos": 5,
+          "Fish": {
+            "Kind": 2,
+            "Colors": [
+              2,
+              1
+            ]
+          },
+          "BaitGuardAvailable": false,
+          "RodMods": {
+            "Offensive": 0,
+            "Defensive": 0
+          }
+        }
+      },
+      "InitialActionEV": [
+        0.27605300453514736,
+        0.2096655328798186,
+        0.284203869047619
+      ],
+      "PolicyResults": {
+        "heuristic": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  2,
+                  1
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "heuristic",
+            "Simulations": 3000,
+            "Seed": 20059
+          },
+          "Policy": "heuristic",
+          "CaptureRate": 0.26366666666666666,
+          "EscapeRate": 0.7363333333333333,
+          "AvgRounds": 4.903,
+          "AvgFatigues": 0.2623333333333333,
+          "ActionUsage": [
+            4520,
+            1502,
+            8687
+          ],
+          "InitialActionEV": [
+            0.27605300453514736,
+            0.2096655328798186,
+            0.284203869047619
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 15,
+            "track_capture": 776,
+            "track_escape": 2209
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        "optimal": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  2,
+                  1
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "optimal",
+            "Simulations": 3000,
+            "Seed": 20042
+          },
+          "Policy": "optimal",
+          "CaptureRate": 0.2773333333333333,
+          "EscapeRate": 0.7226666666666667,
+          "AvgRounds": 5.313,
+          "AvgFatigues": 0.413,
+          "ActionUsage": [
+            5359,
+            1228,
+            9352
+          ],
+          "InitialActionEV": [
+            0.27605300453514736,
+            0.2096655328798186,
+            0.284203869047619
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 210,
+            "track_capture": 622,
+            "track_escape": 2168
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        "random": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  2,
+                  1
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "random",
+            "Simulations": 3000,
+            "Seed": 20076
+          },
+          "Policy": "random",
+          "CaptureRate": 0.03766666666666667,
+          "EscapeRate": 0.9623333333333334,
+          "AvgRounds": 3.1393333333333335,
+          "AvgFatigues": 0.101,
+          "ActionUsage": [
+            3077,
+            3164,
+            3177
+          ],
+          "InitialActionEV": [
+            0.27605300453514736,
+            0.2096655328798186,
+            0.284203869047619
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 11,
+            "track_capture": 102,
+            "track_escape": 2887
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        }
+      },
+      "ForcedActionResults": [
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  2,
+                  1
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 21742
+          },
+          "Policy": "forzar",
+          "CaptureRate": 0,
+          "EscapeRate": 1,
+          "AvgRounds": 2.0813333333333333,
+          "AvgFatigues": 0,
+          "ActionUsage": [
+            6244,
+            0,
+            0
+          ],
+          "InitialActionEV": [
+            0.27605300453514736,
+            0.2096655328798186,
+            0.284203869047619
+          ],
+          "TerminalReasonBreakdown": {
+            "track_escape": 3000
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  2,
+                  1
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 21759
+          },
+          "Policy": "tensar",
+          "CaptureRate": 0,
+          "EscapeRate": 1,
+          "AvgRounds": 2.094,
+          "AvgFatigues": 0,
+          "ActionUsage": [
+            0,
+            6282,
+            0
+          ],
+          "InitialActionEV": [
+            0.27605300453514736,
+            0.2096655328798186,
+            0.284203869047619
+          ],
+          "TerminalReasonBreakdown": {
+            "track_escape": 3000
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  2,
+                  1
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 21776
+          },
+          "Policy": "soltar",
+          "CaptureRate": 0.06466666666666666,
+          "EscapeRate": 0.9353333333333333,
+          "AvgRounds": 5.324666666666666,
+          "AvgFatigues": 0.3536666666666667,
+          "ActionUsage": [
+            0,
+            0,
+            15974
+          ],
+          "InitialActionEV": [
+            0.27605300453514736,
+            0.2096655328798186,
+            0.284203869047619
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 103,
+            "track_capture": 91,
+            "track_escape": 2806
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        }
+      ],
+      "BestForcedAction": 2,
+      "BestForcedRate": 0.06466666666666666
+    },
+    {
+      "Scenario": {
+        "Name": "baseline-slot-5-blue-yellow",
+        "Category": "baseline",
+        "Config": {
+          "InitialTrackPos": 5,
+          "Fish": {
+            "Kind": 2,
+            "Colors": [
+              2,
+              3
+            ]
+          },
+          "BaitGuardAvailable": false,
+          "RodMods": {
+            "Offensive": 0,
+            "Defensive": 0
+          }
+        }
+      },
+      "InitialActionEV": [
+        0.284203869047619,
+        0.27605300453514736,
+        0.20966553287981854
+      ],
+      "PolicyResults": {
+        "heuristic": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  2,
+                  3
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "heuristic",
+            "Simulations": 3000,
+            "Seed": 21059
+          },
+          "Policy": "heuristic",
+          "CaptureRate": 0.2683333333333333,
+          "EscapeRate": 0.7316666666666667,
+          "AvgRounds": 5.113666666666667,
+          "AvgFatigues": 0.264,
+          "ActionUsage": [
+            10561,
+            3505,
+            1275
+          ],
+          "InitialActionEV": [
+            0.284203869047619,
+            0.27605300453514736,
+            0.20966553287981854
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 16,
+            "track_capture": 789,
+            "track_escape": 2195
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        "optimal": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  2,
+                  3
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "optimal",
+            "Simulations": 3000,
+            "Seed": 21042
+          },
+          "Policy": "optimal",
+          "CaptureRate": 0.29,
+          "EscapeRate": 0.71,
+          "AvgRounds": 5.406666666666666,
+          "AvgFatigues": 0.406,
+          "ActionUsage": [
+            11450,
+            3660,
+            1110
+          ],
+          "InitialActionEV": [
+            0.284203869047619,
+            0.27605300453514736,
+            0.20966553287981854
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 178,
+            "track_capture": 692,
+            "track_escape": 2130
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        "random": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  2,
+                  3
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "random",
+            "Simulations": 3000,
+            "Seed": 21076
+          },
+          "Policy": "random",
+          "CaptureRate": 0.041666666666666664,
+          "EscapeRate": 0.9583333333333334,
+          "AvgRounds": 3.12,
+          "AvgFatigues": 0.10133333333333333,
+          "ActionUsage": [
+            3154,
+            3041,
+            3165
+          ],
+          "InitialActionEV": [
+            0.284203869047619,
+            0.27605300453514736,
+            0.20966553287981854
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 7,
+            "track_capture": 118,
+            "track_escape": 2875
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        }
+      },
+      "ForcedActionResults": [
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  2,
+                  3
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 22742
+          },
+          "Policy": "forzar",
+          "CaptureRate": 0.07166666666666667,
+          "EscapeRate": 0.9283333333333333,
+          "AvgRounds": 5.600666666666666,
+          "AvgFatigues": 0.38066666666666665,
+          "ActionUsage": [
+            16802,
+            0,
+            0
+          ],
+          "InitialActionEV": [
+            0.284203869047619,
+            0.27605300453514736,
+            0.20966553287981854
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 103,
+            "track_capture": 112,
+            "track_escape": 2785
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  2,
+                  3
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 22759
+          },
+          "Policy": "tensar",
+          "CaptureRate": 0,
+          "EscapeRate": 1,
+          "AvgRounds": 2.0926666666666667,
+          "AvgFatigues": 0,
+          "ActionUsage": [
+            0,
+            6278,
+            0
+          ],
+          "InitialActionEV": [
+            0.284203869047619,
+            0.27605300453514736,
+            0.20966553287981854
+          ],
+          "TerminalReasonBreakdown": {
+            "track_escape": 3000
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  2,
+                  3
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 22776
+          },
+          "Policy": "soltar",
+          "CaptureRate": 0,
+          "EscapeRate": 1,
+          "AvgRounds": 2.0873333333333335,
+          "AvgFatigues": 0,
+          "ActionUsage": [
+            0,
+            0,
+            6262
+          ],
+          "InitialActionEV": [
+            0.284203869047619,
+            0.27605300453514736,
+            0.20966553287981854
+          ],
+          "TerminalReasonBreakdown": {
+            "track_escape": 3000
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        }
+      ],
+      "BestForcedAction": 0,
+      "BestForcedRate": 0.07166666666666667
+    },
+    {
+      "Scenario": {
+        "Name": "bait-slot-5-blue-red",
+        "Category": "loadout",
+        "Config": {
+          "InitialTrackPos": 5,
+          "Fish": {
+            "Kind": 2,
+            "Colors": [
+              2,
+              1
+            ]
+          },
+          "BaitGuardAvailable": true,
+          "RodMods": {
+            "Offensive": 0,
+            "Defensive": 0
+          }
+        }
+      },
+      "InitialActionEV": [
+        0.5198058390022675,
+        0.5314292800453514,
+        0.6298433956916099
+      ],
+      "PolicyResults": {
+        "heuristic": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  2,
+                  1
+                ]
+              },
+              "BaitGuardAvailable": true,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "heuristic",
+            "Simulations": 3000,
+            "Seed": 22059
+          },
+          "Policy": "heuristic",
+          "CaptureRate": 0.522,
+          "EscapeRate": 0.478,
+          "AvgRounds": 7.783,
+          "AvgFatigues": 0.5253333333333333,
+          "ActionUsage": [
+            8422,
+            3005,
+            11922
+          ],
+          "InitialActionEV": [
+            0.5198058390022675,
+            0.5314292800453514,
+            0.6298433956916099
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 38,
+            "track_capture": 1528,
+            "track_escape": 1434
+          },
+          "BaitSaveRate": 0.7433333333333333,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        "optimal": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  2,
+                  1
+                ]
+              },
+              "BaitGuardAvailable": true,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "optimal",
+            "Simulations": 3000,
+            "Seed": 22042
+          },
+          "Policy": "optimal",
+          "CaptureRate": 0.6316666666666667,
+          "EscapeRate": 0.36833333333333335,
+          "AvgRounds": 10.412666666666667,
+          "AvgFatigues": 1.0593333333333332,
+          "ActionUsage": [
+            10416,
+            2479,
+            18343
+          ],
+          "InitialActionEV": [
+            0.5198058390022675,
+            0.5314292800453514,
+            0.6298433956916099
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 596,
+            "track_capture": 1299,
+            "track_escape": 1105
+          },
+          "BaitSaveRate": 0.8063333333333333,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        "random": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  2,
+                  1
+                ]
+              },
+              "BaitGuardAvailable": true,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "random",
+            "Simulations": 3000,
+            "Seed": 22076
+          },
+          "Policy": "random",
+          "CaptureRate": 0.114,
+          "EscapeRate": 0.886,
+          "AvgRounds": 6.127666666666666,
+          "AvgFatigues": 0.304,
+          "ActionUsage": [
+            6077,
+            6074,
+            6232
+          ],
+          "InitialActionEV": [
+            0.5198058390022675,
+            0.5314292800453514,
+            0.6298433956916099
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 52,
+            "track_capture": 290,
+            "track_escape": 2658
+          },
+          "BaitSaveRate": 0.9453333333333334,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        }
+      },
+      "ForcedActionResults": [
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  2,
+                  1
+                ]
+              },
+              "BaitGuardAvailable": true,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 23742
+          },
+          "Policy": "forzar",
+          "CaptureRate": 0,
+          "EscapeRate": 1,
+          "AvgRounds": 4.1273333333333335,
+          "AvgFatigues": 0,
+          "ActionUsage": [
+            12382,
+            0,
+            0
+          ],
+          "InitialActionEV": [
+            0.5198058390022675,
+            0.5314292800453514,
+            0.6298433956916099
+          ],
+          "TerminalReasonBreakdown": {
+            "track_escape": 3000
+          },
+          "BaitSaveRate": 1,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  2,
+                  1
+                ]
+              },
+              "BaitGuardAvailable": true,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 23759
+          },
+          "Policy": "tensar",
+          "CaptureRate": 0,
+          "EscapeRate": 1,
+          "AvgRounds": 4.236666666666666,
+          "AvgFatigues": 0,
+          "ActionUsage": [
+            0,
+            12710,
+            0
+          ],
+          "InitialActionEV": [
+            0.5198058390022675,
+            0.5314292800453514,
+            0.6298433956916099
+          ],
+          "TerminalReasonBreakdown": {
+            "track_escape": 3000
+          },
+          "BaitSaveRate": 1,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  2,
+                  1
+                ]
+              },
+              "BaitGuardAvailable": true,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 23776
+          },
+          "Policy": "soltar",
+          "CaptureRate": 0.2813333333333333,
+          "EscapeRate": 0.7186666666666667,
+          "AvgRounds": 10.392666666666667,
+          "AvgFatigues": 0.9996666666666667,
+          "ActionUsage": [
+            0,
+            0,
+            31178
+          ],
+          "InitialActionEV": [
+            0.5198058390022675,
+            0.5314292800453514,
+            0.6298433956916099
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 324,
+            "track_capture": 520,
+            "track_escape": 2156
+          },
+          "BaitSaveRate": 0.936,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        }
+      ],
+      "BestForcedAction": 2,
+      "BestForcedRate": 0.2813333333333333
+    },
+    {
+      "Scenario": {
+        "Name": "off-red-slot-4-red",
+        "Category": "loadout",
+        "Config": {
+          "InitialTrackPos": 4,
+          "Fish": {
+            "Kind": 1,
+            "Colors": [
+              1,
+              0
+            ]
+          },
+          "BaitGuardAvailable": false,
+          "RodMods": {
+            "Offensive": 1,
+            "Defensive": 0
+          }
+        }
+      },
+      "InitialActionEV": [
+        0.6316152919501132,
+        0.7729836309523808,
+        0.7465777352607708
+      ],
+      "PolicyResults": {
+        "heuristic": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 4,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  1,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 1,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "heuristic",
+            "Simulations": 3000,
+            "Seed": 23059
+          },
+          "Policy": "heuristic",
+          "CaptureRate": 0.7526666666666667,
+          "EscapeRate": 0.24733333333333332,
+          "AvgRounds": 8.857666666666667,
+          "AvgFatigues": 0.5356666666666666,
+          "ActionUsage": [
+            4052,
+            12080,
+            10441
+          ],
+          "InitialActionEV": [
+            0.6316152919501132,
+            0.7729836309523808,
+            0.7465777352607708
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 6,
+            "track_capture": 2252,
+            "track_escape": 742
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        "optimal": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 4,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  1,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 1,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "optimal",
+            "Simulations": 3000,
+            "Seed": 23042
+          },
+          "Policy": "optimal",
+          "CaptureRate": 0.7856666666666666,
+          "EscapeRate": 0.21433333333333332,
+          "AvgRounds": 10.271,
+          "AvgFatigues": 0.9363333333333334,
+          "ActionUsage": [
+            6381,
+            13847,
+            10585
+          ],
+          "InitialActionEV": [
+            0.6316152919501132,
+            0.7729836309523808,
+            0.7465777352607708
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 502,
+            "track_capture": 1855,
+            "track_escape": 643
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        "random": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 4,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  1,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 1,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "random",
+            "Simulations": 3000,
+            "Seed": 23076
+          },
+          "Policy": "random",
+          "CaptureRate": 0.195,
+          "EscapeRate": 0.805,
+          "AvgRounds": 6.8966666666666665,
+          "AvgFatigues": 0.384,
+          "ActionUsage": [
+            6913,
+            6915,
+            6862
+          ],
+          "InitialActionEV": [
+            0.6316152919501132,
+            0.7729836309523808,
+            0.7465777352607708
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 58,
+            "track_capture": 527,
+            "track_escape": 2415
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        }
+      },
+      "ForcedActionResults": [
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 4,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  1,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 1,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 24742
+          },
+          "Policy": "forzar",
+          "CaptureRate": 0,
+          "EscapeRate": 1,
+          "AvgRounds": 4.167333333333334,
+          "AvgFatigues": 0,
+          "ActionUsage": [
+            12502,
+            0,
+            0
+          ],
+          "InitialActionEV": [
+            0.6316152919501132,
+            0.7729836309523808,
+            0.7465777352607708
+          ],
+          "TerminalReasonBreakdown": {
+            "track_escape": 3000
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 4,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  1,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 1,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 24759
+          },
+          "Policy": "tensar",
+          "CaptureRate": 0.21733333333333332,
+          "EscapeRate": 0.7826666666666666,
+          "AvgRounds": 9.544666666666666,
+          "AvgFatigues": 0.787,
+          "ActionUsage": [
+            0,
+            28634,
+            0
+          ],
+          "InitialActionEV": [
+            0.6316152919501132,
+            0.7729836309523808,
+            0.7465777352607708
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 73,
+            "track_capture": 579,
+            "track_escape": 2348
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 4,
+              "Fish": {
+                "Kind": 1,
+                "Colors": [
+                  1,
+                  0
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 1,
+                "Defensive": 0
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 24776
+          },
+          "Policy": "soltar",
+          "CaptureRate": 0.21333333333333335,
+          "EscapeRate": 0.7866666666666666,
+          "AvgRounds": 9.625333333333334,
+          "AvgFatigues": 0.7963333333333333,
+          "ActionUsage": [
+            0,
+            0,
+            28876
+          ],
+          "InitialActionEV": [
+            0.6316152919501132,
+            0.7729836309523808,
+            0.7465777352607708
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 60,
+            "track_capture": 580,
+            "track_escape": 2360
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        }
+      ],
+      "BestForcedAction": 1,
+      "BestForcedRate": 0.21733333333333332
+    },
+    {
+      "Scenario": {
+        "Name": "def-blue-slot-5-blue-red",
+        "Category": "loadout",
+        "Config": {
+          "InitialTrackPos": 5,
+          "Fish": {
+            "Kind": 2,
+            "Colors": [
+              2,
+              1
+            ]
+          },
+          "BaitGuardAvailable": false,
+          "RodMods": {
+            "Offensive": 0,
+            "Defensive": 2
+          }
+        }
+      },
+      "InitialActionEV": [
+        0.33273809523809517,
+        0.9874893707482991,
+        0.6525715702947845
+      ],
+      "PolicyResults": {
+        "heuristic": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  2,
+                  1
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 2
+              }
+            },
+            "PolicyName": "heuristic",
+            "Simulations": 3000,
+            "Seed": 24059
+          },
+          "Policy": "heuristic",
+          "CaptureRate": 0.9753333333333334,
+          "EscapeRate": 0.024666666666666667,
+          "AvgRounds": 10.885666666666667,
+          "AvgFatigues": 0.781,
+          "ActionUsage": [
+            4399,
+            23896,
+            4362
+          ],
+          "InitialActionEV": [
+            0.33273809523809517,
+            0.9874893707482991,
+            0.6525715702947845
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 12,
+            "track_capture": 2914,
+            "track_escape": 74
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 4.639333333333333
+        },
+        "optimal": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  2,
+                  1
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 2
+              }
+            },
+            "PolicyName": "optimal",
+            "Simulations": 3000,
+            "Seed": 24042
+          },
+          "Policy": "optimal",
+          "CaptureRate": 0.9883333333333333,
+          "EscapeRate": 0.011666666666666667,
+          "AvgRounds": 12.233666666666666,
+          "AvgFatigues": 1.1696666666666666,
+          "ActionUsage": [
+            5715,
+            26900,
+            4086
+          ],
+          "InitialActionEV": [
+            0.33273809523809517,
+            0.9874893707482991,
+            0.6525715702947845
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 549,
+            "track_capture": 2416,
+            "track_escape": 35
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 5.408
+        },
+        "random": {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  2,
+                  1
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 2
+              }
+            },
+            "PolicyName": "random",
+            "Simulations": 3000,
+            "Seed": 24076
+          },
+          "Policy": "random",
+          "CaptureRate": 0.143,
+          "EscapeRate": 0.857,
+          "AvgRounds": 5.277333333333333,
+          "AvgFatigues": 0.30133333333333334,
+          "ActionUsage": [
+            5387,
+            5243,
+            5202
+          ],
+          "InitialActionEV": [
+            0.33273809523809517,
+            0.9874893707482991,
+            0.6525715702947845
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 22,
+            "track_capture": 407,
+            "track_escape": 2571
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 1.1713333333333333
+        }
+      },
+      "ForcedActionResults": [
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  2,
+                  1
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 2
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 25742
+          },
+          "Policy": "forzar",
+          "CaptureRate": 0,
+          "EscapeRate": 1,
+          "AvgRounds": 2.1093333333333333,
+          "AvgFatigues": 0,
+          "ActionUsage": [
+            6328,
+            0,
+            0
+          ],
+          "InitialActionEV": [
+            0.33273809523809517,
+            0.9874893707482991,
+            0.6525715702947845
+          ],
+          "TerminalReasonBreakdown": {
+            "track_escape": 3000
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        },
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  2,
+                  1
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 2
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 25759
+          },
+          "Policy": "tensar",
+          "CaptureRate": 0.7903333333333333,
+          "EscapeRate": 0.20966666666666667,
+          "AvgRounds": 13.275333333333334,
+          "AvgFatigues": 1.4576666666666667,
+          "ActionUsage": [
+            0,
+            39826,
+            0
+          ],
+          "InitialActionEV": [
+            0.33273809523809517,
+            0.9874893707482991,
+            0.6525715702947845
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 410,
+            "track_capture": 1961,
+            "track_escape": 629
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 8.708333333333334
+        },
+        {
+          "Scenario": {
+            "Config": {
+              "InitialTrackPos": 5,
+              "Fish": {
+                "Kind": 2,
+                "Colors": [
+                  2,
+                  1
+                ]
+              },
+              "BaitGuardAvailable": false,
+              "RodMods": {
+                "Offensive": 0,
+                "Defensive": 2
+              }
+            },
+            "PolicyName": "",
+            "Simulations": 3000,
+            "Seed": 25776
+          },
+          "Policy": "soltar",
+          "CaptureRate": 0.065,
+          "EscapeRate": 0.935,
+          "AvgRounds": 5.243666666666667,
+          "AvgFatigues": 0.3466666666666667,
+          "ActionUsage": [
+            0,
+            0,
+            15731
+          ],
+          "InitialActionEV": [
+            0.33273809523809517,
+            0.9874893707482991,
+            0.6525715702947845
+          ],
+          "TerminalReasonBreakdown": {
+            "total_fatigue": 103,
+            "track_capture": 92,
+            "track_escape": 2805
+          },
+          "BaitSaveRate": 0,
+          "OffensiveTriggerRate": 0,
+          "DefensiveTriggerRate": 0
+        }
+      ],
+      "BestForcedAction": 1,
+      "BestForcedRate": 0.7903333333333333
+    }
+  ]
+}

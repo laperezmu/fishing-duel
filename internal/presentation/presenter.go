@@ -1,0 +1,146 @@
+package presentation
+
+import (
+	"pesca/internal/domain"
+	"pesca/internal/encounter"
+	"pesca/internal/game"
+)
+
+type Catalog struct {
+	Title            string
+	PlayerMoveLabels map[domain.Move]string
+	FishMoveLabels   map[domain.Move]string
+	RoundOutcomes    map[domain.RoundOutcome]string
+	EncounterResults map[encounter.Status]string
+	EndReasons       map[encounter.EndReason]string
+}
+
+func DefaultCatalog() Catalog {
+	return Catalog{
+		Title: "Pesca: duelo contra el pez",
+		PlayerMoveLabels: map[domain.Move]string{
+			domain.Blue:   "Tirar",
+			domain.Red:    "Recoger",
+			domain.Yellow: "Soltar",
+		},
+		FishMoveLabels: map[domain.Move]string{
+			domain.Blue:   "Embestir",
+			domain.Red:    "Aferrarse",
+			domain.Yellow: "Zafarse",
+		},
+		RoundOutcomes: map[domain.RoundOutcome]string{
+			domain.Draw:      "empate",
+			domain.PlayerWin: "gana el jugador",
+			domain.FishWin:   "gana el pez",
+		},
+		EncounterResults: map[encounter.Status]string{
+			encounter.StatusCaptured: "pez capturado",
+			encounter.StatusEscaped:  "pez escapado",
+			encounter.StatusOngoing:  "encuentro en curso",
+		},
+		EndReasons: map[encounter.EndReason]string{
+			encounter.EndReasonTrackCapture: "captura por acercarlo hasta el jugador",
+			encounter.EndReasonTrackEscape:  "escape por superar la distancia maxima",
+			encounter.EndReasonDeckCapture:  "captura al agotar la baraja con distancia 2 o menor",
+			encounter.EndReasonDeckEscape:   "escape al agotar la baraja con distancia mayor que 2",
+			encounter.EndReasonNone:         "sin resolver",
+		},
+	}
+}
+
+type Presenter struct {
+	catalog Catalog
+}
+
+func NewPresenter(catalog Catalog) Presenter {
+	return Presenter{catalog: catalog}
+}
+
+func (p Presenter) Intro() IntroView {
+	return IntroView{
+		Title:   p.catalog.Title,
+		Options: p.moveOptions(),
+	}
+}
+
+func (p Presenter) Status(state game.State) StatusView {
+	return StatusView{
+		RoundNumber:               state.Round + 1,
+		Distance:                  state.Encounter.Distance,
+		CaptureDistance:           state.Encounter.Config.CaptureDistance,
+		EscapeDistance:            state.Encounter.Config.EscapeDistance,
+		ExhaustionCaptureDistance: state.Encounter.Config.ExhaustionCaptureDistance,
+		ActiveCards:               state.Deck.ActiveCards,
+		DiscardCards:              state.Deck.DiscardCards,
+		RecycleCount:              state.Deck.RecycleCount,
+		PlayerWins:                state.Stats.PlayerWins,
+		FishWins:                  state.Stats.FishWins,
+		Draws:                     state.Stats.Draws,
+	}
+}
+
+func (p Presenter) Round(result game.RoundResult) RoundView {
+	return RoundView{
+		Status:      p.Status(result.State),
+		PlayerMove:  result.PlayerMove,
+		FishMove:    result.FishMove,
+		PlayerLabel: p.playerMoveLabel(result.PlayerMove),
+		FishLabel:   p.fishMoveLabel(result.FishMove),
+		Outcome:     p.roundOutcomeLabel(result.Outcome),
+	}
+}
+
+func (p Presenter) Summary(state game.State) SummaryView {
+	return SummaryView{
+		TotalRounds: state.Round,
+		Distance:    state.Encounter.Distance,
+		Outcome:     p.encounterOutcomeLabel(state.Encounter.Status),
+		EndReason:   p.endReasonLabel(state.Encounter.EndReason),
+		PlayerWins:  state.Stats.PlayerWins,
+		FishWins:    state.Stats.FishWins,
+		Draws:       state.Stats.Draws,
+	}
+}
+
+func (p Presenter) moveOptions() []MoveOption {
+	return []MoveOption{
+		{Index: 1, Move: domain.Blue, Label: p.playerMoveLabel(domain.Blue)},
+		{Index: 2, Move: domain.Red, Label: p.playerMoveLabel(domain.Red)},
+		{Index: 3, Move: domain.Yellow, Label: p.playerMoveLabel(domain.Yellow)},
+	}
+}
+
+func (p Presenter) playerMoveLabel(move domain.Move) string {
+	if label, ok := p.catalog.PlayerMoveLabels[move]; ok {
+		return label
+	}
+	return move.String()
+}
+
+func (p Presenter) fishMoveLabel(move domain.Move) string {
+	if label, ok := p.catalog.FishMoveLabels[move]; ok {
+		return label
+	}
+	return move.String()
+}
+
+func (p Presenter) roundOutcomeLabel(outcome domain.RoundOutcome) string {
+	if label, ok := p.catalog.RoundOutcomes[outcome]; ok {
+		return label
+	}
+	return outcome.String()
+}
+
+func (p Presenter) encounterOutcomeLabel(status encounter.Status) string {
+	if label, ok := p.catalog.EncounterResults[status]; ok {
+		return label
+	}
+	return string(status)
+}
+
+func (p Presenter) endReasonLabel(reason encounter.EndReason) string {
+	if label, ok := p.catalog.EndReasons[reason]; ok {
+		return label
+	}
+	return string(reason)
+}
