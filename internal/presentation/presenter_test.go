@@ -11,25 +11,21 @@ import (
 	"pesca/internal/game"
 )
 
-func TestPresenterIntroBuildsExpectedMoveOptions(t *testing.T) {
+func TestPresenterIntro(t *testing.T) {
 	tests := []struct {
-		name       string
+		title      string
 		catalog    Catalog
 		wantTitle  string
 		wantLabels []string
 	}{
 		{
-			name:      "default catalog",
-			catalog:   DefaultCatalog(),
-			wantTitle: "Pesca: duelo contra el pez",
-			wantLabels: []string{
-				"Tirar",
-				"Recoger",
-				"Soltar",
-			},
+			title:      "returns default title and move labels when using the default catalog",
+			catalog:    DefaultCatalog(),
+			wantTitle:  "Pesca: duelo contra el pez",
+			wantLabels: []string{"Tirar", "Recoger", "Soltar"},
 		},
 		{
-			name: "custom player labels",
+			title: "returns custom move labels when the catalog overrides player text",
 			catalog: Catalog{
 				Title: "Custom",
 				PlayerMoveLabels: map[domain.Move]string{
@@ -38,19 +34,14 @@ func TestPresenterIntroBuildsExpectedMoveOptions(t *testing.T) {
 					domain.Yellow: "Liberar",
 				},
 			},
-			wantTitle: "Custom",
-			wantLabels: []string{
-				"Lanzar",
-				"Cobrar",
-				"Liberar",
-			},
+			wantTitle:  "Custom",
+			wantLabels: []string{"Lanzar", "Cobrar", "Liberar"},
 		},
 	}
 
 	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			presenter := NewPresenter(test.catalog)
-			intro := presenter.Intro()
+		t.Run(test.title, func(t *testing.T) {
+			intro := NewPresenter(test.catalog).Intro()
 
 			require.Len(t, intro.Options, 3)
 			assert.Equal(t, test.wantTitle, intro.Title)
@@ -61,8 +52,69 @@ func TestPresenterIntroBuildsExpectedMoveOptions(t *testing.T) {
 	}
 }
 
-func TestPresenterUsesCustomCatalogTexts(t *testing.T) {
-	presenter := NewPresenter(Catalog{
+func TestPresenterStatus(t *testing.T) {
+	presenter := NewPresenter(DefaultCatalog())
+	state := game.State{
+		Round: 2,
+		Deck: game.DeckState{
+			ActiveCards:  4,
+			DiscardCards: 5,
+			RecycleCount: 1,
+		},
+		Encounter: encounter.State{
+			Config: encounter.Config{
+				CaptureDistance:           0,
+				EscapeDistance:            5,
+				ExhaustionCaptureDistance: 2,
+			},
+			Distance: 3,
+		},
+		Stats: game.RoundStats{
+			PlayerWins: 2,
+			FishWins:   1,
+			Draws:      3,
+		},
+	}
+
+	status := presenter.Status(state)
+
+	assert.Equal(t, 3, status.RoundNumber)
+	assert.Equal(t, 3, status.Distance)
+	assert.Equal(t, 0, status.CaptureDistance)
+	assert.Equal(t, 5, status.EscapeDistance)
+	assert.Equal(t, 2, status.ExhaustionCaptureDistance)
+	assert.Equal(t, 4, status.ActiveCards)
+	assert.Equal(t, 5, status.DiscardCards)
+	assert.Equal(t, 1, status.RecycleCount)
+	assert.Equal(t, 2, status.PlayerWins)
+	assert.Equal(t, 1, status.FishWins)
+	assert.Equal(t, 3, status.Draws)
+}
+
+func TestPresenterRound(t *testing.T) {
+	presenter := NewPresenter(newCustomCatalog())
+	round := presenter.Round(game.RoundResult{
+		PlayerMove: domain.Blue,
+		FishMove:   domain.Red,
+		Outcome:    domain.PlayerWin,
+		State:      game.State{Encounter: newCapturedEncounterState(t)},
+	})
+
+	assert.Equal(t, "Lanzar", round.PlayerLabel)
+	assert.Equal(t, "Afianzar", round.FishLabel)
+	assert.Equal(t, "aventaja el jugador", round.Outcome)
+}
+
+func TestPresenterSummary(t *testing.T) {
+	presenter := NewPresenter(newCustomCatalog())
+	summary := presenter.Summary(game.State{Encounter: newCapturedEncounterState(t)})
+
+	assert.Equal(t, "presa asegurada", summary.Outcome)
+	assert.Equal(t, "sin mazo, pesca cerrada", summary.EndReason)
+}
+
+func newCustomCatalog() Catalog {
+	return Catalog{
 		Title: "Custom",
 		PlayerMoveLabels: map[domain.Move]string{
 			domain.Blue:   "Lanzar",
@@ -83,24 +135,16 @@ func TestPresenterUsesCustomCatalogTexts(t *testing.T) {
 		EndReasons: map[encounter.EndReason]string{
 			encounter.EndReasonDeckCapture: "sin mazo, pesca cerrada",
 		},
-	})
+	}
+}
 
-	encounterState, err := encounter.NewState(encounter.DefaultConfig())
+func newCapturedEncounterState(t *testing.T) encounter.State {
+	t.Helper()
+
+	state, err := encounter.NewState(encounter.DefaultConfig())
 	require.NoError(t, err)
-	encounterState.Status = encounter.StatusCaptured
-	encounterState.EndReason = encounter.EndReasonDeckCapture
+	state.Status = encounter.StatusCaptured
+	state.EndReason = encounter.EndReasonDeckCapture
 
-	round := presenter.Round(game.RoundResult{
-		PlayerMove: domain.Blue,
-		FishMove:   domain.Red,
-		Outcome:    domain.PlayerWin,
-		State:      game.State{Encounter: encounterState},
-	})
-	assert.Equal(t, "Lanzar", round.PlayerLabel)
-	assert.Equal(t, "Afianzar", round.FishLabel)
-	assert.Equal(t, "aventaja el jugador", round.Outcome)
-
-	summary := presenter.Summary(game.State{Encounter: encounterState})
-	assert.Equal(t, "presa asegurada", summary.Outcome)
-	assert.Equal(t, "sin mazo, pesca cerrada", summary.EndReason)
+	return state
 }

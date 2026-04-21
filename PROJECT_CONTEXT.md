@@ -98,3 +98,11 @@ The numbering is part of the workflow and should advance with each new plan.
 Implementation branch naming:
 - `docs/001-nombre-corto.md` -> branch `001-nombre-corto`
 - `docs/002-nombre-corto.md` -> branch `002-nombre-corto`
+
+## Testing Conventions
+
+- Test cases must use explicit descriptive titles.
+- There should be one test function per production function under test.
+- When a production function has multiple relevant result paths, prefer table-driven tests with titled cases.
+- Use mocks to isolate the unit under test and avoid coupling the test to collaborator logic.
+- Keep tests declarative and avoid conditional logic inside test flows.

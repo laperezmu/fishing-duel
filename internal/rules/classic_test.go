@@ -8,26 +8,26 @@ import (
 	"pesca/internal/domain"
 )
 
-func TestClassicEvaluator(t *testing.T) {
+func TestClassicEvaluatorEvaluate(t *testing.T) {
 	tests := []struct {
-		name    string
+		title   string
 		profile FishCombatProfile
 		player  domain.Move
 		fish    domain.Move
 		outcome domain.RoundOutcome
 	}{
-		{name: "blue beats red", profile: NewFishCombatProfile(), player: domain.Blue, fish: domain.Red, outcome: domain.PlayerWin},
-		{name: "red beats yellow", profile: NewFishCombatProfile(), player: domain.Red, fish: domain.Yellow, outcome: domain.PlayerWin},
-		{name: "yellow beats blue", profile: NewFishCombatProfile(), player: domain.Yellow, fish: domain.Blue, outcome: domain.PlayerWin},
-		{name: "same move draws without tie advantage", profile: NewFishCombatProfile(), player: domain.Blue, fish: domain.Blue, outcome: domain.Draw},
-		{name: "fish wins opposite matchup", profile: NewFishCombatProfile(), player: domain.Red, fish: domain.Blue, outcome: domain.FishWin},
-		{name: "fish wins blue tie with configured advantage", profile: NewFishCombatProfile(domain.Blue, domain.Red), player: domain.Blue, fish: domain.Blue, outcome: domain.FishWin},
-		{name: "fish wins red tie with configured advantage", profile: NewFishCombatProfile(domain.Blue, domain.Red), player: domain.Red, fish: domain.Red, outcome: domain.FishWin},
-		{name: "tie stays draw outside configured advantage", profile: NewFishCombatProfile(domain.Blue, domain.Red), player: domain.Yellow, fish: domain.Yellow, outcome: domain.Draw},
+		{title: "returns player win when the player uses blue against fish red", profile: NewFishCombatProfile(), player: domain.Blue, fish: domain.Red, outcome: domain.PlayerWin},
+		{title: "returns player win when the player uses red against fish yellow", profile: NewFishCombatProfile(), player: domain.Red, fish: domain.Yellow, outcome: domain.PlayerWin},
+		{title: "returns player win when the player uses yellow against fish blue", profile: NewFishCombatProfile(), player: domain.Yellow, fish: domain.Blue, outcome: domain.PlayerWin},
+		{title: "returns draw when both moves match without tie advantage", profile: NewFishCombatProfile(), player: domain.Blue, fish: domain.Blue, outcome: domain.Draw},
+		{title: "returns fish win when the fish has the stronger matchup", profile: NewFishCombatProfile(), player: domain.Red, fish: domain.Blue, outcome: domain.FishWin},
+		{title: "returns fish win when blue tie advantage is configured", profile: NewFishCombatProfile(domain.Blue, domain.Red), player: domain.Blue, fish: domain.Blue, outcome: domain.FishWin},
+		{title: "returns fish win when red tie advantage is configured", profile: NewFishCombatProfile(domain.Blue, domain.Red), player: domain.Red, fish: domain.Red, outcome: domain.FishWin},
+		{title: "returns draw when the tie color is outside the configured advantage set", profile: NewFishCombatProfile(domain.Blue, domain.Red), player: domain.Yellow, fish: domain.Yellow, outcome: domain.Draw},
 	}
 
 	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
+		t.Run(test.title, func(t *testing.T) {
 			evaluator := NewClassicEvaluator(test.profile)
 			assert.Equal(t, test.outcome, evaluator.Evaluate(test.player, test.fish))
 		})

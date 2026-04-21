@@ -15,52 +15,59 @@ import (
 	"pesca/internal/rules"
 )
 
-func TestEngineAppliesEncounterEndConditions(t *testing.T) {
+func TestEnginePlayRound(t *testing.T) {
 	tests := []struct {
-		name              string
-		cards             []domain.Move
-		config            encounter.Config
-		plays             []domain.Move
-		wantStatus        encounter.Status
-		wantEndReason     encounter.EndReason
-		wantDistance      int
-		wantPlayerWins    int
-		wantFishWins      int
-		wantDraws         int
-		wantFinishedError error
+		title               string
+		cards               []domain.Move
+		config              encounter.Config
+		plays               []domain.Move
+		wantRoundFinished   []bool
+		wantStatus          encounter.Status
+		wantEndReason       encounter.EndReason
+		wantDistance        int
+		wantPlayerWins      int
+		wantFishWins        int
+		wantDraws           int
+		wantFollowUpPlayErr error
 	}{
 		{
-			name:           "captures when track reaches player",
-			cards:          []domain.Move{domain.Red, domain.Red, domain.Red},
-			config:         encounter.DefaultConfig(),
-			plays:          []domain.Move{domain.Blue, domain.Blue, domain.Blue},
-			wantStatus:     encounter.StatusCaptured,
-			wantEndReason:  encounter.EndReasonTrackCapture,
-			wantDistance:   0,
-			wantPlayerWins: 3,
+			title:               "returns capture when repeated player wins move the fish to the shore",
+			cards:               []domain.Move{domain.Red, domain.Red, domain.Red},
+			config:              encounter.DefaultConfig(),
+			plays:               []domain.Move{domain.Blue, domain.Blue, domain.Blue},
+			wantRoundFinished:   []bool{false, false, true},
+			wantStatus:          encounter.StatusCaptured,
+			wantEndReason:       encounter.EndReasonTrackCapture,
+			wantDistance:        0,
+			wantPlayerWins:      3,
+			wantFollowUpPlayErr: game.ErrGameFinished,
 		},
 		{
-			name:          "escapes when track exceeds limit",
-			cards:         []domain.Move{domain.Yellow, domain.Yellow, domain.Yellow},
-			config:        encounter.DefaultConfig(),
-			plays:         []domain.Move{domain.Blue, domain.Blue, domain.Blue},
-			wantStatus:    encounter.StatusEscaped,
-			wantEndReason: encounter.EndReasonTrackEscape,
-			wantDistance:  6,
-			wantFishWins:  3,
+			title:               "returns escape when repeated fish wins move beyond the limit",
+			cards:               []domain.Move{domain.Yellow, domain.Yellow, domain.Yellow},
+			config:              encounter.DefaultConfig(),
+			plays:               []domain.Move{domain.Blue, domain.Blue, domain.Blue},
+			wantRoundFinished:   []bool{false, false, true},
+			wantStatus:          encounter.StatusEscaped,
+			wantEndReason:       encounter.EndReasonTrackEscape,
+			wantDistance:        6,
+			wantFishWins:        3,
+			wantFollowUpPlayErr: game.ErrGameFinished,
 		},
 		{
-			name:           "captures on deck exhaustion near player",
-			cards:          []domain.Move{domain.Red},
-			config:         encounter.DefaultConfig(),
-			plays:          []domain.Move{domain.Blue},
-			wantStatus:     encounter.StatusCaptured,
-			wantEndReason:  encounter.EndReasonDeckCapture,
-			wantDistance:   2,
-			wantPlayerWins: 1,
+			title:               "returns deck capture when the deck ends near the player",
+			cards:               []domain.Move{domain.Red},
+			config:              encounter.DefaultConfig(),
+			plays:               []domain.Move{domain.Blue},
+			wantRoundFinished:   []bool{true},
+			wantStatus:          encounter.StatusCaptured,
+			wantEndReason:       encounter.EndReasonDeckCapture,
+			wantDistance:        2,
+			wantPlayerWins:      1,
+			wantFollowUpPlayErr: game.ErrGameFinished,
 		},
 		{
-			name:  "escapes on deck exhaustion far from player",
+			title: "returns deck escape when the deck ends beyond the capture threshold",
 			cards: []domain.Move{domain.Yellow},
 			config: encounter.Config{
 				InitialDistance:           3,
@@ -70,25 +77,24 @@ func TestEngineAppliesEncounterEndConditions(t *testing.T) {
 				PlayerWinStep:             1,
 				FishWinStep:               1,
 			},
-			plays:             []domain.Move{domain.Blue},
-			wantStatus:        encounter.StatusEscaped,
-			wantEndReason:     encounter.EndReasonDeckEscape,
-			wantDistance:      4,
-			wantFishWins:      1,
-			wantFinishedError: game.ErrGameFinished,
+			plays:               []domain.Move{domain.Blue},
+			wantRoundFinished:   []bool{true},
+			wantStatus:          encounter.StatusEscaped,
+			wantEndReason:       encounter.EndReasonDeckEscape,
+			wantDistance:        4,
+			wantFishWins:        1,
+			wantFollowUpPlayErr: game.ErrGameFinished,
 		},
 	}
 
 	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
+		t.Run(test.title, func(t *testing.T) {
 			engine := newEngineForTest(t, test.cards, test.config)
 
 			for i, move := range test.plays {
 				result, err := engine.PlayRound(move)
 				require.NoError(t, err)
-				if i < len(test.plays)-1 {
-					assert.False(t, result.State.Finished)
-				}
+				assert.Equal(t, test.wantRoundFinished[i], result.State.Finished)
 			}
 
 			state := engine.State()
@@ -101,10 +107,8 @@ func TestEngineAppliesEncounterEndConditions(t *testing.T) {
 			assert.Equal(t, test.wantFishWins, state.Stats.FishWins)
 			assert.Equal(t, test.wantDraws, state.Stats.Draws)
 
-			if test.wantFinishedError != nil {
-				_, err := engine.PlayRound(domain.Blue)
-				assert.ErrorIs(t, err, test.wantFinishedError)
-			}
+			_, err := engine.PlayRound(domain.Blue)
+			assert.ErrorIs(t, err, test.wantFollowUpPlayErr)
 		})
 	}
 }

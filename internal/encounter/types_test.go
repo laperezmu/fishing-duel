@@ -8,14 +8,13 @@ import (
 )
 
 func TestNewState(t *testing.T) {
-	tests := []struct {
-		name        string
-		config      Config
-		wantState   State
-		wantErrText string
+	validCases := []struct {
+		title     string
+		config    Config
+		wantState State
 	}{
 		{
-			name:   "default config is valid",
+			title:  "returns an ongoing state when the default config is valid",
 			config: DefaultConfig(),
 			wantState: State{
 				Config:    DefaultConfig(),
@@ -24,8 +23,24 @@ func TestNewState(t *testing.T) {
 				EndReason: EndReasonNone,
 			},
 		},
+	}
+
+	for _, test := range validCases {
+		t.Run(test.title, func(t *testing.T) {
+			state, err := NewState(test.config)
+
+			require.NoError(t, err)
+			assert.Equal(t, test.wantState, state)
+		})
+	}
+
+	invalidCases := []struct {
+		title       string
+		config      Config
+		wantErrText string
+	}{
 		{
-			name: "rejects initial distance at or below two",
+			title: "returns an error when initial distance is two or lower",
 			config: Config{
 				InitialDistance:           2,
 				CaptureDistance:           0,
@@ -37,7 +52,7 @@ func TestNewState(t *testing.T) {
 			wantErrText: "initial distance must be greater than 2",
 		},
 		{
-			name: "rejects escape distance below initial distance",
+			title: "returns an error when escape distance is lower than initial distance",
 			config: Config{
 				InitialDistance:           3,
 				CaptureDistance:           0,
@@ -49,7 +64,7 @@ func TestNewState(t *testing.T) {
 			wantErrText: "escape distance must be at least the initial distance",
 		},
 		{
-			name: "rejects non positive player win step",
+			title: "returns an error when player win step is not positive",
 			config: Config{
 				InitialDistance:           3,
 				CaptureDistance:           0,
@@ -61,7 +76,7 @@ func TestNewState(t *testing.T) {
 			wantErrText: "player win step must be greater than 0",
 		},
 		{
-			name: "rejects non positive fish win step",
+			title: "returns an error when fish win step is not positive",
 			config: Config{
 				InitialDistance:           3,
 				CaptureDistance:           0,
@@ -73,7 +88,7 @@ func TestNewState(t *testing.T) {
 			wantErrText: "fish win step must be greater than 0",
 		},
 		{
-			name: "rejects exhaustion capture distance below capture distance",
+			title: "returns an error when exhaustion capture distance is below capture distance",
 			config: Config{
 				InitialDistance:           3,
 				CaptureDistance:           1,
@@ -86,19 +101,13 @@ func TestNewState(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
+	for _, test := range invalidCases {
+		t.Run(test.title, func(t *testing.T) {
 			state, err := NewState(test.config)
 
-			if test.wantErrText != "" {
-				require.Error(t, err)
-				assert.ErrorContains(t, err, test.wantErrText)
-				assert.Equal(t, State{}, state)
-				return
-			}
-
-			require.NoError(t, err)
-			assert.Equal(t, test.wantState, state)
+			require.Error(t, err)
+			assert.ErrorContains(t, err, test.wantErrText)
+			assert.Equal(t, State{}, state)
 		})
 	}
 }
