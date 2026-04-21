@@ -1,11 +1,10 @@
 package rules
 
 import (
+	"pesca/internal/domain"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-
-	"pesca/internal/domain"
 )
 
 func TestClassicEvaluatorEvaluate(t *testing.T) {

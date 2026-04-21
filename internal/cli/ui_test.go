@@ -2,16 +2,15 @@ package cli
 
 import (
 	"bytes"
+	"pesca/internal/domain"
+	"pesca/internal/encounter"
+	"pesca/internal/game"
+	"pesca/internal/presentation"
 	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	"pesca/internal/domain"
-	"pesca/internal/encounter"
-	"pesca/internal/game"
-	"pesca/internal/presentation"
 )
 
 func TestShowIntroIncludesColoredOptions(t *testing.T) {

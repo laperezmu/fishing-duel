@@ -19,6 +19,8 @@ Before implementation starts:
 ## Delivery Process
 
 After implementation is complete:
+- Run `go test ./...`
+- Run `golangci-lint run`
 - Create a pull request in the repository
 - Include a detailed description of the integrated changes in the PR body
 

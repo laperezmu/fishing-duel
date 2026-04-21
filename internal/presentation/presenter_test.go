@@ -1,14 +1,13 @@
 package presentation
 
 import (
+	"pesca/internal/domain"
+	"pesca/internal/encounter"
+	"pesca/internal/game"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	"pesca/internal/domain"
-	"pesca/internal/encounter"
-	"pesca/internal/game"
 )
 
 func TestPresenterIntro(t *testing.T) {

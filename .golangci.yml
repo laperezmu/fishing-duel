@@ -1,0 +1,65 @@
+run:
+  timeout: 5m
+  tests: true
+
+linters:
+  disable-all: true
+  enable:
+    - cyclop
+    - errcheck
+    - gofmt
+    - gofumpt
+    - goimports
+    - gocritic
+    - gosec
+    - govet
+    - ineffassign
+    - misspell
+    - nestif
+    - revive
+    - staticcheck
+    - unused
+
+linters-settings:
+  cyclop:
+    max-complexity: 12
+    package-average: 10.0
+  nestif:
+    min-complexity: 4
+  revive:
+    confidence: 0.8
+    rules:
+      - name: blank-imports
+      - name: context-as-argument
+      - name: context-keys-type
+      - name: dot-imports
+      - name: empty-block
+      - name: error-return
+      - name: error-strings
+      - name: error-naming
+      - name: exported
+      - name: if-return
+      - name: increment-decrement
+      - name: indent-error-flow
+      - name: var-declaration
+      - name: package-comments
+      - name: range
+      - name: receiver-naming
+      - name: redefines-builtin-id
+      - name: superfluous-else
+      - name: time-naming
+      - name: unconditional-recursion
+      - name: unexported-return
+      - name: unhandled-error
+      - name: unnecessary-stmt
+      - name: unused-parameter
+      - name: use-any
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
+  exclude-rules:
+    - path: cmd/fishing-duel/main.go
+      linters:
+        - gosec
+      text: G404

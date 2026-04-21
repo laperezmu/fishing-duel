@@ -1,12 +1,11 @@
 package deck
 
 import (
+	"pesca/internal/domain"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	"pesca/internal/domain"
 )
 
 func TestManagerRecyclesAndRemovesThreeCards(t *testing.T) {

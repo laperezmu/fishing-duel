@@ -2,16 +2,15 @@ package app_test
 
 import (
 	"errors"
+	"pesca/internal/app"
+	"pesca/internal/domain"
+	"pesca/internal/game"
+	"pesca/internal/presentation"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
-
-	"pesca/internal/app"
-	"pesca/internal/domain"
-	"pesca/internal/game"
-	"pesca/internal/presentation"
 )
 
 func TestNewSession(t *testing.T) {

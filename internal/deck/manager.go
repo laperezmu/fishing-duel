@@ -2,7 +2,6 @@ package deck
 
 import (
 	"errors"
-
 	"pesca/internal/domain"
 )
 

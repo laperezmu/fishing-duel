@@ -1,11 +1,6 @@
 package game_test
 
 import (
-	"testing"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-
 	"pesca/internal/deck"
 	"pesca/internal/domain"
 	"pesca/internal/encounter"
@@ -13,6 +8,10 @@ import (
 	"pesca/internal/game"
 	"pesca/internal/progression"
 	"pesca/internal/rules"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestEnginePlayRound(t *testing.T) {
