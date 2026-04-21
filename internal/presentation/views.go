@@ -6,9 +6,13 @@ import (
 )
 
 type MoveOption struct {
-	Index int
-	Move  domain.Move
-	Label string
+	Index           int
+	Move            domain.Move
+	Label           string
+	RemainingUses   int
+	MaxUses         int
+	Available       bool
+	RestoresOnRound int
 }
 
 type IntroView struct {
@@ -28,6 +32,7 @@ type StatusView struct {
 	PlayerWins                int
 	FishWins                  int
 	Draws                     int
+	MoveOptions               []MoveOption
 }
 
 type RoundView struct {

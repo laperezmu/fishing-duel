@@ -12,6 +12,7 @@ import (
 	"pesca/internal/endings"
 	"pesca/internal/game"
 	"pesca/internal/match"
+	"pesca/internal/playermoves"
 	"pesca/internal/presentation"
 	"pesca/internal/progression"
 	"pesca/internal/rules"
@@ -37,8 +38,14 @@ func main() {
 		exitWithError("error inicializando encuentro", err)
 	}
 
+	playerMoveController, err := playermoves.NewUsageController(playermoves.DefaultConfig())
+	if err != nil {
+		exitWithError("error configurando movimientos del jugador", err)
+	}
+
 	engine, err := game.NewEngine(
 		fishDeck,
+		playerMoveController,
 		rules.NewClassicEvaluator(rules.NewFishCombatProfile()),
 		progression.TrackPolicy{},
 		endings.EncounterEndCondition{},

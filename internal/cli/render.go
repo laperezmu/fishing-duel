@@ -77,7 +77,7 @@ func renderLastRoundSection(view presentation.RoundView) string {
 func renderOptionsSection(options []presentation.MoveOption) string {
 	parts := make([]string, 0, len(options))
 	for _, option := range options {
-		parts = append(parts, fmt.Sprintf("%d) %s", option.Index, colorizeMove(option.Move, option.Label)))
+		parts = append(parts, renderMoveOption(option))
 	}
 
 	return strings.Join([]string{
@@ -85,6 +85,19 @@ func renderOptionsSection(options []presentation.MoveOption) string {
 		"  " + strings.Join(parts, "   "),
 		"  Escribe 1, 2 o 3 para actuar.",
 	}, "\n")
+}
+
+func renderMoveOption(option presentation.MoveOption) string {
+	moveLabel := colorizeMove(option.Move, option.Label)
+	if option.Available {
+		return fmt.Sprintf("%d) %s %s", option.Index, moveLabel, dim(fmt.Sprintf("[%d/%d]", option.RemainingUses, option.MaxUses)))
+	}
+
+	if option.RestoresOnRound > 0 {
+		return fmt.Sprintf("%d) %s %s", option.Index, moveLabel, dim(fmt.Sprintf("[recarga R%d]", option.RestoresOnRound)))
+	}
+
+	return fmt.Sprintf("%d) %s %s", option.Index, moveLabel, dim("[sin usos]"))
 }
 
 func renderGameOverSection(summary presentation.SummaryView) string {

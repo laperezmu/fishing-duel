@@ -60,7 +60,7 @@ func (s *Session) Run() error {
 
 	for !s.engine.State().Finished {
 		status := s.presenter.Status(s.engine.State())
-		move, err := s.ui.ChooseMove(status, s.intro.Options)
+		move, err := s.ui.ChooseMove(status, status.MoveOptions)
 		if err != nil {
 			return fmt.Errorf("choose move: %w", err)
 		}

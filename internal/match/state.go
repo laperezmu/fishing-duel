@@ -18,12 +18,24 @@ type Stats struct {
 	Draws      int
 }
 
+type PlayerMoveState struct {
+	Move            domain.Move
+	MaxUses         int
+	RemainingUses   int
+	RestoresOnRound int
+}
+
+type PlayerMoveResources struct {
+	Moves []PlayerMoveState
+}
+
 type State struct {
-	Round     int
-	Deck      DeckState
-	Encounter encounter.State
-	Stats     Stats
-	Finished  bool
+	Round       int
+	Deck        DeckState
+	Encounter   encounter.State
+	PlayerMoves PlayerMoveResources
+	Stats       Stats
+	Finished    bool
 }
 
 type RoundResult struct {

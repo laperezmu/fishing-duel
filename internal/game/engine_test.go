@@ -7,6 +7,7 @@ import (
 	"pesca/internal/endings"
 	"pesca/internal/game"
 	"pesca/internal/match"
+	"pesca/internal/playermoves"
 	"pesca/internal/progression"
 	"pesca/internal/rules"
 	"testing"
@@ -111,16 +112,62 @@ func TestEnginePlayRound(t *testing.T) {
 			assert.ErrorIs(t, err, test.wantFollowUpPlayErr)
 		})
 	}
+
+	t.Run("returns an error when the selected move is recharging", func(t *testing.T) {
+		engine := newEngineForTestWithPlayerMoveConfig(
+			t,
+			[]domain.Move{domain.Red, domain.Red},
+			encounter.Config{
+				InitialDistance:           3,
+				CaptureDistance:           -2,
+				EscapeDistance:            99,
+				ExhaustionCaptureDistance: 2,
+				PlayerWinStep:             1,
+				FishWinStep:               1,
+			},
+			playermoves.Config{
+				InitialUsesPerMove: map[domain.Move]int{
+					domain.Blue:   1,
+					domain.Red:    3,
+					domain.Yellow: 3,
+				},
+				RecoveryDelayRounds: 1,
+			},
+		)
+
+		firstRoundResult, err := engine.PlayRound(domain.Blue)
+		require.NoError(t, err)
+		assert.Equal(t, 0, firstRoundResult.State.PlayerMoves.Moves[0].RemainingUses)
+		assert.Equal(t, 3, firstRoundResult.State.PlayerMoves.Moves[0].RestoresOnRound)
+
+		_, err = engine.PlayRound(domain.Blue)
+		assert.ErrorIs(t, err, playermoves.ErrMoveUnavailable)
+
+		secondRoundResult, err := engine.PlayRound(domain.Red)
+		require.NoError(t, err)
+		assert.Equal(t, 2, secondRoundResult.State.Round)
+		assert.Equal(t, 2, secondRoundResult.Round)
+		assert.Equal(t, 2, secondRoundResult.State.PlayerMoves.Moves[1].RemainingUses)
+		assert.Equal(t, 1, secondRoundResult.State.PlayerMoves.Moves[0].RemainingUses)
+		assert.Equal(t, 0, secondRoundResult.State.PlayerMoves.Moves[0].RestoresOnRound)
+	})
 }
 
 func newEngineForTest(t *testing.T, cards []domain.Move, config encounter.Config) *game.Engine {
+	return newEngineForTestWithPlayerMoveConfig(t, cards, config, playermoves.DefaultConfig())
+}
+
+func newEngineForTestWithPlayerMoveConfig(t *testing.T, cards []domain.Move, config encounter.Config, playerMoveConfig playermoves.Config) *game.Engine {
 	t.Helper()
 
 	encounterState, err := encounter.NewState(config)
 	require.NoError(t, err)
+	playerMoveController, err := playermoves.NewUsageController(playerMoveConfig)
+	require.NoError(t, err)
 
 	engine, err := game.NewEngine(
 		deck.New(cards, func([]domain.Move) {}, deck.RemoveCardsRecyclePolicy{CardsToRemove: 3}),
+		playerMoveController,
 		rules.NewClassicEvaluator(rules.NewFishCombatProfile()),
 		progression.TrackPolicy{},
 		endings.EncounterEndCondition{},
