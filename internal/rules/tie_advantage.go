@@ -9,7 +9,7 @@ func (TieAdvantageCondition) Apply(context CombatContext) (domain.RoundOutcome, 
 		return 0, false
 	}
 
-	if !context.Fish.HasTieAdvantage(context.FishMove) {
+	if !context.FishProfile.HasTieAdvantage(context.FishMove) {
 		return 0, false
 	}
 

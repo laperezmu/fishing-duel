@@ -3,7 +3,7 @@ package presentation
 import (
 	"pesca/internal/domain"
 	"pesca/internal/encounter"
-	"pesca/internal/game"
+	"pesca/internal/match"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -53,9 +53,9 @@ func TestPresenterIntro(t *testing.T) {
 
 func TestPresenterStatus(t *testing.T) {
 	presenter := NewPresenter(DefaultCatalog())
-	state := game.State{
+	state := match.State{
 		Round: 2,
-		Deck: game.DeckState{
+		Deck: match.DeckState{
 			ActiveCards:  4,
 			DiscardCards: 5,
 			RecycleCount: 1,
@@ -68,7 +68,7 @@ func TestPresenterStatus(t *testing.T) {
 			},
 			Distance: 3,
 		},
-		Stats: game.RoundStats{
+		Stats: match.Stats{
 			PlayerWins: 2,
 			FishWins:   1,
 			Draws:      3,
@@ -78,7 +78,7 @@ func TestPresenterStatus(t *testing.T) {
 	status := presenter.Status(state)
 
 	assert.Equal(t, 3, status.RoundNumber)
-	assert.Equal(t, 3, status.Distance)
+	assert.Equal(t, 3, status.FishDistance)
 	assert.Equal(t, 0, status.CaptureDistance)
 	assert.Equal(t, 5, status.EscapeDistance)
 	assert.Equal(t, 2, status.ExhaustionCaptureDistance)
@@ -92,24 +92,26 @@ func TestPresenterStatus(t *testing.T) {
 
 func TestPresenterRound(t *testing.T) {
 	presenter := NewPresenter(newCustomCatalog())
-	round := presenter.Round(game.RoundResult{
+	round := presenter.Round(match.RoundResult{
 		PlayerMove: domain.Blue,
 		FishMove:   domain.Red,
 		Outcome:    domain.PlayerWin,
-		State:      game.State{Encounter: newCapturedEncounterState(t)},
+		State:      match.State{Encounter: newCapturedEncounterState(t)},
 	})
 
 	assert.Equal(t, "Lanzar", round.PlayerLabel)
 	assert.Equal(t, "Afianzar", round.FishLabel)
-	assert.Equal(t, "aventaja el jugador", round.Outcome)
+	assert.Equal(t, domain.PlayerWin, round.Outcome)
+	assert.Equal(t, "aventaja el jugador", round.OutcomeLabel)
 }
 
 func TestPresenterSummary(t *testing.T) {
 	presenter := NewPresenter(newCustomCatalog())
-	summary := presenter.Summary(game.State{Encounter: newCapturedEncounterState(t)})
+	summary := presenter.Summary(match.State{Encounter: newCapturedEncounterState(t)})
 
-	assert.Equal(t, "presa asegurada", summary.Outcome)
-	assert.Equal(t, "sin mazo, pesca cerrada", summary.EndReason)
+	assert.Equal(t, encounter.StatusCaptured, summary.EncounterStatus)
+	assert.Equal(t, "presa asegurada", summary.OutcomeLabel)
+	assert.Equal(t, "sin mazo, pesca cerrada", summary.EndReasonLabel)
 }
 
 func newCustomCatalog() Catalog {

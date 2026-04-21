@@ -13,15 +13,14 @@ Motor central del juego.
 
 ## Contratos principales
 
-- `Evaluator`: decide el resultado de la ronda.
-- `ProgressionPolicy`: modifica el estado acumulado.
-- `EndCondition`: determina si el encuentro termina.
+- `RoundEvaluator`: decide el resultado de la ronda.
+- `MatchProgressionPolicy`: modifica el estado acumulado.
+- `MatchEndCondition`: determina si el encuentro termina.
 
 ## Estructuras clave
 
-- `State`: estado completo del juego.
-- `RoundResult`: snapshot util tras una ronda.
 - `Engine`: coordinador principal.
+- El estado compartido y el resultado de ronda viven en `internal/match/`.
 
 ## Si quieres anadir una mecanica nueva
 

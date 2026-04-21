@@ -4,7 +4,7 @@ Efectos de una ronda sobre el estado persistente del juego.
 
 ## Responsabilidad
 
-- Aplicar el resultado de la ronda al `game.State`.
+- Aplicar el resultado de la ronda al `match.State`.
 - Mover la distancia del pez.
 - Actualizar estadisticas de victorias y empates.
 

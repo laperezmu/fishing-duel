@@ -32,12 +32,12 @@ const (
 func (o RoundOutcome) String() string {
 	switch o {
 	case Draw:
-		return "empate"
+		return "draw"
 	case PlayerWin:
-		return "gana el jugador"
+		return "player win"
 	case FishWin:
-		return "gana el pez"
+		return "fish win"
 	default:
-		return "desconocido"
+		return "unknown"
 	}
 }

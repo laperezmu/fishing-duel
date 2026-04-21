@@ -3,42 +3,42 @@ package rules
 import "pesca/internal/domain"
 
 type ClassicEvaluator struct {
-	Fish       FishCombatProfile
-	Conditions []Condition
+	FishCombatProfile FishCombatProfile
+	CombatConditions  []CombatCondition
 }
 
-func NewClassicEvaluator(fish FishCombatProfile, conditions ...Condition) ClassicEvaluator {
-	configuredConditions := append([]Condition{TieAdvantageCondition{}}, conditions...)
+func NewClassicEvaluator(fishCombatProfile FishCombatProfile, combatConditions ...CombatCondition) ClassicEvaluator {
+	configuredConditions := append([]CombatCondition{TieAdvantageCondition{}}, combatConditions...)
 	return ClassicEvaluator{
-		Fish:       fish,
-		Conditions: configuredConditions,
+		FishCombatProfile: fishCombatProfile,
+		CombatConditions:  configuredConditions,
 	}
 }
 
-func (e ClassicEvaluator) Evaluate(player, fish domain.Move) domain.RoundOutcome {
+func (e ClassicEvaluator) Evaluate(playerMove, fishMove domain.Move) domain.RoundOutcome {
 	context := CombatContext{
-		PlayerMove: player,
-		FishMove:   fish,
-		Fish:       e.Fish,
+		PlayerMove:  playerMove,
+		FishMove:    fishMove,
+		FishProfile: e.FishCombatProfile,
 	}
 
-	for _, condition := range e.Conditions {
-		if outcome, ok := condition.Apply(context); ok {
+	for _, combatCondition := range e.CombatConditions {
+		if outcome, ok := combatCondition.Apply(context); ok {
 			return outcome
 		}
 	}
 
-	return evaluateClassicBase(player, fish)
+	return evaluateClassicBase(playerMove, fishMove)
 }
 
-func evaluateClassicBase(player, fish domain.Move) domain.RoundOutcome {
-	if player == fish {
+func evaluateClassicBase(playerMove, fishMove domain.Move) domain.RoundOutcome {
+	if playerMove == fishMove {
 		return domain.Draw
 	}
 
-	if (player == domain.Blue && fish == domain.Red) ||
-		(player == domain.Red && fish == domain.Yellow) ||
-		(player == domain.Yellow && fish == domain.Blue) {
+	if (playerMove == domain.Blue && fishMove == domain.Red) ||
+		(playerMove == domain.Red && fishMove == domain.Yellow) ||
+		(playerMove == domain.Yellow && fishMove == domain.Blue) {
 		return domain.PlayerWin
 	}
 

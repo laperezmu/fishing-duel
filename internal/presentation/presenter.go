@@ -3,7 +3,7 @@ package presentation
 import (
 	"pesca/internal/domain"
 	"pesca/internal/encounter"
-	"pesca/internal/game"
+	"pesca/internal/match"
 )
 
 type Catalog struct {
@@ -63,10 +63,10 @@ func (p Presenter) Intro() IntroView {
 	}
 }
 
-func (p Presenter) Status(state game.State) StatusView {
+func (p Presenter) Status(state match.State) StatusView {
 	return StatusView{
 		RoundNumber:               state.Round + 1,
-		Distance:                  state.Encounter.Distance,
+		FishDistance:              state.Encounter.Distance,
 		CaptureDistance:           state.Encounter.Config.CaptureDistance,
 		EscapeDistance:            state.Encounter.Config.EscapeDistance,
 		ExhaustionCaptureDistance: state.Encounter.Config.ExhaustionCaptureDistance,
@@ -79,26 +79,28 @@ func (p Presenter) Status(state game.State) StatusView {
 	}
 }
 
-func (p Presenter) Round(result game.RoundResult) RoundView {
+func (p Presenter) Round(result match.RoundResult) RoundView {
 	return RoundView{
-		Status:      p.Status(result.State),
-		PlayerMove:  result.PlayerMove,
-		FishMove:    result.FishMove,
-		PlayerLabel: p.playerMoveLabel(result.PlayerMove),
-		FishLabel:   p.fishMoveLabel(result.FishMove),
-		Outcome:     p.roundOutcomeLabel(result.Outcome),
+		Status:       p.Status(result.State),
+		PlayerMove:   result.PlayerMove,
+		FishMove:     result.FishMove,
+		PlayerLabel:  p.playerMoveLabel(result.PlayerMove),
+		FishLabel:    p.fishMoveLabel(result.FishMove),
+		Outcome:      result.Outcome,
+		OutcomeLabel: p.roundOutcomeLabel(result.Outcome),
 	}
 }
 
-func (p Presenter) Summary(state game.State) SummaryView {
+func (p Presenter) Summary(state match.State) SummaryView {
 	return SummaryView{
-		TotalRounds: state.Round,
-		Distance:    state.Encounter.Distance,
-		Outcome:     p.encounterOutcomeLabel(state.Encounter.Status),
-		EndReason:   p.endReasonLabel(state.Encounter.EndReason),
-		PlayerWins:  state.Stats.PlayerWins,
-		FishWins:    state.Stats.FishWins,
-		Draws:       state.Stats.Draws,
+		TotalRounds:     state.Round,
+		FishDistance:    state.Encounter.Distance,
+		EncounterStatus: state.Encounter.Status,
+		OutcomeLabel:    p.encounterOutcomeLabel(state.Encounter.Status),
+		EndReasonLabel:  p.endReasonLabel(state.Encounter.EndReason),
+		PlayerWins:      state.Stats.PlayerWins,
+		FishWins:        state.Stats.FishWins,
+		Draws:           state.Stats.Draws,
 	}
 }
 

@@ -2,12 +2,12 @@ package progression
 
 import (
 	"pesca/internal/domain"
-	"pesca/internal/game"
+	"pesca/internal/match"
 )
 
 type TrackPolicy struct{}
 
-func (TrackPolicy) Apply(state *game.State, outcome domain.RoundOutcome) {
+func (TrackPolicy) Apply(state *match.State, outcome domain.RoundOutcome) {
 	switch outcome {
 	case domain.PlayerWin:
 		state.Stats.PlayerWins++

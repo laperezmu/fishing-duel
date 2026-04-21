@@ -3,6 +3,7 @@ package cli
 import (
 	"fmt"
 	"pesca/internal/domain"
+	"pesca/internal/encounter"
 )
 
 const (
@@ -30,14 +31,25 @@ func dim(text string) string {
 	return fmt.Sprintf("%s%s%s", ansiDim, text, ansiReset)
 }
 
-func outcomeColor(text string) string {
-	switch text {
-	case "gana el jugador", "pez capturado":
-		return fmt.Sprintf("%s%s%s%s", ansiBold, ansiGreen, text, ansiReset)
-	case "gana el pez", "pez escapado":
-		return fmt.Sprintf("%s%s%s%s", ansiBold, ansiRed, text, ansiReset)
+func colorizeRoundOutcome(outcome domain.RoundOutcome, outcomeLabel string) string {
+	switch outcome {
+	case domain.PlayerWin:
+		return fmt.Sprintf("%s%s%s%s", ansiBold, ansiGreen, outcomeLabel, ansiReset)
+	case domain.FishWin:
+		return fmt.Sprintf("%s%s%s%s", ansiBold, ansiRed, outcomeLabel, ansiReset)
 	default:
-		return fmt.Sprintf("%s%s%s%s", ansiBold, ansiYellow, text, ansiReset)
+		return fmt.Sprintf("%s%s%s%s", ansiBold, ansiYellow, outcomeLabel, ansiReset)
+	}
+}
+
+func colorizeEncounterStatus(status encounter.Status, outcomeLabel string) string {
+	switch status {
+	case encounter.StatusCaptured:
+		return fmt.Sprintf("%s%s%s%s", ansiBold, ansiGreen, outcomeLabel, ansiReset)
+	case encounter.StatusEscaped:
+		return fmt.Sprintf("%s%s%s%s", ansiBold, ansiRed, outcomeLabel, ansiReset)
+	default:
+		return fmt.Sprintf("%s%s%s%s", ansiBold, ansiYellow, outcomeLabel, ansiReset)
 	}
 }
 

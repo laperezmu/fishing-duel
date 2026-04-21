@@ -4,7 +4,7 @@ Traduccion de estado tecnico a contenido mostrable.
 
 ## Responsabilidad
 
-- Convertir `game.State` y `game.RoundResult` en view models.
+- Convertir `match.State` y `match.RoundResult` en view models.
 - Resolver titulos, etiquetas de acciones y textos de resultado.
 - Permitir cambiar idioma, tono o nomenclatura sin tocar el motor.
 

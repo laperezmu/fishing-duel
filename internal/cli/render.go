@@ -51,8 +51,8 @@ func renderHeader(title string) string {
 func renderTrackSection(status presentation.StatusView) string {
 	return strings.Join([]string{
 		accent("Sedal"),
-		"  Orilla  " + renderTrack(status.Distance, status.EscapeDistance) + "  Mar abierto",
-		fmt.Sprintf("  Distancia actual: %d | Captura <= %d | Escape > %d | Baraja <= %d", status.Distance, status.CaptureDistance, status.EscapeDistance, status.ExhaustionCaptureDistance),
+		"  Orilla  " + renderTrack(status.FishDistance, status.EscapeDistance) + "  Mar abierto",
+		fmt.Sprintf("  Distancia actual: %d | Captura <= %d | Escape > %d | Baraja <= %d", status.FishDistance, status.CaptureDistance, status.EscapeDistance, status.ExhaustionCaptureDistance),
 	}, "\n")
 }
 
@@ -69,8 +69,8 @@ func renderLastRoundSection(view presentation.RoundView) string {
 		accent("Ultimo lance"),
 		"  Tu accion : " + colorizeMove(view.PlayerMove, view.PlayerLabel),
 		"  Pez       : " + colorizeMove(view.FishMove, view.FishLabel),
-		"  Resultado : " + outcomeColor(view.Outcome),
-		fmt.Sprintf("  Distancia : %d", view.Status.Distance),
+		"  Resultado : " + colorizeRoundOutcome(view.Outcome, view.OutcomeLabel),
+		fmt.Sprintf("  Distancia : %d", view.Status.FishDistance),
 	}, "\n")
 }
 
@@ -90,38 +90,38 @@ func renderOptionsSection(options []presentation.MoveOption) string {
 func renderGameOverSection(summary presentation.SummaryView) string {
 	return strings.Join([]string{
 		accent("Desenlace"),
-		"  Resultado : " + outcomeColor(summary.Outcome),
-		"  Motivo    : " + summary.EndReason,
-		fmt.Sprintf("  Distancia : %d", summary.Distance),
+		"  Resultado : " + colorizeEncounterStatus(summary.EncounterStatus, summary.OutcomeLabel),
+		"  Motivo    : " + summary.EndReasonLabel,
+		fmt.Sprintf("  Distancia : %d", summary.FishDistance),
 		fmt.Sprintf("  Rondas    : %d | Jugador %d | Pez %d | Empates %d", summary.TotalRounds, summary.PlayerWins, summary.FishWins, summary.Draws),
 	}, "\n")
 }
 
-func renderTrack(distance, escapeDistance int) string {
-	segments := []string{renderPlayerMarker(distance)}
-	for position := 1; position <= escapeDistance; position++ {
-		segments = append(segments, renderTrackMarker(position, distance))
+func renderTrack(fishDistance, escapeDistance int) string {
+	segments := []string{renderPlayerMarker(fishDistance)}
+	for trackPosition := 1; trackPosition <= escapeDistance; trackPosition++ {
+		segments = append(segments, renderTrackMarker(trackPosition, fishDistance))
 	}
 	segments = append(segments, renderEscapeMarker())
-	if distance > escapeDistance {
+	if fishDistance > escapeDistance {
 		segments = append(segments, accent("F!"))
 	}
 
 	return strings.Join(segments, dim("~~~~"))
 }
 
-func renderPlayerMarker(distance int) string {
-	if distance <= 0 {
+func renderPlayerMarker(fishDistance int) string {
+	if fishDistance <= 0 {
 		return accent("[J/F]")
 	}
 	return accent("[J]")
 }
 
-func renderTrackMarker(position, distance int) string {
-	if position == distance {
+func renderTrackMarker(trackPosition, fishDistance int) string {
+	if trackPosition == fishDistance {
 		return accent("[F]")
 	}
-	return dim(fmt.Sprintf("[%d]", position))
+	return dim(fmt.Sprintf("[%d]", trackPosition))
 }
 
 func renderEscapeMarker() string {

@@ -11,6 +11,7 @@ import (
 	"pesca/internal/encounter"
 	"pesca/internal/endings"
 	"pesca/internal/game"
+	"pesca/internal/match"
 	"pesca/internal/presentation"
 	"pesca/internal/progression"
 	"pesca/internal/rules"
@@ -25,8 +26,8 @@ func main() {
 		})
 	}
 
-	manager := deck.NewManager(
-		deck.NewStandardFishDeck(),
+	fishDeck := deck.New(
+		deck.NewStandardFishCards(),
 		shuffler,
 		deck.RemoveCardsRecyclePolicy{CardsToRemove: 3},
 	)
@@ -37,11 +38,11 @@ func main() {
 	}
 
 	engine, err := game.NewEngine(
-		manager,
+		fishDeck,
 		rules.NewClassicEvaluator(rules.NewFishCombatProfile()),
 		progression.TrackPolicy{},
-		endings.EncounterCondition{},
-		game.State{Encounter: encounterState},
+		endings.EncounterEndCondition{},
+		match.State{Encounter: encounterState},
 	)
 	if err != nil {
 		exitWithError("error inicializando partida", err)

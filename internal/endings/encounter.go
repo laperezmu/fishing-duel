@@ -2,12 +2,12 @@ package endings
 
 import (
 	"pesca/internal/encounter"
-	"pesca/internal/game"
+	"pesca/internal/match"
 )
 
-type EncounterCondition struct{}
+type EncounterEndCondition struct{}
 
-func (EncounterCondition) Apply(state *game.State) {
+func (EncounterEndCondition) Apply(state *match.State) {
 	state.Finished = false
 	state.Encounter.Status = encounter.StatusOngoing
 	state.Encounter.EndReason = encounter.EndReasonNone

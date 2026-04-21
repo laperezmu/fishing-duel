@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"pesca/internal/domain"
 	"pesca/internal/encounter"
-	"pesca/internal/game"
+	"pesca/internal/match"
 	"pesca/internal/presentation"
 	"strings"
 	"testing"
@@ -21,7 +21,7 @@ func TestShowIntroIncludesColoredOptions(t *testing.T) {
 	err := ui.ShowIntro(presenter.Intro())
 	require.NoError(t, err)
 
-	move, err := ui.ChooseMove(presenter.Status(dummyState()), presenter.Intro().Options)
+	move, err := ui.ChooseMove(presenter.Status(samplePromptState(t)), presenter.Intro().Options)
 	require.NoError(t, err)
 	assert.Equal(t, domain.Blue, move)
 
@@ -42,18 +42,19 @@ func TestChooseMoveShowsLastRoundSummary(t *testing.T) {
 	require.NoError(t, ui.ShowIntro(presenter.Intro()))
 
 	err := ui.ShowRound(presentation.RoundView{
-		Status:      presentation.StatusView{Distance: 2},
-		PlayerMove:  domain.Blue,
-		FishMove:    domain.Yellow,
-		PlayerLabel: "Tirar",
-		FishLabel:   "Zafarse",
-		Outcome:     "gana el jugador",
+		Status:       presentation.StatusView{FishDistance: 2},
+		PlayerMove:   domain.Blue,
+		FishMove:     domain.Yellow,
+		PlayerLabel:  "Tirar",
+		FishLabel:    "Zafarse",
+		Outcome:      domain.PlayerWin,
+		OutcomeLabel: "gana el jugador",
 	})
 	require.NoError(t, err)
 
 	_, err = ui.ChooseMove(presentation.StatusView{
 		RoundNumber:               2,
-		Distance:                  2,
+		FishDistance:              2,
 		CaptureDistance:           0,
 		EscapeDistance:            5,
 		ExhaustionCaptureDistance: 2,
@@ -70,14 +71,18 @@ func TestChooseMoveShowsLastRoundSummary(t *testing.T) {
 	assert.Contains(t, printed, "Ultimo lance")
 	assert.Contains(t, printed, colorizeMove(domain.Blue, "Tirar"))
 	assert.Contains(t, printed, colorizeMove(domain.Yellow, "Zafarse"))
-	assert.Contains(t, printed, outcomeColor("gana el jugador"))
+	assert.Contains(t, printed, colorizeRoundOutcome(domain.PlayerWin, "gana el jugador"))
 	assert.Contains(t, printed, "Distancia : 2")
 }
 
-func dummyState() game.State {
-	encounterState, _ := encounter.NewState(encounter.DefaultConfig())
-	return game.State{
-		Deck: game.DeckState{
+func samplePromptState(t *testing.T) match.State {
+	t.Helper()
+
+	encounterState, err := encounter.NewState(encounter.DefaultConfig())
+	require.NoError(t, err)
+
+	return match.State{
+		Deck: match.DeckState{
 			ActiveCards: 9,
 		},
 		Encounter: encounterState,
