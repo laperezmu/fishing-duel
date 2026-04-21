@@ -6,6 +6,7 @@ import (
 	"pesca/internal/encounter"
 	"pesca/internal/endings"
 	"pesca/internal/game"
+	"pesca/internal/match"
 	"pesca/internal/progression"
 	"pesca/internal/rules"
 	"testing"
@@ -119,11 +120,11 @@ func newEngineForTest(t *testing.T, cards []domain.Move, config encounter.Config
 	require.NoError(t, err)
 
 	engine, err := game.NewEngine(
-		deck.NewManager(cards, func([]domain.Move) {}, deck.RemoveCardsRecyclePolicy{CardsToRemove: 3}),
+		deck.New(cards, func([]domain.Move) {}, deck.RemoveCardsRecyclePolicy{CardsToRemove: 3}),
 		rules.NewClassicEvaluator(rules.NewFishCombatProfile()),
 		progression.TrackPolicy{},
-		endings.EncounterCondition{},
-		game.State{Encounter: encounterState},
+		endings.EncounterEndCondition{},
+		match.State{Encounter: encounterState},
 	)
 	require.NoError(t, err)
 

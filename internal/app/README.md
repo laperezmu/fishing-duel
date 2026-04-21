@@ -12,6 +12,7 @@ Flujo de sesion desacoplado de la UI concreta.
 ## Dependencias
 
 - `game.Engine` para ejecutar la partida.
+- `match.State` y `match.RoundResult` como datos compartidos del flujo.
 - `presentation.Presenter` para traducir estado a vistas.
 - Una implementacion de `UI` para mostrar y capturar interaccion.
 

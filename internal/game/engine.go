@@ -5,103 +5,96 @@ import (
 	"fmt"
 	"pesca/internal/deck"
 	"pesca/internal/domain"
+	"pesca/internal/match"
 )
 
 var ErrGameFinished = errors.New("game already finished")
 
-type Evaluator interface {
-	Evaluate(player, fish domain.Move) domain.RoundOutcome
+type RoundEvaluator interface {
+	Evaluate(playerMove, fishMove domain.Move) domain.RoundOutcome
 }
 
-type ProgressionPolicy interface {
-	Apply(state *State, outcome domain.RoundOutcome)
+type MatchProgressionPolicy interface {
+	Apply(state *match.State, outcome domain.RoundOutcome)
 }
 
-type EndCondition interface {
-	Apply(state *State)
-}
-
-type RoundResult struct {
-	Round      int
-	PlayerMove domain.Move
-	FishMove   domain.Move
-	Outcome    domain.RoundOutcome
-	State      State
+type MatchEndCondition interface {
+	Apply(state *match.State)
 }
 
 type Engine struct {
-	deck        *deck.Manager
-	evaluator   Evaluator
-	progression ProgressionPolicy
-	ending      EndCondition
-	state       State
+	fishDeck          *deck.Deck
+	roundEvaluator    RoundEvaluator
+	progressionPolicy MatchProgressionPolicy
+	endCondition      MatchEndCondition
+	state             match.State
 }
 
-func NewEngine(deckManager *deck.Manager, evaluator Evaluator, progression ProgressionPolicy, ending EndCondition, initialState State) (*Engine, error) {
+func NewEngine(fishDeck *deck.Deck, roundEvaluator RoundEvaluator, progressionPolicy MatchProgressionPolicy, endCondition MatchEndCondition, initialState match.State) (*Engine, error) {
 	switch {
-	case deckManager == nil:
-		return nil, fmt.Errorf("deck manager is required")
-	case evaluator == nil:
-		return nil, fmt.Errorf("evaluator is required")
-	case progression == nil:
+	case fishDeck == nil:
+		return nil, fmt.Errorf("fish deck is required")
+	case roundEvaluator == nil:
+		return nil, fmt.Errorf("round evaluator is required")
+	case progressionPolicy == nil:
 		return nil, fmt.Errorf("progression policy is required")
-	case ending == nil:
+	case endCondition == nil:
 		return nil, fmt.Errorf("end condition is required")
 	}
 
 	engine := &Engine{
-		deck:        deckManager,
-		evaluator:   evaluator,
-		progression: progression,
-		ending:      ending,
-		state:       initialState,
+		fishDeck:          fishDeck,
+		roundEvaluator:    roundEvaluator,
+		progressionPolicy: progressionPolicy,
+		endCondition:      endCondition,
+		state:             initialState,
 	}
-	engine.deck.PrepareNextRound()
+	engine.fishDeck.PrepareNextRound()
 	engine.refreshState()
-	engine.ending.Apply(&engine.state)
+	engine.endCondition.Apply(&engine.state)
 
 	return engine, nil
 }
 
-func (e *Engine) State() State {
-	return e.state
+func (engine *Engine) State() match.State {
+	return engine.state
 }
 
-func (e *Engine) PlayRound(playerMove domain.Move) (RoundResult, error) {
-	if e.state.Finished {
-		return RoundResult{}, ErrGameFinished
+func (engine *Engine) PlayRound(playerMove domain.Move) (match.RoundResult, error) {
+	if engine.state.Finished {
+		return match.RoundResult{}, ErrGameFinished
 	}
 
-	fishMove, err := e.deck.Draw()
+	fishMove, err := engine.fishDeck.Draw()
 	if err != nil {
-		e.refreshState()
-		e.ending.Apply(&e.state)
-		if e.state.Finished {
-			return RoundResult{}, ErrGameFinished
+		engine.refreshState()
+		engine.endCondition.Apply(&engine.state)
+		if engine.state.Finished {
+			return match.RoundResult{}, ErrGameFinished
 		}
-		return RoundResult{}, err
+		return match.RoundResult{}, err
 	}
 
-	outcome := e.evaluator.Evaluate(playerMove, fishMove)
-	e.state.Round++
-	e.progression.Apply(&e.state, outcome)
+	roundOutcome := engine.roundEvaluator.Evaluate(playerMove, fishMove)
+	engine.state.Round++
+	engine.progressionPolicy.Apply(&engine.state, roundOutcome)
 
-	e.deck.PrepareNextRound()
-	e.refreshState()
-	e.ending.Apply(&e.state)
+	engine.fishDeck.PrepareNextRound()
+	engine.refreshState()
+	engine.endCondition.Apply(&engine.state)
 
-	return RoundResult{
-		Round:      e.state.Round,
+	return match.RoundResult{
+		Round:      engine.state.Round,
 		PlayerMove: playerMove,
 		FishMove:   fishMove,
-		Outcome:    outcome,
-		State:      e.state,
+		Outcome:    roundOutcome,
+		State:      engine.state,
 	}, nil
 }
 
-func (e *Engine) refreshState() {
-	e.state.Deck.ActiveCards = e.deck.ActiveCount()
-	e.state.Deck.DiscardCards = e.deck.DiscardCount()
-	e.state.Deck.RecycleCount = e.deck.RecycleCount()
-	e.state.Deck.Exhausted = e.deck.Exhausted()
+func (engine *Engine) refreshState() {
+	engine.state.Deck.ActiveCards = engine.fishDeck.ActiveCount()
+	engine.state.Deck.DiscardCards = engine.fishDeck.DiscardCount()
+	engine.state.Deck.RecycleCount = engine.fishDeck.RecycleCount()
+	engine.state.Deck.Exhausted = engine.fishDeck.Exhausted()
 }

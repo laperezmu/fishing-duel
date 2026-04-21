@@ -1,6 +1,9 @@
 package presentation
 
-import "pesca/internal/domain"
+import (
+	"pesca/internal/domain"
+	"pesca/internal/encounter"
+)
 
 type MoveOption struct {
 	Index int
@@ -15,7 +18,7 @@ type IntroView struct {
 
 type StatusView struct {
 	RoundNumber               int
-	Distance                  int
+	FishDistance              int
 	CaptureDistance           int
 	EscapeDistance            int
 	ExhaustionCaptureDistance int
@@ -28,20 +31,22 @@ type StatusView struct {
 }
 
 type RoundView struct {
-	Status      StatusView
-	PlayerMove  domain.Move
-	FishMove    domain.Move
-	PlayerLabel string
-	FishLabel   string
-	Outcome     string
+	Status       StatusView
+	PlayerMove   domain.Move
+	FishMove     domain.Move
+	PlayerLabel  string
+	FishLabel    string
+	Outcome      domain.RoundOutcome
+	OutcomeLabel string
 }
 
 type SummaryView struct {
-	TotalRounds int
-	Distance    int
-	Outcome     string
-	EndReason   string
-	PlayerWins  int
-	FishWins    int
-	Draws       int
+	TotalRounds     int
+	FishDistance    int
+	EncounterStatus encounter.Status
+	OutcomeLabel    string
+	EndReasonLabel  string
+	PlayerWins      int
+	FishWins        int
+	Draws           int
 }

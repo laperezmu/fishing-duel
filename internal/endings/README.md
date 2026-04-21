@@ -4,13 +4,13 @@ Condiciones de finalizacion del encuentro.
 
 ## Responsabilidad
 
-- Inspeccionar el `game.State` actualizado.
+- Inspeccionar el `match.State` actualizado.
 - Marcar si la partida termino.
 - Registrar el estado terminal del encuentro.
 
 ## Implementacion actual
 
-- `EncounterCondition`: captura por proximidad, escape por exceso de distancia y resolucion especial cuando el mazo se agota.
+- `EncounterEndCondition`: captura por proximidad, escape por exceso de distancia y resolucion especial cuando el mazo se agota.
 
 ## Como extenderlo
 

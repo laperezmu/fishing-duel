@@ -13,7 +13,7 @@ Administracion de la baraja del pez.
 
 - `RecyclePolicy`: cambia como vuelve el descarte al mazo.
 - `Shuffler`: cambia la estrategia de mezcla.
-- `NewStandardFishDeck()`: base para crear mazos predefinidos.
+- `NewStandardFishCards()`: base para crear mazos predefinidos.
 
 ## Ejemplos de cambios futuros
 

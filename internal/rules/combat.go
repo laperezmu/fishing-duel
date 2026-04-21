@@ -22,11 +22,11 @@ func (p FishCombatProfile) HasTieAdvantage(move domain.Move) bool {
 }
 
 type CombatContext struct {
-	PlayerMove domain.Move
-	FishMove   domain.Move
-	Fish       FishCombatProfile
+	PlayerMove  domain.Move
+	FishMove    domain.Move
+	FishProfile FishCombatProfile
 }
 
-type Condition interface {
+type CombatCondition interface {
 	Apply(CombatContext) (domain.RoundOutcome, bool)
 }

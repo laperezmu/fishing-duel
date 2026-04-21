@@ -3,7 +3,7 @@ package app
 import (
 	"fmt"
 	"pesca/internal/domain"
-	"pesca/internal/game"
+	"pesca/internal/match"
 	"pesca/internal/presentation"
 )
 
@@ -16,14 +16,14 @@ type UI interface {
 
 type Presenter interface {
 	Intro() presentation.IntroView
-	Status(game.State) presentation.StatusView
-	Round(game.RoundResult) presentation.RoundView
-	Summary(game.State) presentation.SummaryView
+	Status(match.State) presentation.StatusView
+	Round(match.RoundResult) presentation.RoundView
+	Summary(match.State) presentation.SummaryView
 }
 
 type Engine interface {
-	State() game.State
-	PlayRound(domain.Move) (game.RoundResult, error)
+	State() match.State
+	PlayRound(domain.Move) (match.RoundResult, error)
 }
 
 type Session struct {
