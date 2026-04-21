@@ -3,10 +3,8 @@ package game
 import (
 	"errors"
 	"fmt"
-	"pesca/internal/deck"
 	"pesca/internal/domain"
 	"pesca/internal/match"
-	"pesca/internal/playermoves"
 )
 
 var ErrGameFinished = errors.New("game already finished")
@@ -23,16 +21,32 @@ type MatchEndCondition interface {
 	Apply(state *match.State)
 }
 
+type FishDeck interface {
+	Draw() (domain.Move, error)
+	PrepareNextRound()
+	ActiveCount() int
+	DiscardCount() int
+	RecycleCount() int
+	Exhausted() bool
+}
+
+type PlayerMoveController interface {
+	Initialize(state *match.State)
+	PrepareRound(state *match.State)
+	ValidateMove(state match.State, playerMove domain.Move) error
+	ConsumeMove(state *match.State, playerMove domain.Move)
+}
+
 type Engine struct {
-	fishDeck          *deck.Deck
-	playerMoves       *playermoves.UsageController
+	fishDeck          FishDeck
+	playerMoves       PlayerMoveController
 	roundEvaluator    RoundEvaluator
 	progressionPolicy MatchProgressionPolicy
 	endCondition      MatchEndCondition
 	state             match.State
 }
 
-func NewEngine(fishDeck *deck.Deck, playerMoves *playermoves.UsageController, roundEvaluator RoundEvaluator, progressionPolicy MatchProgressionPolicy, endCondition MatchEndCondition, initialState match.State) (*Engine, error) {
+func NewEngine(fishDeck FishDeck, playerMoves PlayerMoveController, roundEvaluator RoundEvaluator, progressionPolicy MatchProgressionPolicy, endCondition MatchEndCondition, initialState match.State) (*Engine, error) {
 	switch {
 	case fishDeck == nil:
 		return nil, fmt.Errorf("fish deck is required")

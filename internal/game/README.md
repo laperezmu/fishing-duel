@@ -14,7 +14,8 @@ Motor central del juego.
 ## Contratos principales
 
 - `RoundEvaluator`: decide el resultado de la ronda.
-- `playermoves.UsageController`: valida y consume recursos de las acciones del jugador.
+- `FishDeck`: contrato del mazo que entrega cartas y expone su estado.
+- `PlayerMoveController`: valida y consume recursos de las acciones del jugador.
 - `MatchProgressionPolicy`: modifica el estado acumulado.
 - `MatchEndCondition`: determina si el encuentro termina.
 
