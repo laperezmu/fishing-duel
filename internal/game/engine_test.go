@@ -3,6 +3,9 @@ package game_test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"pesca/internal/deck"
 	"pesca/internal/domain"
 	"pesca/internal/encounter"
@@ -12,103 +15,101 @@ import (
 	"pesca/internal/rules"
 )
 
-func TestEngineCapturesWhenTrackReachesPlayer(t *testing.T) {
-	engine := newEngineForTest(t, []domain.Move{domain.Red, domain.Red, domain.Red}, encounter.DefaultConfig())
-
-	for i := 0; i < 3; i++ {
-		result, err := engine.PlayRound(domain.Blue)
-		if err != nil {
-			t.Fatalf("PlayRound() round %d error = %v", i+1, err)
-		}
-		if i < 2 && result.State.Finished {
-			t.Fatalf("game finished too early on round %d", i+1)
-		}
+func TestEnginePlayRound(t *testing.T) {
+	tests := []struct {
+		title               string
+		cards               []domain.Move
+		config              encounter.Config
+		plays               []domain.Move
+		wantRoundFinished   []bool
+		wantStatus          encounter.Status
+		wantEndReason       encounter.EndReason
+		wantDistance        int
+		wantPlayerWins      int
+		wantFishWins        int
+		wantDraws           int
+		wantFollowUpPlayErr error
+	}{
+		{
+			title:               "returns capture when repeated player wins move the fish to the shore",
+			cards:               []domain.Move{domain.Red, domain.Red, domain.Red},
+			config:              encounter.DefaultConfig(),
+			plays:               []domain.Move{domain.Blue, domain.Blue, domain.Blue},
+			wantRoundFinished:   []bool{false, false, true},
+			wantStatus:          encounter.StatusCaptured,
+			wantEndReason:       encounter.EndReasonTrackCapture,
+			wantDistance:        0,
+			wantPlayerWins:      3,
+			wantFollowUpPlayErr: game.ErrGameFinished,
+		},
+		{
+			title:               "returns escape when repeated fish wins move beyond the limit",
+			cards:               []domain.Move{domain.Yellow, domain.Yellow, domain.Yellow},
+			config:              encounter.DefaultConfig(),
+			plays:               []domain.Move{domain.Blue, domain.Blue, domain.Blue},
+			wantRoundFinished:   []bool{false, false, true},
+			wantStatus:          encounter.StatusEscaped,
+			wantEndReason:       encounter.EndReasonTrackEscape,
+			wantDistance:        6,
+			wantFishWins:        3,
+			wantFollowUpPlayErr: game.ErrGameFinished,
+		},
+		{
+			title:               "returns deck capture when the deck ends near the player",
+			cards:               []domain.Move{domain.Red},
+			config:              encounter.DefaultConfig(),
+			plays:               []domain.Move{domain.Blue},
+			wantRoundFinished:   []bool{true},
+			wantStatus:          encounter.StatusCaptured,
+			wantEndReason:       encounter.EndReasonDeckCapture,
+			wantDistance:        2,
+			wantPlayerWins:      1,
+			wantFollowUpPlayErr: game.ErrGameFinished,
+		},
+		{
+			title: "returns deck escape when the deck ends beyond the capture threshold",
+			cards: []domain.Move{domain.Yellow},
+			config: encounter.Config{
+				InitialDistance:           3,
+				CaptureDistance:           0,
+				EscapeDistance:            10,
+				ExhaustionCaptureDistance: 2,
+				PlayerWinStep:             1,
+				FishWinStep:               1,
+			},
+			plays:               []domain.Move{domain.Blue},
+			wantRoundFinished:   []bool{true},
+			wantStatus:          encounter.StatusEscaped,
+			wantEndReason:       encounter.EndReasonDeckEscape,
+			wantDistance:        4,
+			wantFishWins:        1,
+			wantFollowUpPlayErr: game.ErrGameFinished,
+		},
 	}
 
-	state := engine.State()
-	if !state.Finished {
-		t.Fatalf("finished = false, want true")
-	}
-	if state.Encounter.Status != encounter.StatusCaptured {
-		t.Fatalf("status = %q, want %q", state.Encounter.Status, encounter.StatusCaptured)
-	}
-	if state.Encounter.EndReason != encounter.EndReasonTrackCapture {
-		t.Fatalf("end reason = %q, want %q", state.Encounter.EndReason, encounter.EndReasonTrackCapture)
-	}
-	if state.Encounter.Distance != 0 {
-		t.Fatalf("distance = %d, want 0", state.Encounter.Distance)
-	}
-	if state.Stats.PlayerWins != 3 {
-		t.Fatalf("player wins = %d, want 3", state.Stats.PlayerWins)
-	}
-}
+	for _, test := range tests {
+		t.Run(test.title, func(t *testing.T) {
+			engine := newEngineForTest(t, test.cards, test.config)
 
-func TestEngineEscapesWhenTrackExceedsLimit(t *testing.T) {
-	engine := newEngineForTest(t, []domain.Move{domain.Yellow, domain.Yellow, domain.Yellow}, encounter.DefaultConfig())
+			for i, move := range test.plays {
+				result, err := engine.PlayRound(move)
+				require.NoError(t, err)
+				assert.Equal(t, test.wantRoundFinished[i], result.State.Finished)
+			}
 
-	for i := 0; i < 3; i++ {
-		if _, err := engine.PlayRound(domain.Blue); err != nil {
-			t.Fatalf("PlayRound() round %d error = %v", i+1, err)
-		}
-	}
+			state := engine.State()
+			assert.True(t, state.Finished)
+			assert.Equal(t, len(test.plays), state.Round)
+			assert.Equal(t, test.wantStatus, state.Encounter.Status)
+			assert.Equal(t, test.wantEndReason, state.Encounter.EndReason)
+			assert.Equal(t, test.wantDistance, state.Encounter.Distance)
+			assert.Equal(t, test.wantPlayerWins, state.Stats.PlayerWins)
+			assert.Equal(t, test.wantFishWins, state.Stats.FishWins)
+			assert.Equal(t, test.wantDraws, state.Stats.Draws)
 
-	state := engine.State()
-	if state.Encounter.Status != encounter.StatusEscaped {
-		t.Fatalf("status = %q, want %q", state.Encounter.Status, encounter.StatusEscaped)
-	}
-	if state.Encounter.EndReason != encounter.EndReasonTrackEscape {
-		t.Fatalf("end reason = %q, want %q", state.Encounter.EndReason, encounter.EndReasonTrackEscape)
-	}
-	if state.Encounter.Distance != 6 {
-		t.Fatalf("distance = %d, want 6", state.Encounter.Distance)
-	}
-}
-
-func TestEngineCapturesOnDeckExhaustionNearPlayer(t *testing.T) {
-	engine := newEngineForTest(t, []domain.Move{domain.Red}, encounter.DefaultConfig())
-
-	if _, err := engine.PlayRound(domain.Blue); err != nil {
-		t.Fatalf("PlayRound() error = %v", err)
-	}
-
-	state := engine.State()
-	if state.Encounter.Status != encounter.StatusCaptured {
-		t.Fatalf("status = %q, want %q", state.Encounter.Status, encounter.StatusCaptured)
-	}
-	if state.Encounter.EndReason != encounter.EndReasonDeckCapture {
-		t.Fatalf("end reason = %q, want %q", state.Encounter.EndReason, encounter.EndReasonDeckCapture)
-	}
-	if state.Encounter.Distance != 2 {
-		t.Fatalf("distance = %d, want 2", state.Encounter.Distance)
-	}
-}
-
-func TestEngineEscapesOnDeckExhaustionFarFromPlayer(t *testing.T) {
-	engine := newEngineForTest(t, []domain.Move{domain.Yellow}, encounter.Config{
-		InitialDistance:           3,
-		CaptureDistance:           0,
-		EscapeDistance:            10,
-		ExhaustionCaptureDistance: 2,
-		PlayerWinStep:             1,
-		FishWinStep:               1,
-	})
-
-	if _, err := engine.PlayRound(domain.Blue); err != nil {
-		t.Fatalf("PlayRound() error = %v", err)
-	}
-
-	state := engine.State()
-	if state.Encounter.Status != encounter.StatusEscaped {
-		t.Fatalf("status = %q, want %q", state.Encounter.Status, encounter.StatusEscaped)
-	}
-	if state.Encounter.EndReason != encounter.EndReasonDeckEscape {
-		t.Fatalf("end reason = %q, want %q", state.Encounter.EndReason, encounter.EndReasonDeckEscape)
-	}
-	if state.Encounter.Distance != 4 {
-		t.Fatalf("distance = %d, want 4", state.Encounter.Distance)
-	}
-	if _, err := engine.PlayRound(domain.Blue); err != game.ErrGameFinished {
-		t.Fatalf("PlayRound() after finish error = %v, want %v", err, game.ErrGameFinished)
+			_, err := engine.PlayRound(domain.Blue)
+			assert.ErrorIs(t, err, test.wantFollowUpPlayErr)
+		})
 	}
 }
 
@@ -116,9 +117,7 @@ func newEngineForTest(t *testing.T, cards []domain.Move, config encounter.Config
 	t.Helper()
 
 	encounterState, err := encounter.NewState(config)
-	if err != nil {
-		t.Fatalf("NewState() error = %v", err)
-	}
+	require.NoError(t, err)
 
 	engine, err := game.NewEngine(
 		deck.NewManager(cards, func([]domain.Move) {}, deck.RemoveCardsRecyclePolicy{CardsToRemove: 3}),
@@ -127,9 +126,7 @@ func newEngineForTest(t *testing.T, cards []domain.Move, config encounter.Config
 		endings.EncounterCondition{},
 		game.State{Encounter: encounterState},
 	)
-	if err != nil {
-		t.Fatalf("NewEngine() error = %v", err)
-	}
+	require.NoError(t, err)
 
 	return engine
 }

@@ -1,113 +1,279 @@
 package app_test
 
 import (
+	"errors"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
+
 	"pesca/internal/app"
-	"pesca/internal/deck"
 	"pesca/internal/domain"
-	"pesca/internal/encounter"
-	"pesca/internal/endings"
 	"pesca/internal/game"
 	"pesca/internal/presentation"
-	"pesca/internal/progression"
-	"pesca/internal/rules"
 )
 
-func TestSessionRunsThroughAbstractUI(t *testing.T) {
-	encounterState, err := encounter.NewState(encounter.Config{
-		InitialDistance:           3,
-		CaptureDistance:           -1,
-		EscapeDistance:            99,
-		ExhaustionCaptureDistance: 2,
-		PlayerWinStep:             1,
-		FishWinStep:               1,
+func TestNewSession(t *testing.T) {
+	t.Run("returns a session when engine ui and presenter are provided", func(t *testing.T) {
+		engine := &mockEngine{}
+		ui := &mockUI{}
+		presenter := &mockPresenter{}
+		intro := presentation.IntroView{Title: "Pesca"}
+
+		presenter.On("Intro").Return(intro).Once()
+
+		session, err := app.NewSession(engine, ui, presenter)
+
+		require.NoError(t, err)
+		assert.NotNil(t, session)
+		presenter.AssertExpectations(t)
 	})
-	if err != nil {
-		t.Fatalf("NewState() error = %v", err)
+
+	missingDependencyCases := []struct {
+		title     string
+		engine    app.Engine
+		ui        app.UI
+		presenter app.Presenter
+		wantErr   string
+	}{
+		{
+			title:     "returns an error when engine is missing",
+			ui:        &mockUI{},
+			presenter: &mockPresenter{},
+			wantErr:   "engine is required",
+		},
+		{
+			title:     "returns an error when ui is missing",
+			engine:    &mockEngine{},
+			presenter: &mockPresenter{},
+			wantErr:   "ui is required",
+		},
+		{
+			title:   "returns an error when presenter is missing",
+			engine:  &mockEngine{},
+			ui:      &mockUI{},
+			wantErr: "presenter is required",
+		},
 	}
 
-	manager := deck.NewManager(
-		deck.NewStandardFishDeck(),
-		func([]domain.Move) {},
-		deck.RemoveCardsRecyclePolicy{CardsToRemove: 3},
-	)
+	for _, test := range missingDependencyCases {
+		t.Run(test.title, func(t *testing.T) {
+			session, err := app.NewSession(test.engine, test.ui, test.presenter)
 
-	engine, err := game.NewEngine(
-		manager,
-		rules.NewClassicEvaluator(rules.NewFishCombatProfile()),
-		progression.TrackPolicy{},
-		endings.EncounterCondition{},
-		game.State{Encounter: encounterState},
-	)
-	if err != nil {
-		t.Fatalf("NewEngine() error = %v", err)
-	}
-
-	ui := &stubUI{moves: repeatMove(domain.Blue, 18)}
-	presenter := presentation.NewPresenter(presentation.DefaultCatalog())
-	session, err := app.NewSession(engine, ui, presenter)
-	if err != nil {
-		t.Fatalf("NewSession() error = %v", err)
-	}
-
-	if err := session.Run(); err != nil {
-		t.Fatalf("Run() error = %v", err)
-	}
-
-	if ui.intro.Title == "" {
-		t.Fatalf("intro was not shown")
-	}
-	if len(ui.rounds) != 18 {
-		t.Fatalf("rounds shown = %d, want 18", len(ui.rounds))
-	}
-	if ui.summary.TotalRounds != 18 {
-		t.Fatalf("summary rounds = %d, want 18", ui.summary.TotalRounds)
-	}
-	if ui.summary.Outcome != "pez capturado" {
-		t.Fatalf("summary outcome = %q, want pez capturado", ui.summary.Outcome)
-	}
-	if ui.summary.EndReason != "captura al agotar la baraja con distancia 2 o menor" {
-		t.Fatalf("summary end reason = %q", ui.summary.EndReason)
-	}
-	if ui.movesConsumed != 18 {
-		t.Fatalf("moves consumed = %d, want 18", ui.movesConsumed)
+			require.Error(t, err)
+			assert.EqualError(t, err, test.wantErr)
+			assert.Nil(t, session)
+		})
 	}
 }
 
-type stubUI struct {
+func TestSessionRun(t *testing.T) {
+	t.Run("shows intro runs one round and shows summary when the engine finishes", func(t *testing.T) {
+		fixture := newSessionFixture(t)
+
+		fixture.engine.On("State").Return(fixture.ongoingState).Twice()
+		fixture.engine.On("PlayRound", domain.Blue).Return(fixture.roundResult, nil).Once()
+		fixture.engine.On("State").Return(fixture.finishedState).Twice()
+		fixture.ui.On("ShowIntro", fixture.intro).Return(nil).Once()
+		fixture.presenter.On("Status", fixture.ongoingState).Return(fixture.status).Once()
+		fixture.ui.On("ChooseMove", fixture.status, fixture.intro.Options).Return(domain.Blue, nil).Once()
+		fixture.presenter.On("Round", fixture.roundResult).Return(fixture.round).Once()
+		fixture.ui.On("ShowRound", fixture.round).Return(nil).Once()
+		fixture.presenter.On("Summary", fixture.finishedState).Return(fixture.summary).Once()
+		fixture.ui.On("ShowGameOver", fixture.summary).Return(nil).Once()
+
+		require.NoError(t, fixture.session.Run())
+
+		fixture.engine.AssertExpectations(t)
+		fixture.ui.AssertExpectations(t)
+		fixture.presenter.AssertExpectations(t)
+	})
+
+	errorCases := []struct {
+		title   string
+		setup   func(sessionFixture)
+		wantErr string
+	}{
+		{
+			title: "returns a wrapped error when showing the intro fails",
+			setup: func(f sessionFixture) {
+				f.ui.On("ShowIntro", f.intro).Return(errors.New("intro failed")).Once()
+			},
+			wantErr: "show intro: intro failed",
+		},
+		{
+			title: "returns a wrapped error when choosing a move fails",
+			setup: func(f sessionFixture) {
+				f.engine.On("State").Return(f.ongoingState).Twice()
+				f.ui.On("ShowIntro", f.intro).Return(nil).Once()
+				f.presenter.On("Status", f.ongoingState).Return(f.status).Once()
+				f.ui.On("ChooseMove", f.status, f.intro.Options).Return(domain.Blue, errors.New("choose failed")).Once()
+			},
+			wantErr: "choose move: choose failed",
+		},
+		{
+			title: "returns a wrapped error when playing a round fails",
+			setup: func(f sessionFixture) {
+				f.engine.On("State").Return(f.ongoingState).Twice()
+				f.ui.On("ShowIntro", f.intro).Return(nil).Once()
+				f.presenter.On("Status", f.ongoingState).Return(f.status).Once()
+				f.ui.On("ChooseMove", f.status, f.intro.Options).Return(domain.Blue, nil).Once()
+				f.engine.On("PlayRound", domain.Blue).Return(game.RoundResult{}, errors.New("round failed")).Once()
+			},
+			wantErr: "play round: round failed",
+		},
+		{
+			title: "returns a wrapped error when showing the round fails",
+			setup: func(f sessionFixture) {
+				f.engine.On("State").Return(f.ongoingState).Twice()
+				f.ui.On("ShowIntro", f.intro).Return(nil).Once()
+				f.presenter.On("Status", f.ongoingState).Return(f.status).Once()
+				f.ui.On("ChooseMove", f.status, f.intro.Options).Return(domain.Blue, nil).Once()
+				f.engine.On("PlayRound", domain.Blue).Return(f.roundResult, nil).Once()
+				f.presenter.On("Round", f.roundResult).Return(f.round).Once()
+				f.ui.On("ShowRound", f.round).Return(errors.New("round view failed")).Once()
+			},
+			wantErr: "show round: round view failed",
+		},
+		{
+			title: "returns a wrapped error when showing the summary fails",
+			setup: func(f sessionFixture) {
+				f.engine.On("State").Return(f.ongoingState).Twice()
+				f.engine.On("PlayRound", domain.Blue).Return(f.roundResult, nil).Once()
+				f.engine.On("State").Return(f.finishedState).Twice()
+				f.ui.On("ShowIntro", f.intro).Return(nil).Once()
+				f.presenter.On("Status", f.ongoingState).Return(f.status).Once()
+				f.ui.On("ChooseMove", f.status, f.intro.Options).Return(domain.Blue, nil).Once()
+				f.presenter.On("Round", f.roundResult).Return(f.round).Once()
+				f.ui.On("ShowRound", f.round).Return(nil).Once()
+				f.presenter.On("Summary", f.finishedState).Return(f.summary).Once()
+				f.ui.On("ShowGameOver", f.summary).Return(errors.New("summary failed")).Once()
+			},
+			wantErr: "show game over: summary failed",
+		},
+	}
+
+	for _, test := range errorCases {
+		t.Run(test.title, func(t *testing.T) {
+			fixture := newSessionFixture(t)
+			test.setup(fixture)
+
+			err := fixture.session.Run()
+
+			require.Error(t, err)
+			assert.EqualError(t, err, test.wantErr)
+			fixture.engine.AssertExpectations(t)
+			fixture.ui.AssertExpectations(t)
+			fixture.presenter.AssertExpectations(t)
+		})
+	}
+}
+
+type sessionFixture struct {
+	engine        *mockEngine
+	ui            *mockUI
+	presenter     *mockPresenter
+	session       *app.Session
 	intro         presentation.IntroView
-	rounds        []presentation.RoundView
+	status        presentation.StatusView
+	round         presentation.RoundView
 	summary       presentation.SummaryView
-	moves         []domain.Move
-	movesConsumed int
+	ongoingState  game.State
+	finishedState game.State
+	roundResult   game.RoundResult
 }
 
-func (ui *stubUI) ShowIntro(view presentation.IntroView) error {
-	ui.intro = view
-	return nil
-}
+func newSessionFixture(t *testing.T) sessionFixture {
+	t.Helper()
 
-func (ui *stubUI) ChooseMove(_ presentation.StatusView, _ []presentation.MoveOption) (domain.Move, error) {
-	move := ui.moves[ui.movesConsumed]
-	ui.movesConsumed++
-	return move, nil
-}
-
-func (ui *stubUI) ShowRound(view presentation.RoundView) error {
-	ui.rounds = append(ui.rounds, view)
-	return nil
-}
-
-func (ui *stubUI) ShowGameOver(view presentation.SummaryView) error {
-	ui.summary = view
-	return nil
-}
-
-func repeatMove(move domain.Move, count int) []domain.Move {
-	moves := make([]domain.Move, count)
-	for i := range moves {
-		moves[i] = move
+	engine := &mockEngine{}
+	ui := &mockUI{}
+	presenter := &mockPresenter{}
+	intro := presentation.IntroView{
+		Title: "Pesca",
+		Options: []presentation.MoveOption{
+			{Index: 1, Move: domain.Blue, Label: "Tirar"},
+			{Index: 2, Move: domain.Red, Label: "Recoger"},
+			{Index: 3, Move: domain.Yellow, Label: "Soltar"},
+		},
 	}
-	return moves
+	status := presentation.StatusView{RoundNumber: 1}
+	ongoingState := game.State{Round: 0, Finished: false}
+	finishedState := game.State{Round: 1, Finished: true}
+	roundResult := game.RoundResult{Round: 1, PlayerMove: domain.Blue, State: finishedState}
+	round := presentation.RoundView{Outcome: "gana el jugador"}
+	summary := presentation.SummaryView{TotalRounds: 1}
+
+	presenter.On("Intro").Return(intro).Once()
+	session, err := app.NewSession(engine, ui, presenter)
+	require.NoError(t, err)
+
+	return sessionFixture{
+		engine:        engine,
+		ui:            ui,
+		presenter:     presenter,
+		session:       session,
+		intro:         intro,
+		status:        status,
+		round:         round,
+		summary:       summary,
+		ongoingState:  ongoingState,
+		finishedState: finishedState,
+		roundResult:   roundResult,
+	}
+}
+
+type mockEngine struct {
+	mock.Mock
+}
+
+func (engine *mockEngine) State() game.State {
+	return engine.Called().Get(0).(game.State)
+}
+
+func (engine *mockEngine) PlayRound(move domain.Move) (game.RoundResult, error) {
+	args := engine.Called(move)
+	return args.Get(0).(game.RoundResult), args.Error(1)
+}
+
+type mockUI struct {
+	mock.Mock
+}
+
+func (ui *mockUI) ShowIntro(view presentation.IntroView) error {
+	return ui.Called(view).Error(0)
+}
+
+func (ui *mockUI) ChooseMove(view presentation.StatusView, options []presentation.MoveOption) (domain.Move, error) {
+	args := ui.Called(view, options)
+	return args.Get(0).(domain.Move), args.Error(1)
+}
+
+func (ui *mockUI) ShowRound(view presentation.RoundView) error {
+	return ui.Called(view).Error(0)
+}
+
+func (ui *mockUI) ShowGameOver(view presentation.SummaryView) error {
+	return ui.Called(view).Error(0)
+}
+
+type mockPresenter struct {
+	mock.Mock
+}
+
+func (presenter *mockPresenter) Intro() presentation.IntroView {
+	return presenter.Called().Get(0).(presentation.IntroView)
+}
+
+func (presenter *mockPresenter) Status(state game.State) presentation.StatusView {
+	return presenter.Called(state).Get(0).(presentation.StatusView)
+}
+
+func (presenter *mockPresenter) Round(result game.RoundResult) presentation.RoundView {
+	return presenter.Called(result).Get(0).(presentation.RoundView)
+}
+
+func (presenter *mockPresenter) Summary(state game.State) presentation.SummaryView {
+	return presenter.Called(state).Get(0).(presentation.SummaryView)
 }

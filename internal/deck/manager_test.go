@@ -3,6 +3,9 @@ package deck
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"pesca/internal/domain"
 )
 
@@ -14,39 +17,34 @@ func TestManagerRecyclesAndRemovesThreeCards(t *testing.T) {
 	)
 
 	for i := 0; i < 9; i++ {
-		if _, err := manager.Draw(); err != nil {
-			t.Fatalf("draw %d failed: %v", i+1, err)
-		}
+		_, err := manager.Draw()
+		require.NoError(t, err, "draw %d failed", i+1)
 	}
-	if manager.ActiveCount() != 0 || manager.DiscardCount() != 9 {
-		t.Fatalf("after first pass active=%d discard=%d, want 0 and 9", manager.ActiveCount(), manager.DiscardCount())
-	}
+	assert.Equal(t, 0, manager.ActiveCount())
+	assert.Equal(t, 9, manager.DiscardCount())
 
 	manager.PrepareNextRound()
-	if manager.ActiveCount() != 6 || manager.DiscardCount() != 0 || manager.RecycleCount() != 1 {
-		t.Fatalf("after first recycle active=%d discard=%d recycles=%d, want 6 0 1", manager.ActiveCount(), manager.DiscardCount(), manager.RecycleCount())
-	}
+	assert.Equal(t, 6, manager.ActiveCount())
+	assert.Equal(t, 0, manager.DiscardCount())
+	assert.Equal(t, 1, manager.RecycleCount())
 
 	for i := 0; i < 6; i++ {
-		if _, err := manager.Draw(); err != nil {
-			t.Fatalf("second cycle draw %d failed: %v", i+1, err)
-		}
+		_, err := manager.Draw()
+		require.NoError(t, err, "second cycle draw %d failed", i+1)
 	}
 	manager.PrepareNextRound()
-	if manager.ActiveCount() != 3 || manager.RecycleCount() != 2 {
-		t.Fatalf("after second recycle active=%d recycles=%d, want 3 and 2", manager.ActiveCount(), manager.RecycleCount())
-	}
+	assert.Equal(t, 3, manager.ActiveCount())
+	assert.Equal(t, 2, manager.RecycleCount())
 
 	for i := 0; i < 3; i++ {
-		if _, err := manager.Draw(); err != nil {
-			t.Fatalf("third cycle draw %d failed: %v", i+1, err)
-		}
+		_, err := manager.Draw()
+		require.NoError(t, err, "third cycle draw %d failed", i+1)
 	}
 	manager.PrepareNextRound()
-	if manager.ActiveCount() != 0 || !manager.Exhausted() || manager.RecycleCount() != 3 {
-		t.Fatalf("after final recycle active=%d exhausted=%t recycles=%d, want 0 true 3", manager.ActiveCount(), manager.Exhausted(), manager.RecycleCount())
-	}
-	if _, err := manager.Draw(); err != ErrNoCardsAvailable {
-		t.Fatalf("draw on exhausted deck = %v, want %v", err, ErrNoCardsAvailable)
-	}
+	assert.Equal(t, 0, manager.ActiveCount())
+	assert.True(t, manager.Exhausted())
+	assert.Equal(t, 3, manager.RecycleCount())
+
+	_, err := manager.Draw()
+	assert.ErrorIs(t, err, ErrNoCardsAvailable)
 }

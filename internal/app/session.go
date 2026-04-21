@@ -22,14 +22,19 @@ type Presenter interface {
 	Summary(game.State) presentation.SummaryView
 }
 
+type Engine interface {
+	State() game.State
+	PlayRound(domain.Move) (game.RoundResult, error)
+}
+
 type Session struct {
-	engine    *game.Engine
+	engine    Engine
 	ui        UI
 	presenter Presenter
 	intro     presentation.IntroView
 }
 
-func NewSession(engine *game.Engine, ui UI, presenter Presenter) (*Session, error) {
+func NewSession(engine Engine, ui UI, presenter Presenter) (*Session, error) {
 	if engine == nil {
 		return nil, fmt.Errorf("engine is required")
 	}

@@ -5,6 +5,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"pesca/internal/domain"
 	"pesca/internal/encounter"
 	"pesca/internal/game"
@@ -17,35 +20,27 @@ func TestShowIntroIncludesColoredOptions(t *testing.T) {
 	presenter := presentation.NewPresenter(presentation.DefaultCatalog())
 
 	err := ui.ShowIntro(presenter.Intro())
-	if err != nil {
-		t.Fatalf("ShowIntro() error = %v", err)
-	}
+	require.NoError(t, err)
 
 	move, err := ui.ChooseMove(presenter.Status(dummyState()), presenter.Intro().Options)
-	if err != nil {
-		t.Fatalf("ChooseMove() error = %v", err)
-	}
-	if move != domain.Blue {
-		t.Fatalf("move = %v, want %v", move, domain.Blue)
-	}
+	require.NoError(t, err)
+	assert.Equal(t, domain.Blue, move)
 
 	printed := out.String()
-	assertContains(t, printed, clearSequence)
-	assertContains(t, printed, "Tensa el sedal y arrastra al pez hacia la orilla.")
-	assertContains(t, printed, "Orilla")
-	assertContains(t, printed, "[ESC]")
-	assertContains(t, printed, colorizeMove(domain.Blue, "Tirar"))
-	assertContains(t, printed, colorizeMove(domain.Red, "Recoger"))
-	assertContains(t, printed, colorizeMove(domain.Yellow, "Soltar"))
+	assert.Contains(t, printed, clearSequence)
+	assert.Contains(t, printed, "Tensa el sedal y arrastra al pez hacia la orilla.")
+	assert.Contains(t, printed, "Orilla")
+	assert.Contains(t, printed, "[ESC]")
+	assert.Contains(t, printed, colorizeMove(domain.Blue, "Tirar"))
+	assert.Contains(t, printed, colorizeMove(domain.Red, "Recoger"))
+	assert.Contains(t, printed, colorizeMove(domain.Yellow, "Soltar"))
 }
 
 func TestChooseMoveShowsLastRoundSummary(t *testing.T) {
 	var out bytes.Buffer
 	ui := NewUI(strings.NewReader("2\n"), &out)
 	presenter := presentation.NewPresenter(presentation.DefaultCatalog())
-	if err := ui.ShowIntro(presenter.Intro()); err != nil {
-		t.Fatalf("ShowIntro() error = %v", err)
-	}
+	require.NoError(t, ui.ShowIntro(presenter.Intro()))
 
 	err := ui.ShowRound(presentation.RoundView{
 		Status:      presentation.StatusView{Distance: 2},
@@ -55,9 +50,7 @@ func TestChooseMoveShowsLastRoundSummary(t *testing.T) {
 		FishLabel:   "Zafarse",
 		Outcome:     "gana el jugador",
 	})
-	if err != nil {
-		t.Fatalf("ShowRound() error = %v", err)
-	}
+	require.NoError(t, err)
 
 	_, err = ui.ChooseMove(presentation.StatusView{
 		RoundNumber:               2,
@@ -72,16 +65,14 @@ func TestChooseMoveShowsLastRoundSummary(t *testing.T) {
 		FishWins:                  0,
 		Draws:                     0,
 	}, presenter.Intro().Options)
-	if err != nil {
-		t.Fatalf("ChooseMove() error = %v", err)
-	}
+	require.NoError(t, err)
 
 	printed := out.String()
-	assertContains(t, printed, "Ultimo lance")
-	assertContains(t, printed, colorizeMove(domain.Blue, "Tirar"))
-	assertContains(t, printed, colorizeMove(domain.Yellow, "Zafarse"))
-	assertContains(t, printed, outcomeColor("gana el jugador"))
-	assertContains(t, printed, "Distancia : 2")
+	assert.Contains(t, printed, "Ultimo lance")
+	assert.Contains(t, printed, colorizeMove(domain.Blue, "Tirar"))
+	assert.Contains(t, printed, colorizeMove(domain.Yellow, "Zafarse"))
+	assert.Contains(t, printed, outcomeColor("gana el jugador"))
+	assert.Contains(t, printed, "Distancia : 2")
 }
 
 func dummyState() game.State {
@@ -91,12 +82,5 @@ func dummyState() game.State {
 			ActiveCards: 9,
 		},
 		Encounter: encounterState,
-	}
-}
-
-func assertContains(t *testing.T, text, want string) {
-	t.Helper()
-	if !strings.Contains(text, want) {
-		t.Fatalf("output %q does not contain %q", text, want)
 	}
 }
