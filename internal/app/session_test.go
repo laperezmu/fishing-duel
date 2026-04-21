@@ -3,6 +3,10 @@ package app_test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
+
 	"pesca/internal/app"
 	"pesca/internal/deck"
 	"pesca/internal/domain"
@@ -14,7 +18,76 @@ import (
 	"pesca/internal/rules"
 )
 
-func TestSessionRunsThroughAbstractUI(t *testing.T) {
+func TestNewSessionValidatesDependencies(t *testing.T) {
+	engine := newEngineForSessionTest(t)
+	ui := &mockUI{}
+	presenter := &mockPresenter{}
+
+	tests := []struct {
+		name      string
+		engine    *game.Engine
+		ui        app.UI
+		presenter app.Presenter
+		wantErr   string
+	}{
+		{name: "requires engine", ui: ui, presenter: presenter, wantErr: "engine is required"},
+		{name: "requires ui", engine: engine, presenter: presenter, wantErr: "ui is required"},
+		{name: "requires presenter", engine: engine, ui: ui, wantErr: "presenter is required"},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			session, err := app.NewSession(test.engine, test.ui, test.presenter)
+
+			require.Error(t, err)
+			assert.EqualError(t, err, test.wantErr)
+			assert.Nil(t, session)
+		})
+	}
+}
+
+func TestSessionRunUsesInjectedDependencies(t *testing.T) {
+	engine := newEngineForSessionTest(t)
+	intro := presentation.IntroView{
+		Title: "Pesca",
+		Options: []presentation.MoveOption{
+			{Index: 1, Move: domain.Blue, Label: "Tirar"},
+			{Index: 2, Move: domain.Red, Label: "Recoger"},
+			{Index: 3, Move: domain.Yellow, Label: "Soltar"},
+		},
+	}
+	status := presentation.StatusView{}
+	round := presentation.RoundView{}
+	summary := presentation.SummaryView{TotalRounds: 18}
+
+	ui := &mockUI{}
+	presenter := &mockPresenter{}
+	presenter.On("Intro").Return(intro).Once()
+
+	session, err := app.NewSession(engine, ui, presenter)
+	require.NoError(t, err)
+
+	ui.On("ShowIntro", intro).Return(nil).Once()
+	presenter.On("Status", mock.Anything).Return(status).Times(18)
+	ui.On("ChooseMove", status, intro.Options).Return(domain.Blue, nil).Times(18)
+	presenter.On("Round", mock.Anything).Return(round).Times(18)
+	ui.On("ShowRound", round).Return(nil).Times(18)
+	presenter.On("Summary", mock.Anything).Return(summary).Once()
+	ui.On("ShowGameOver", summary).Return(nil).Once()
+
+	require.NoError(t, session.Run())
+
+	ui.AssertExpectations(t)
+	presenter.AssertExpectations(t)
+	ui.AssertNumberOfCalls(t, "ChooseMove", 18)
+	ui.AssertNumberOfCalls(t, "ShowRound", 18)
+	presenter.AssertNumberOfCalls(t, "Status", 18)
+	presenter.AssertNumberOfCalls(t, "Round", 18)
+}
+
+func newEngineForSessionTest(t *testing.T) *game.Engine {
+	t.Helper()
+
 	encounterState, err := encounter.NewState(encounter.Config{
 		InitialDistance:           3,
 		CaptureDistance:           -1,
@@ -23,91 +96,61 @@ func TestSessionRunsThroughAbstractUI(t *testing.T) {
 		PlayerWinStep:             1,
 		FishWinStep:               1,
 	})
-	if err != nil {
-		t.Fatalf("NewState() error = %v", err)
-	}
-
-	manager := deck.NewManager(
-		deck.NewStandardFishDeck(),
-		func([]domain.Move) {},
-		deck.RemoveCardsRecyclePolicy{CardsToRemove: 3},
-	)
+	require.NoError(t, err)
 
 	engine, err := game.NewEngine(
-		manager,
+		deck.NewManager(
+			deck.NewStandardFishDeck(),
+			func([]domain.Move) {},
+			deck.RemoveCardsRecyclePolicy{CardsToRemove: 3},
+		),
 		rules.NewClassicEvaluator(rules.NewFishCombatProfile()),
 		progression.TrackPolicy{},
 		endings.EncounterCondition{},
 		game.State{Encounter: encounterState},
 	)
-	if err != nil {
-		t.Fatalf("NewEngine() error = %v", err)
-	}
+	require.NoError(t, err)
 
-	ui := &stubUI{moves: repeatMove(domain.Blue, 18)}
-	presenter := presentation.NewPresenter(presentation.DefaultCatalog())
-	session, err := app.NewSession(engine, ui, presenter)
-	if err != nil {
-		t.Fatalf("NewSession() error = %v", err)
-	}
-
-	if err := session.Run(); err != nil {
-		t.Fatalf("Run() error = %v", err)
-	}
-
-	if ui.intro.Title == "" {
-		t.Fatalf("intro was not shown")
-	}
-	if len(ui.rounds) != 18 {
-		t.Fatalf("rounds shown = %d, want 18", len(ui.rounds))
-	}
-	if ui.summary.TotalRounds != 18 {
-		t.Fatalf("summary rounds = %d, want 18", ui.summary.TotalRounds)
-	}
-	if ui.summary.Outcome != "pez capturado" {
-		t.Fatalf("summary outcome = %q, want pez capturado", ui.summary.Outcome)
-	}
-	if ui.summary.EndReason != "captura al agotar la baraja con distancia 2 o menor" {
-		t.Fatalf("summary end reason = %q", ui.summary.EndReason)
-	}
-	if ui.movesConsumed != 18 {
-		t.Fatalf("moves consumed = %d, want 18", ui.movesConsumed)
-	}
+	return engine
 }
 
-type stubUI struct {
-	intro         presentation.IntroView
-	rounds        []presentation.RoundView
-	summary       presentation.SummaryView
-	moves         []domain.Move
-	movesConsumed int
+type mockUI struct {
+	mock.Mock
 }
 
-func (ui *stubUI) ShowIntro(view presentation.IntroView) error {
-	ui.intro = view
-	return nil
+func (ui *mockUI) ShowIntro(view presentation.IntroView) error {
+	return ui.Called(view).Error(0)
 }
 
-func (ui *stubUI) ChooseMove(_ presentation.StatusView, _ []presentation.MoveOption) (domain.Move, error) {
-	move := ui.moves[ui.movesConsumed]
-	ui.movesConsumed++
-	return move, nil
+func (ui *mockUI) ChooseMove(view presentation.StatusView, options []presentation.MoveOption) (domain.Move, error) {
+	args := ui.Called(view, options)
+	return args.Get(0).(domain.Move), args.Error(1)
 }
 
-func (ui *stubUI) ShowRound(view presentation.RoundView) error {
-	ui.rounds = append(ui.rounds, view)
-	return nil
+func (ui *mockUI) ShowRound(view presentation.RoundView) error {
+	return ui.Called(view).Error(0)
 }
 
-func (ui *stubUI) ShowGameOver(view presentation.SummaryView) error {
-	ui.summary = view
-	return nil
+func (ui *mockUI) ShowGameOver(view presentation.SummaryView) error {
+	return ui.Called(view).Error(0)
 }
 
-func repeatMove(move domain.Move, count int) []domain.Move {
-	moves := make([]domain.Move, count)
-	for i := range moves {
-		moves[i] = move
-	}
-	return moves
+type mockPresenter struct {
+	mock.Mock
+}
+
+func (presenter *mockPresenter) Intro() presentation.IntroView {
+	return presenter.Called().Get(0).(presentation.IntroView)
+}
+
+func (presenter *mockPresenter) Status(state game.State) presentation.StatusView {
+	return presenter.Called(state).Get(0).(presentation.StatusView)
+}
+
+func (presenter *mockPresenter) Round(result game.RoundResult) presentation.RoundView {
+	return presenter.Called(result).Get(0).(presentation.RoundView)
+}
+
+func (presenter *mockPresenter) Summary(state game.State) presentation.SummaryView {
+	return presenter.Called(state).Get(0).(presentation.SummaryView)
 }

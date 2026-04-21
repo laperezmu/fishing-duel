@@ -11,11 +11,14 @@ Each plan must include:
 
 Implementation should not start without at least this minimum planning step.
 
+Before implementation starts:
+- Create a new git branch for the feature
+- Use the implementation plan document name as the branch name
+- Continue all feature work on that branch until the PR is merged
+
 ## Delivery Process
 
 After implementation is complete:
-- Create a new git branch for the implementation
-- Name the branch after the implementation plan document
 - Create a pull request in the repository
 - Include a detailed description of the integrated changes in the PR body
 
@@ -32,6 +35,10 @@ The pull request is the handoff point for review.
 Integration is considered complete only when the user manually closes and merges the pull request.
 
 That merge point is the end of the feature integration cycle.
+
+After merge:
+- Return to `main`
+- Continue the next feature from `main`
 
 ## Feature Plan Template
 
