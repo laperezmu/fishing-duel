@@ -10,7 +10,7 @@ Condiciones de finalizacion del encuentro.
 
 ## Implementacion actual
 
-- `EncounterEndCondition`: captura por proximidad, escape por exceso de distancia y resolucion especial cuando el mazo se agota.
+ - `EncounterEndCondition`: captura por proximidad, escape por exceso de distancia o profundidad, escape por chapoteo y resolucion especial cuando el mazo se agota.
 
 ## Como extenderlo
 

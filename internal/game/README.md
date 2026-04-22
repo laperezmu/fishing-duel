@@ -23,6 +23,7 @@ Motor central del juego.
 
 - `Engine`: coordinador principal.
 - El estado compartido y el resultado de ronda viven en `internal/match/`.
+- La carta robada del pez vive en `internal/cards/` y las capacidades del jugador en `internal/playerrig/`.
 
 ## Si quieres anadir una mecanica nueva
 

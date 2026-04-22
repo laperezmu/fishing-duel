@@ -51,8 +51,9 @@ func renderHeader(title string) string {
 func renderTrackSection(status presentation.StatusView) string {
 	return strings.Join([]string{
 		accent("Sedal"),
-		"  Orilla  " + renderTrack(status.FishDistance, status.EscapeDistance) + "  Mar abierto",
-		fmt.Sprintf("  Distancia actual: %d | Captura <= %d | Escape > %d | Baraja <= %d", status.FishDistance, status.CaptureDistance, status.EscapeDistance, status.ExhaustionCaptureDistance),
+		"  Orilla  " + renderTrack(status.FishDistance, status.MaxDistance) + "  Mar abierto",
+		fmt.Sprintf("  Distancia actual: %d | Captura <= %d | Escape > %d | Baraja <= %d", status.FishDistance, status.CaptureDistance, status.MaxDistance, status.ExhaustionCaptureDistance),
+		fmt.Sprintf("  Profundidad actual: %d | Superficie <= %d | Escape > %d", status.FishDepth, status.SurfaceDepth, status.MaxDepth),
 	}, "\n")
 }
 
@@ -65,13 +66,19 @@ func renderStatsSection(status presentation.StatusView) string {
 }
 
 func renderLastRoundSection(view presentation.RoundView) string {
-	return strings.Join([]string{
+	lines := []string{
 		accent("Ultimo lance"),
 		"  Tu accion : " + colorizeMove(view.PlayerMove, view.PlayerLabel),
 		"  Pez       : " + colorizeMove(view.FishMove, view.FishLabel),
 		"  Resultado : " + colorizeRoundOutcome(view.Outcome, view.OutcomeLabel),
 		fmt.Sprintf("  Distancia : %d", view.Status.FishDistance),
-	}, "\n")
+		fmt.Sprintf("  Profundidad : %d", view.Status.FishDepth),
+	}
+	if view.EventLabel != "" {
+		lines = append(lines, "  Evento    : "+view.EventLabel)
+	}
+
+	return strings.Join(lines, "\n")
 }
 
 func renderOptionsSection(options []presentation.MoveOption) string {
@@ -106,6 +113,7 @@ func renderGameOverSection(summary presentation.SummaryView) string {
 		"  Resultado : " + colorizeEncounterStatus(summary.EncounterStatus, summary.OutcomeLabel),
 		"  Motivo    : " + summary.EndReasonLabel,
 		fmt.Sprintf("  Distancia : %d", summary.FishDistance),
+		fmt.Sprintf("  Profundidad : %d", summary.FishDepth),
 		fmt.Sprintf("  Rondas    : %d | Jugador %d | Pez %d | Empates %d", summary.TotalRounds, summary.PlayerWins, summary.FishWins, summary.Draws),
 	}, "\n")
 }

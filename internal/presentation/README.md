@@ -14,6 +14,7 @@ Traduccion de estado tecnico a contenido mostrable.
 - `Presenter`: transforma estado a vistas.
 - `IntroView`, `StatusView`, `RoundView`, `SummaryView`: contratos de presentacion.
 - `MoveOption`: representa una accion del jugador junto con sus usos y su estado de recarga.
+- Las vistas del encounter muestran tanto distancia como profundidad y eventos de superficie.
 
 ## Como extenderlo
 

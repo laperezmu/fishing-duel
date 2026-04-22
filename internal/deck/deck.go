@@ -2,23 +2,24 @@ package deck
 
 import (
 	"errors"
+	"pesca/internal/cards"
 	"pesca/internal/domain"
 )
 
 var ErrNoCardsAvailable = errors.New("no cards available")
 
-type Shuffler func([]domain.Move)
+type Shuffler func([]cards.FishCard)
 
 type RecyclePolicy interface {
-	Recycle(discardedCards []domain.Move, shuffler Shuffler) []domain.Move
+	Recycle(discardedCards []cards.FishCard, shuffler Shuffler) []cards.FishCard
 }
 
 type RemoveCardsRecyclePolicy struct {
 	CardsToRemove int
 }
 
-func (policy RemoveCardsRecyclePolicy) Recycle(discardedCards []domain.Move, shuffler Shuffler) []domain.Move {
-	refreshedCards := append([]domain.Move(nil), discardedCards...)
+func (policy RemoveCardsRecyclePolicy) Recycle(discardedCards []cards.FishCard, shuffler Shuffler) []cards.FishCard {
+	refreshedCards := append([]cards.FishCard(nil), discardedCards...)
 	if shuffler != nil {
 		shuffler(refreshedCards)
 	}
@@ -35,16 +36,16 @@ func (policy RemoveCardsRecyclePolicy) Recycle(discardedCards []domain.Move, shu
 }
 
 type Deck struct {
-	activeCards    []domain.Move
-	discardedCards []domain.Move
+	activeCards    []cards.FishCard
+	discardedCards []cards.FishCard
 	shuffler       Shuffler
 	recyclePolicy  RecyclePolicy
 	recycleCount   int
 	exhausted      bool
 }
 
-func New(initialCards []domain.Move, shuffler Shuffler, recyclePolicy RecyclePolicy) *Deck {
-	activeCards := append([]domain.Move(nil), initialCards...)
+func New(initialCards []cards.FishCard, shuffler Shuffler, recyclePolicy RecyclePolicy) *Deck {
+	activeCards := append([]cards.FishCard(nil), initialCards...)
 	if shuffler != nil {
 		shuffler(activeCards)
 	}
@@ -60,23 +61,23 @@ func New(initialCards []domain.Move, shuffler Shuffler, recyclePolicy RecyclePol
 	}
 }
 
-func NewStandardFishCards() []domain.Move {
-	return []domain.Move{
-		domain.Blue,
-		domain.Blue,
-		domain.Blue,
-		domain.Red,
-		domain.Red,
-		domain.Red,
-		domain.Yellow,
-		domain.Yellow,
-		domain.Yellow,
+func NewStandardFishCards() []cards.FishCard {
+	return []cards.FishCard{
+		cards.NewFishCard(domain.Blue),
+		cards.NewFishCard(domain.Blue),
+		cards.NewFishCard(domain.Blue),
+		cards.NewFishCard(domain.Red),
+		cards.NewFishCard(domain.Red),
+		cards.NewFishCard(domain.Red),
+		cards.NewFishCard(domain.Yellow),
+		cards.NewFishCard(domain.Yellow),
+		cards.NewFishCard(domain.Yellow),
 	}
 }
 
-func (deck *Deck) Draw() (domain.Move, error) {
+func (deck *Deck) Draw() (cards.FishCard, error) {
 	if err := deck.ensureCardsAvailable(); err != nil {
-		return 0, err
+		return cards.FishCard{}, err
 	}
 
 	lastCardIndex := len(deck.activeCards) - 1

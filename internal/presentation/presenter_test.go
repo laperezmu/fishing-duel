@@ -4,6 +4,7 @@ import (
 	"pesca/internal/domain"
 	"pesca/internal/encounter"
 	"pesca/internal/match"
+	"pesca/internal/playerrig"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -62,12 +63,16 @@ func TestPresenterStatus(t *testing.T) {
 		},
 		Encounter: encounter.State{
 			Config: encounter.Config{
+				InitialDepth:              1,
+				SurfaceDepth:              0,
 				CaptureDistance:           0,
-				EscapeDistance:            5,
 				ExhaustionCaptureDistance: 2,
+				SplashEscapeChance:        0.5,
 			},
 			Distance: 3,
+			Depth:    2,
 		},
+		PlayerRig: playerrig.State{MaxDistance: 5, MaxDepth: 4},
 		Stats: match.Stats{
 			PlayerWins: 2,
 			FishWins:   1,
@@ -84,8 +89,11 @@ func TestPresenterStatus(t *testing.T) {
 
 	assert.Equal(t, 3, status.RoundNumber)
 	assert.Equal(t, 3, status.FishDistance)
+	assert.Equal(t, 2, status.FishDepth)
+	assert.Equal(t, 0, status.SurfaceDepth)
+	assert.Equal(t, 5, status.MaxDistance)
+	assert.Equal(t, 4, status.MaxDepth)
 	assert.Equal(t, 0, status.CaptureDistance)
-	assert.Equal(t, 5, status.EscapeDistance)
 	assert.Equal(t, 2, status.ExhaustionCaptureDistance)
 	assert.Equal(t, 4, status.ActiveCards)
 	assert.Equal(t, 5, status.DiscardCards)
@@ -102,17 +110,20 @@ func TestPresenterStatus(t *testing.T) {
 
 func TestPresenterRound(t *testing.T) {
 	presenter := NewPresenter(newCustomCatalog())
+	encounterState := newCapturedEncounterState(t)
+	encounterState.LastEvent = encounter.Event{Kind: encounter.EventKindSplash, Escaped: false}
 	round := presenter.Round(match.RoundResult{
 		PlayerMove: domain.Blue,
 		FishMove:   domain.Red,
 		Outcome:    domain.PlayerWin,
-		State:      match.State{Encounter: newCapturedEncounterState(t)},
+		State:      match.State{Encounter: encounterState},
 	})
 
 	assert.Equal(t, "Lanzar", round.PlayerLabel)
 	assert.Equal(t, "Afianzar", round.FishLabel)
 	assert.Equal(t, domain.PlayerWin, round.Outcome)
 	assert.Equal(t, "aventaja el jugador", round.OutcomeLabel)
+	assert.Equal(t, "chapotea: sigue enganchado", round.EventLabel)
 }
 
 func TestPresenterSummary(t *testing.T) {
@@ -120,6 +131,7 @@ func TestPresenterSummary(t *testing.T) {
 	summary := presenter.Summary(match.State{Encounter: newCapturedEncounterState(t)})
 
 	assert.Equal(t, encounter.StatusCaptured, summary.EncounterStatus)
+	assert.Equal(t, 1, summary.FishDepth)
 	assert.Equal(t, "presa asegurada", summary.OutcomeLabel)
 	assert.Equal(t, "sin mazo, pesca cerrada", summary.EndReasonLabel)
 }
@@ -140,11 +152,19 @@ func newCustomCatalog() Catalog {
 		RoundOutcomes: map[domain.RoundOutcome]string{
 			domain.PlayerWin: "aventaja el jugador",
 		},
+		EncounterEvents: map[encounter.EventKind]string{
+			encounter.EventKindSplash: "chapotea",
+		},
+		EventOutcomes: map[bool]string{
+			false: "sigue enganchado",
+			true:  "se suelta",
+		},
 		EncounterResults: map[encounter.Status]string{
 			encounter.StatusCaptured: "presa asegurada",
 		},
 		EndReasons: map[encounter.EndReason]string{
-			encounter.EndReasonDeckCapture: "sin mazo, pesca cerrada",
+			encounter.EndReasonDeckCapture:  "sin mazo, pesca cerrada",
+			encounter.EndReasonSplashEscape: "escape por chapoteo",
 		},
 	}
 }

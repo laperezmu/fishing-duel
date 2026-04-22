@@ -5,14 +5,15 @@ import (
 	"math/rand"
 	"os"
 	"pesca/internal/app"
+	"pesca/internal/cards"
 	"pesca/internal/cli"
 	"pesca/internal/deck"
-	"pesca/internal/domain"
 	"pesca/internal/encounter"
 	"pesca/internal/endings"
 	"pesca/internal/game"
 	"pesca/internal/match"
 	"pesca/internal/playermoves"
+	"pesca/internal/playerrig"
 	"pesca/internal/presentation"
 	"pesca/internal/progression"
 	"pesca/internal/rules"
@@ -21,9 +22,9 @@ import (
 
 func main() {
 	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
-	shuffler := func(cards []domain.Move) {
-		rng.Shuffle(len(cards), func(i, j int) {
-			cards[i], cards[j] = cards[j], cards[i]
+	shuffler := func(fishCards []cards.FishCard) {
+		rng.Shuffle(len(fishCards), func(i, j int) {
+			fishCards[i], fishCards[j] = fishCards[j], fishCards[i]
 		})
 	}
 
@@ -37,6 +38,10 @@ func main() {
 	if err != nil {
 		exitWithError("error inicializando encuentro", err)
 	}
+	playerRigState, err := playerrig.NewState(playerrig.DefaultConfig())
+	if err != nil {
+		exitWithError("error configurando herramientas del jugador", err)
+	}
 
 	playerMoveController, err := playermoves.NewUsageController(playermoves.DefaultConfig())
 	if err != nil {
@@ -47,9 +52,11 @@ func main() {
 		fishDeck,
 		playerMoveController,
 		rules.NewClassicEvaluator(rules.NewFishCombatProfile()),
-		progression.TrackPolicy{},
+		progression.TrackPolicy{SplashEscapeDecider: progression.SplashEscapeDeciderFunc(func(chance float64) bool {
+			return rng.Float64() < chance
+		})},
 		endings.EncounterEndCondition{},
-		match.State{Encounter: encounterState},
+		match.State{Encounter: encounterState, PlayerRig: playerRigState},
 	)
 	if err != nil {
 		exitWithError("error inicializando partida", err)

@@ -3,6 +3,7 @@ package game
 import (
 	"errors"
 	"fmt"
+	"pesca/internal/cards"
 	"pesca/internal/domain"
 	"pesca/internal/match"
 )
@@ -14,7 +15,7 @@ type RoundEvaluator interface {
 }
 
 type MatchProgressionPolicy interface {
-	Apply(state *match.State, outcome domain.RoundOutcome)
+	Apply(state *match.State, round match.ResolvedRound)
 }
 
 type MatchEndCondition interface {
@@ -22,7 +23,7 @@ type MatchEndCondition interface {
 }
 
 type FishDeck interface {
-	Draw() (domain.Move, error)
+	Draw() (cards.FishCard, error)
 	PrepareNextRound()
 	ActiveCount() int
 	DiscardCount() int
@@ -90,7 +91,7 @@ func (engine *Engine) PlayRound(playerMove domain.Move) (match.RoundResult, erro
 		return match.RoundResult{}, err
 	}
 
-	fishMove, err := engine.fishDeck.Draw()
+	fishCard, err := engine.fishDeck.Draw()
 	if err != nil {
 		engine.refreshState()
 		engine.endCondition.Apply(&engine.state)
@@ -100,10 +101,15 @@ func (engine *Engine) PlayRound(playerMove domain.Move) (match.RoundResult, erro
 		return match.RoundResult{}, err
 	}
 
-	roundOutcome := engine.roundEvaluator.Evaluate(playerMove, fishMove)
+	roundOutcome := engine.roundEvaluator.Evaluate(playerMove, fishCard.Move)
 	engine.state.Round++
 	engine.playerMoves.ConsumeMove(&engine.state, playerMove)
-	engine.progressionPolicy.Apply(&engine.state, roundOutcome)
+	engine.progressionPolicy.Apply(&engine.state, match.ResolvedRound{
+		PlayerMove:         playerMove,
+		FishCard:           fishCard,
+		EncounterModifiers: append([]cards.EncounterModifier(nil), fishCard.EncounterModifiers...),
+		Outcome:            roundOutcome,
+	})
 
 	engine.fishDeck.PrepareNextRound()
 	engine.refreshState()
@@ -113,7 +119,8 @@ func (engine *Engine) PlayRound(playerMove domain.Move) (match.RoundResult, erro
 	return match.RoundResult{
 		Round:      engine.state.Round,
 		PlayerMove: playerMove,
-		FishMove:   fishMove,
+		FishMove:   fishCard.Move,
+		FishCard:   fishCard,
 		Outcome:    roundOutcome,
 		State:      engine.state,
 	}, nil
