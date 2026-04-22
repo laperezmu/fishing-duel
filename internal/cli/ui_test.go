@@ -36,6 +36,10 @@ func TestShowIntroIncludesColoredOptions(t *testing.T) {
 	assert.Contains(t, printed, colorizeMove(domain.Red, "Recoger"))
 	assert.Contains(t, printed, colorizeMove(domain.Yellow, "Soltar"))
 	assert.Contains(t, printed, "[3/3]")
+	assert.Contains(t, printed, "Superficie")
+	assert.Contains(t, printed, "Nivel 1")
+	assert.Contains(t, printed, "[SUP]")
+	assert.Contains(t, printed, "[F]")
 	assert.Contains(t, printed, "Profundidad actual: 1")
 }
 

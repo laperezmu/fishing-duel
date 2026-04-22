@@ -12,6 +12,7 @@ func renderPromptScreen(title string, status presentation.StatusView, options []
 	var sections []string
 	sections = append(sections, renderHeader(title))
 	sections = append(sections, renderTrackSection(status))
+	sections = append(sections, renderDepthSection(status))
 	sections = append(sections, renderStatsSection(status))
 	if lastRound != nil {
 		sections = append(sections, renderLastRoundSection(*lastRound))
@@ -53,8 +54,26 @@ func renderTrackSection(status presentation.StatusView) string {
 		accent("Sedal"),
 		"  Orilla  " + renderTrack(status.FishDistance, status.MaxDistance) + "  Mar abierto",
 		fmt.Sprintf("  Distancia actual: %d | Captura <= %d | Escape > %d | Baraja <= %d", status.FishDistance, status.CaptureDistance, status.MaxDistance, status.ExhaustionCaptureDistance),
-		fmt.Sprintf("  Profundidad actual: %d | Superficie <= %d | Escape > %d", status.FishDepth, status.SurfaceDepth, status.MaxDepth),
 	}, "\n")
+}
+
+func renderDepthSection(status presentation.StatusView) string {
+	lines := []string{accent("Profundidad")}
+
+	for depthLevel := status.SurfaceDepth; depthLevel <= status.MaxDepth; depthLevel++ {
+		lines = append(lines, fmt.Sprintf("  %-10s %s", depthLabel(depthLevel, status.SurfaceDepth, status.MaxDepth), renderDepthMarker(depthLevel, status.FishDepth, status.SurfaceDepth)))
+		if depthLevel < status.MaxDepth || status.FishDepth > status.MaxDepth {
+			lines = append(lines, "             "+dim("|"))
+		}
+	}
+
+	if status.FishDepth > status.MaxDepth {
+		lines = append(lines, fmt.Sprintf("  %-10s %s", "Escape", accent("[F!]")))
+	}
+
+	lines = append(lines, fmt.Sprintf("  Profundidad actual: %d | Superficie <= %d | Escape > %d", status.FishDepth, status.SurfaceDepth, status.MaxDepth))
+
+	return strings.Join(lines, "\n")
 }
 
 func renderStatsSection(status presentation.StatusView) string {
@@ -147,4 +166,31 @@ func renderTrackMarker(trackPosition, fishDistance int) string {
 
 func renderEscapeMarker() string {
 	return accent("[ESC]")
+}
+
+func depthLabel(depthLevel, surfaceDepth, maxDepth int) string {
+	if depthLevel == surfaceDepth {
+		return "Superficie"
+	}
+	if depthLevel == maxDepth {
+		return "Fondo"
+	}
+
+	return fmt.Sprintf("Nivel %d", depthLevel)
+}
+
+func renderDepthMarker(depthLevel, fishDepth, surfaceDepth int) string {
+	if depthLevel == surfaceDepth {
+		if fishDepth <= surfaceDepth {
+			return accent("[SUP/F]")
+		}
+
+		return accent("[SUP]")
+	}
+
+	if depthLevel == fishDepth {
+		return accent("[F]")
+	}
+
+	return dim(fmt.Sprintf("[%d]", depthLevel))
 }
