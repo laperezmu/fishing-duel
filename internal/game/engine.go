@@ -86,6 +86,7 @@ func (engine *Engine) PlayRound(playerMove domain.Move) (match.RoundResult, erro
 		return match.RoundResult{}, ErrGameFinished
 	}
 
+	engine.resetRoundState()
 	engine.playerMoves.PrepareRound(&engine.state)
 	if err := engine.playerMoves.ValidateMove(engine.state, playerMove); err != nil {
 		return match.RoundResult{}, err
@@ -104,17 +105,22 @@ func (engine *Engine) PlayRound(playerMove domain.Move) (match.RoundResult, erro
 	roundOutcome := engine.roundEvaluator.Evaluate(playerMove, fishCard.Move)
 	engine.state.Round++
 	engine.playerMoves.ConsumeMove(&engine.state, playerMove)
+	cardEffects := cards.FilterEffects(fishCard.Effects, cards.EffectContext{
+		Owner:   cards.OwnerFish,
+		Outcome: roundOutcome,
+	})
 	engine.progressionPolicy.Apply(&engine.state, match.ResolvedRound{
-		PlayerMove:         playerMove,
-		FishCard:           fishCard,
-		EncounterModifiers: append([]cards.EncounterModifier(nil), fishCard.EncounterModifiers...),
-		Outcome:            roundOutcome,
+		PlayerMove:  playerMove,
+		FishCard:    fishCard,
+		CardEffects: append([]cards.CardEffect(nil), cardEffects...),
+		Outcome:     roundOutcome,
 	})
 
 	engine.fishDeck.PrepareNextRound()
 	engine.refreshState()
 	engine.playerMoves.PrepareRound(&engine.state)
 	engine.endCondition.Apply(&engine.state)
+	engine.resetRoundState()
 
 	return match.RoundResult{
 		Round:      engine.state.Round,
@@ -131,4 +137,8 @@ func (engine *Engine) refreshState() {
 	engine.state.Deck.DiscardCards = engine.fishDeck.DiscardCount()
 	engine.state.Deck.RecycleCount = engine.fishDeck.RecycleCount()
 	engine.state.Deck.Exhausted = engine.fishDeck.Exhausted()
+}
+
+func (engine *Engine) resetRoundState() {
+	engine.state.RoundState = match.RoundState{}
 }

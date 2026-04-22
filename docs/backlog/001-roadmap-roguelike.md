@@ -1,6 +1,29 @@
-# Backlog inicial roguelike
+# Roadmap roguelike
 
-Este documento recopila los primeros pendientes de discovery y delivery para llevar el proyecto desde el duelo de pesca actual hasta un roguelike completo.
+Este documento concentra los pendientes activos de discovery y delivery para llevar el proyecto desde el duelo de pesca actual hacia una estructura roguelike mas completa.
+
+## Proximo foco
+
+### BL-005 Disenar sistema extensible de efectos de cartas
+- **Tipo**: Delivery
+- **Objetivo**: consolidar una arquitectura preparada para cartas de pez y de jugador sin seguir agregando casos aislados.
+- **Resultado esperado**: sistema tecnico para encadenar efectos de carta por fases, trigger y owner.
+- **Dependencias**: plan 008
+- **Prioridad**: Alta
+
+### BL-006 Definir arquetipos de peces
+- **Tipo**: Discovery
+- **Objetivo**: decidir familias de pez con identidad de gameplay clara sobre la nueva base de efectos.
+- **Resultado esperado**: categorias como agresivo, evasivo, controlador, agotador, combo o boss.
+- **Dependencias**: plan 008
+- **Prioridad**: Alta
+
+### BL-007 Disenar perfiles data-driven de pez
+- **Tipo**: Delivery
+- **Objetivo**: describir peces por datos y no por wiring manual en codigo.
+- **Resultado esperado**: estructura configurable para mazo, efectos, recompensas y condiciones.
+- **Dependencias**: `BL-006`
+- **Prioridad**: Alta
 
 ## Core Loop
 
@@ -20,43 +43,12 @@ Este documento recopila los primeros pendientes de discovery y delivery para lle
 - **Dependencias**: `BL-001`
 - **Prioridad**: Alta
 
-### BL-003 Diseñar progresion de dificultad entre zonas
+### BL-003 Disenar progresion de dificultad entre zonas
 - **Tipo**: Discovery
 - **Objetivo**: decidir como escala el reto de una zona a la siguiente.
 - **Resultado esperado**: reglas de dificultad por zona, rareza y encounter.
 - **Dependencias**: `BL-001`, `BL-002`
-- **Prioridad**: Alta
-
-## Combat
-
-### BL-004 Catalogar efectos que alteran el combate base
-- **Tipo**: Discovery
-- **Objetivo**: construir una taxonomia de efectos antes de seguir agregando reglas aisladas.
-- **Resultado esperado**: lista de categorias como alteracion de movimientos, recursos, distancia, mazo, orden de resolucion o estado.
-- **Prioridad**: Alta
-
-### BL-005 Diseñar sistema extensible de efectos de combate
-- **Tipo**: Delivery
-- **Objetivo**: dejar una arquitectura preparada para peces y objetos con efectos composables.
-- **Resultado esperado**: sistema tecnico para encadenar modificadores del encounter.
-- **Dependencias**: `BL-004`
-- **Prioridad**: Alta
-
-## Fish
-
-### BL-006 Definir arquetipos de peces
-- **Tipo**: Discovery
-- **Objetivo**: decidir familias de pez por identidad de gameplay.
-- **Resultado esperado**: categorias como agresivo, evasivo, controlador, agotador, combo o boss.
-- **Dependencias**: `BL-004`
-- **Prioridad**: Alta
-
-### BL-007 Diseñar perfiles data-driven de pez
-- **Tipo**: Delivery
-- **Objetivo**: describir peces por datos y no por wiring manual en codigo.
-- **Resultado esperado**: estructura configurable para mazo, efectos, recompensas y condiciones.
-- **Dependencias**: `BL-006`
-- **Prioridad**: Alta
+- **Prioridad**: Media
 
 ## Items y Build
 
@@ -66,12 +58,12 @@ Este documento recopila los primeros pendientes de discovery y delivery para lle
 - **Resultado esperado**: clasificacion inicial de reliquias, consumibles, mejoras pasivas y modificadores de movimientos.
 - **Prioridad**: Alta
 
-### BL-009 Diseñar sistema de sinergias
+### BL-009 Disenar sistema de sinergias
 - **Tipo**: Discovery
-- **Objetivo**: definir como interactuan objetos, recursos y efectos de combate.
+- **Objetivo**: definir como interactuan objetos, recursos y efectos de cartas.
 - **Resultado esperado**: reglas de stacking, activacion y limites de combinacion.
-- **Dependencias**: `BL-008`, `BL-004`
-- **Prioridad**: Alta
+- **Dependencias**: `BL-008`, `BL-005`
+- **Prioridad**: Media
 
 ### BL-010 Implementar primer vertical slice de build
 - **Tipo**: Delivery
@@ -89,12 +81,12 @@ Este documento recopila los primeros pendientes de discovery y delivery para lle
 - **Dependencias**: `BL-001`
 - **Prioridad**: Alta
 
-### BL-012 Diseñar sistema de recompensas entre encuentros
+### BL-012 Disenar sistema de recompensas entre encuentros
 - **Tipo**: Discovery
 - **Objetivo**: decidir como el jugador obtiene recursos, objetos o elecciones tras cada reto.
 - **Resultado esperado**: tabla de recompensas por nodo y por tipo de pez.
 - **Dependencias**: `BL-011`, `BL-002`
-- **Prioridad**: Alta
+- **Prioridad**: Media
 
 ## Collection
 
@@ -104,23 +96,23 @@ Este documento recopila los primeros pendientes de discovery y delivery para lle
 - **Resultado esperado**: definicion de capturas, variantes, rarezas y criterios de registro.
 - **Prioridad**: Media
 
-### BL-014 Diseñar recompensas por coleccion
+### BL-014 Disenar recompensas por coleccion
 - **Tipo**: Discovery
 - **Objetivo**: decidir si la coleccion solo es cosmetica o tambien desbloquea contenido.
 - **Resultado esperado**: reglas de desbloqueo por hitos del bestiario.
 - **Dependencias**: `BL-013`
-- **Prioridad**: Media
+- **Prioridad**: Baja
 
 ## Tech y UX
 
-### BL-015 Diseñar sistema de contenido data-driven
+### BL-015 Disenar sistema de contenido data-driven
 - **Tipo**: Discovery
 - **Objetivo**: preparar peces, objetos y zonas para crecer sin depender de codigo duro.
 - **Resultado esperado**: estrategia de datos y versionado de contenido.
 - **Dependencias**: `BL-007`, `BL-008`
 - **Prioridad**: Media
 
-### BL-016 Diseñar guardado de run y progreso meta
+### BL-016 Disenar guardado de run y progreso meta
 - **Tipo**: Discovery
 - **Objetivo**: decidir como persistir estado de run, coleccion y desbloqueos.
 - **Resultado esperado**: contrato de persistencia y limites de versionado.
@@ -136,12 +128,19 @@ Este documento recopila los primeros pendientes de discovery y delivery para lle
 
 ## Orden sugerido
 
-1. `BL-001`
-2. `BL-002`
-3. `BL-011`
-4. `BL-004`
-5. `BL-006`
-6. `BL-008`
-7. `BL-009`
-8. `BL-013`
-9. `BL-015`
+1. `BL-005`
+2. `BL-006`
+3. `BL-007`
+4. `BL-001`
+5. `BL-002`
+6. `BL-011`
+7. `BL-008`
+8. `BL-003`
+9. `BL-012`
+10. `BL-009`
+11. `BL-017`
+12. `BL-013`
+13. `BL-015`
+14. `BL-016`
+15. `BL-010`
+16. `BL-014`

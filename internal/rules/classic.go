@@ -5,6 +5,7 @@ import "pesca/internal/domain"
 type ClassicEvaluator struct {
 	FishCombatProfile FishCombatProfile
 	CombatConditions  []CombatCondition
+	OutcomeHooks      []OutcomeHook
 }
 
 func NewClassicEvaluator(fishCombatProfile FishCombatProfile, combatConditions ...CombatCondition) ClassicEvaluator {
@@ -13,6 +14,11 @@ func NewClassicEvaluator(fishCombatProfile FishCombatProfile, combatConditions .
 		FishCombatProfile: fishCombatProfile,
 		CombatConditions:  configuredConditions,
 	}
+}
+
+func (e ClassicEvaluator) WithOutcomeHooks(outcomeHooks ...OutcomeHook) ClassicEvaluator {
+	e.OutcomeHooks = append([]OutcomeHook(nil), outcomeHooks...)
+	return e
 }
 
 func (e ClassicEvaluator) Evaluate(playerMove, fishMove domain.Move) domain.RoundOutcome {
@@ -24,11 +30,25 @@ func (e ClassicEvaluator) Evaluate(playerMove, fishMove domain.Move) domain.Roun
 
 	for _, combatCondition := range e.CombatConditions {
 		if outcome, ok := combatCondition.Apply(context); ok {
-			return outcome
+			return e.applyOutcomeHooks(context, outcome)
 		}
 	}
 
-	return evaluateClassicBase(playerMove, fishMove)
+	return e.applyOutcomeHooks(context, evaluateClassicBase(playerMove, fishMove))
+}
+
+func (e ClassicEvaluator) applyOutcomeHooks(context CombatContext, outcome domain.RoundOutcome) domain.RoundOutcome {
+	updatedOutcome := outcome
+	for _, outcomeHook := range e.OutcomeHooks {
+		nextOutcome, ok := outcomeHook.Apply(context, updatedOutcome)
+		if !ok {
+			continue
+		}
+
+		updatedOutcome = nextOutcome
+	}
+
+	return updatedOutcome
 }
 
 func evaluateClassicBase(playerMove, fishMove domain.Move) domain.RoundOutcome {

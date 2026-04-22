@@ -31,10 +31,10 @@ func TestTrackPolicyApply(t *testing.T) {
 			initialState: newMatchState,
 			policy:       TrackPolicy{},
 			round: match.ResolvedRound{
-				PlayerMove:         domain.Blue,
-				FishCard:           cards.NewFishCard(domain.Red),
-				EncounterModifiers: nil,
-				Outcome:            domain.PlayerWin,
+				PlayerMove:  domain.Blue,
+				FishCard:    cards.NewFishCard(domain.Red),
+				CardEffects: nil,
+				Outcome:     domain.PlayerWin,
 			},
 			wantDistance:   2,
 			wantDepth:      1,
@@ -45,27 +45,24 @@ func TestTrackPolicyApply(t *testing.T) {
 			initialState: newMatchState,
 			policy:       TrackPolicy{},
 			round: match.ResolvedRound{
-				PlayerMove:         domain.Blue,
-				FishCard:           cards.NewFishCard(domain.Yellow),
-				EncounterModifiers: nil,
-				Outcome:            domain.FishWin,
+				PlayerMove:  domain.Blue,
+				FishCard:    cards.NewFishCard(domain.Yellow),
+				CardEffects: nil,
+				Outcome:     domain.FishWin,
 			},
 			wantDistance: 4,
 			wantDepth:    1,
 			wantFishWins: 1,
 		},
 		{
-			title:        "applies a depth modifier from the fish card when the trigger matches",
+			title:        "applies card effects after the base round progression",
 			initialState: newMatchState,
 			policy:       TrackPolicy{},
 			round: match.ResolvedRound{
 				PlayerMove: domain.Blue,
-				FishCard: cards.NewFishCard(domain.Yellow, cards.EncounterModifier{
-					Trigger:    cards.TriggerOnFishWin,
-					DepthShift: 1,
-				}),
-				EncounterModifiers: []cards.EncounterModifier{{
-					Trigger:    cards.TriggerOnFishWin,
+				FishCard:   cards.NewFishCard(domain.Yellow),
+				CardEffects: []cards.CardEffect{{
+					Trigger:    cards.TriggerOnOwnerWin,
 					DepthShift: 1,
 				}},
 				Outcome: domain.FishWin,
@@ -84,10 +81,10 @@ func TestTrackPolicyApply(t *testing.T) {
 			},
 			policy: TrackPolicy{},
 			round: match.ResolvedRound{
-				PlayerMove:         domain.Blue,
-				FishCard:           cards.NewFishCard(domain.Red),
-				EncounterModifiers: nil,
-				Outcome:            domain.PlayerWin,
+				PlayerMove:  domain.Blue,
+				FishCard:    cards.NewFishCard(domain.Red),
+				CardEffects: nil,
+				Outcome:     domain.PlayerWin,
 			},
 			wantDistance:   0,
 			wantDepth:      1,
@@ -101,12 +98,9 @@ func TestTrackPolicyApply(t *testing.T) {
 			})},
 			round: match.ResolvedRound{
 				PlayerMove: domain.Blue,
-				FishCard: cards.NewFishCard(domain.Red, cards.EncounterModifier{
-					Trigger:    cards.TriggerOnPlayerWin,
-					DepthShift: -2,
-				}),
-				EncounterModifiers: []cards.EncounterModifier{{
-					Trigger:    cards.TriggerOnPlayerWin,
+				FishCard:   cards.NewFishCard(domain.Red),
+				CardEffects: []cards.CardEffect{{
+					Trigger:    cards.TriggerOnOwnerLose,
 					DepthShift: -2,
 				}},
 				Outcome: domain.PlayerWin,
@@ -127,12 +121,9 @@ func TestTrackPolicyApply(t *testing.T) {
 			})},
 			round: match.ResolvedRound{
 				PlayerMove: domain.Blue,
-				FishCard: cards.NewFishCard(domain.Red, cards.EncounterModifier{
-					Trigger:    cards.TriggerOnPlayerWin,
-					DepthShift: -2,
-				}),
-				EncounterModifiers: []cards.EncounterModifier{{
-					Trigger:    cards.TriggerOnPlayerWin,
+				FishCard:   cards.NewFishCard(domain.Red),
+				CardEffects: []cards.CardEffect{{
+					Trigger:    cards.TriggerOnOwnerLose,
 					DepthShift: -2,
 				}},
 				Outcome: domain.PlayerWin,
@@ -161,6 +152,37 @@ func TestTrackPolicyApply(t *testing.T) {
 			assert.Equal(t, test.wantDraws, state.Stats.Draws)
 			assert.Equal(t, test.wantEvent, state.Encounter.LastEvent)
 			assert.Equal(t, test.wantEndReason, state.Encounter.EndReason)
+		})
+	}
+}
+
+func TestAccumulateCardEffects(t *testing.T) {
+	tests := []struct {
+		title        string
+		initialDelta encounter.Delta
+		effects      []cards.CardEffect
+		wantDelta    encounter.Delta
+	}{
+		{
+			title:        "returns the original delta when there are no card effects",
+			initialDelta: encounter.Delta{DistanceShift: -1},
+			wantDelta:    encounter.Delta{DistanceShift: -1},
+		},
+		{
+			title:        "adds all card effect shifts into the encounter delta",
+			initialDelta: encounter.Delta{DistanceShift: -1},
+			effects: []cards.CardEffect{{
+				DistanceShift: 2,
+			}, {
+				DepthShift: -1,
+			}},
+			wantDelta: encounter.Delta{DistanceShift: 1, DepthShift: -1},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.title, func(t *testing.T) {
+			assert.Equal(t, test.wantDelta, accumulateCardEffects(test.initialDelta, test.effects))
 		})
 	}
 }

@@ -87,7 +87,8 @@ Minimum required sections before implementation starts:
 ## Documentation Structure
 
 - `docs/features/` stores feature plans that enter the implementation workflow.
-- `docs/backlog/` stores product backlog, discovery tasks and future roadmap items.
+- `docs/discoveries/` stores active discovery documents and research outputs tied to future work.
+- `docs/backlog/` stores product backlog, prioritization and future roadmap items.
 
 ## Plan Storage Convention
 
@@ -109,8 +110,10 @@ Implementation branch naming:
 ## Backlog Convention
 
 - Product backlog items live in `docs/backlog/`.
+- Active discovery documents live in `docs/discoveries/`.
 - Use `docs/backlog/TEMPLATE.md` for new entries.
 - Each backlog item should use an identifier `BL-###`.
+- When a backlog item moves into active discovery, document that work under `docs/discoveries/`.
 - When a backlog item becomes implementation-ready, convert it into a feature plan under `docs/features/`.
 
 ## Testing Conventions

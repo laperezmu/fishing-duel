@@ -33,6 +33,28 @@ func TestEncounterEndConditionApply(t *testing.T) {
 			wantEndReason: encounter.EndReasonNone,
 		},
 		{
+			title: "captures when a temporary round bonus extends the capture distance",
+			state: func() match.State {
+				state := newMatchState(t, 1, 0)
+				state.RoundState.Thresholds.CaptureDistanceBonus = 1
+				return state
+			}(),
+			wantFinished:  true,
+			wantStatus:    encounter.StatusCaptured,
+			wantEndReason: encounter.EndReasonTrackCapture,
+		},
+		{
+			title: "captures when a temporary round bonus raises the effective surface threshold",
+			state: func() match.State {
+				state := newMatchState(t, 0, 1)
+				state.RoundState.Thresholds.SurfaceDepthBonus = 1
+				return state
+			}(),
+			wantFinished:  true,
+			wantStatus:    encounter.StatusCaptured,
+			wantEndReason: encounter.EndReasonTrackCapture,
+		},
+		{
 			title:         "escapes when the fish exceeds the player's max distance",
 			state:         newMatchState(t, 6, 1),
 			wantFinished:  true,
@@ -63,6 +85,18 @@ func TestEncounterEndConditionApply(t *testing.T) {
 			state: func() match.State {
 				state := newMatchState(t, 2, 1)
 				state.Deck.Exhausted = true
+				return state
+			}(),
+			wantFinished:  true,
+			wantStatus:    encounter.StatusCaptured,
+			wantEndReason: encounter.EndReasonDeckCapture,
+		},
+		{
+			title: "captures on deck exhaustion when a temporary round bonus extends the exhaustion threshold",
+			state: func() match.State {
+				state := newMatchState(t, 3, 1)
+				state.Deck.Exhausted = true
+				state.RoundState.Thresholds.ExhaustionCaptureDistanceBonus = 1
 				return state
 			}(),
 			wantFinished:  true,

@@ -1,6 +1,7 @@
 package progression
 
 import (
+	"pesca/internal/cards"
 	"pesca/internal/domain"
 	"pesca/internal/encounter"
 	"pesca/internal/match"
@@ -28,14 +29,16 @@ func (policy TrackPolicy) Apply(state *match.State, round match.ResolvedRound) {
 		state.Stats.Draws++
 	}
 
-	for _, modifier := range round.EncounterModifiers {
-		if !modifier.Applies(round.Outcome) {
-			continue
-		}
-
-		delta.DistanceShift += modifier.DistanceShift
-		delta.DepthShift += modifier.DepthShift
-	}
+	delta = accumulateCardEffects(delta, round.CardEffects)
 
 	encounter.ApplyDelta(&state.Encounter, delta, policy.SplashEscapeDecider)
+}
+
+func accumulateCardEffects(delta encounter.Delta, effects []cards.CardEffect) encounter.Delta {
+	for _, effect := range effects {
+		delta.DistanceShift += effect.DistanceShift
+		delta.DepthShift += effect.DepthShift
+	}
+
+	return delta
 }
