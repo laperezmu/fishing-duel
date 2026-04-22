@@ -9,8 +9,10 @@ import (
 const clearSequence = ansiCursorHome + ansiClearScreen
 
 const (
-	encounterCellWidth = 5
-	encounterStride    = encounterCellWidth + 4
+	encounterAxisIndent = 6
+	encounterCellWidth  = 5
+	encounterSeparator  = "~~~~"
+	encounterColumnSpan = encounterCellWidth + len(encounterSeparator)
 )
 
 func renderPromptScreen(title string, status presentation.StatusView, options []presentation.MoveOption, lastRound *presentation.RoundView, message string) string {
@@ -57,6 +59,7 @@ func renderTrackSection(status presentation.StatusView) string {
 	lines := []string{
 		accent("Sedal"),
 		renderEncounterAxis(status.MaxDistance),
+		renderEncounterAxisDivider(status.MaxDistance),
 	}
 
 	for depthLevel := status.SurfaceDepth; depthLevel <= status.MaxDepth; depthLevel++ {
@@ -65,9 +68,10 @@ func renderTrackSection(status presentation.StatusView) string {
 
 	lines = append(lines,
 		renderEncounterEscapeRow(status),
-		"  Orilla                                      Mar abierto",
-		fmt.Sprintf("  Distancia actual: %d | Captura <= %d | Escape > %d | Baraja <= %d", status.FishDistance, status.CaptureDistance, status.MaxDistance, status.ExhaustionCaptureDistance),
+		renderEncounterShoreLabels(status.MaxDistance),
+		fmt.Sprintf("  Distancia actual: %d | Captura <= %d | Escape > %d", status.FishDistance, status.CaptureDistance, status.MaxDistance),
 		fmt.Sprintf("  Profundidad actual: %d | Superficie <= %d | Escape > %d", status.FishDepth, status.SurfaceDepth, status.MaxDepth),
+		fmt.Sprintf("  Baraja agotada: captura con distancia <= %d y profundidad <= %d", status.ExhaustionCaptureDistance, status.SurfaceDepth+1),
 	)
 
 	return strings.Join(lines, "\n")
@@ -137,11 +141,16 @@ func renderGameOverSection(summary presentation.SummaryView) string {
 func renderEncounterAxis(maxDistance int) string {
 	labels := make([]string, 0, maxDistance+2)
 	for distanceLevel := 0; distanceLevel <= maxDistance; distanceLevel++ {
-		labels = append(labels, fmt.Sprintf("%-*d", encounterStride, distanceLevel))
+		labels = append(labels, centerEncounterText(fmt.Sprintf("%d", distanceLevel), encounterColumnSpan))
 	}
-	labels = append(labels, "ESC")
+	labels = append(labels, centerEncounterText("ESC", encounterCellWidth))
 
-	return strings.Repeat(" ", len(renderEncounterRowPrefix("ESC"))) + strings.Join(labels, "")
+	return strings.Repeat(" ", encounterAxisIndent) + strings.Join(labels, "")
+}
+
+func renderEncounterAxisDivider(maxDistance int) string {
+	lineWidth := encounterRenderableWidth(maxDistance)
+	return strings.Repeat(" ", encounterAxisIndent) + strings.Repeat("-", lineWidth)
 }
 
 func renderEncounterRow(status presentation.StatusView, depthLevel int) string {
@@ -152,61 +161,86 @@ func renderEncounterRow(status presentation.StatusView, depthLevel int) string {
 	}
 	cells = append(cells, renderEncounterEscapeColumnCell(status, depthLevel))
 
-	return rowLabel + strings.Join(cells, dim("~~~~"))
+	return rowLabel + strings.Join(cells, dim(encounterSeparator))
 }
 
 func renderEncounterEscapeRow(status presentation.StatusView) string {
 	cells := make([]string, 0, status.MaxDistance+2)
 	for distanceLevel := 0; distanceLevel <= status.MaxDistance; distanceLevel++ {
 		if status.FishDepth > status.MaxDepth && status.FishDistance == distanceLevel {
-			cells = append(cells, accent(padEncounterCell("[F!]")))
+			cells = append(cells, accent(renderEncounterToken("[F!]")))
 			continue
 		}
 
-		cells = append(cells, accent(padEncounterCell("[ESC]")))
+		cells = append(cells, accent(renderEncounterToken("[ESC]")))
 	}
 
 	if status.FishDepth > status.MaxDepth && status.FishDistance > status.MaxDistance {
-		cells = append(cells, accent(padEncounterCell("[F!]")))
+		cells = append(cells, accent(renderEncounterToken("[F!]")))
 	} else {
-		cells = append(cells, accent(padEncounterCell("[ESC]")))
+		cells = append(cells, accent(renderEncounterToken("[ESC]")))
 	}
 
-	return renderEncounterRowPrefix("ESC") + strings.Join(cells, dim("~~~~"))
+	return renderEncounterRowPrefix("ESC") + strings.Join(cells, dim(encounterSeparator))
 }
 
 func renderEncounterCell(status presentation.StatusView, depthLevel, distanceLevel int) string {
 	if depthLevel == status.SurfaceDepth && distanceLevel == 0 {
 		if status.FishDepth <= status.SurfaceDepth && status.FishDistance <= 0 {
-			return accent(padEncounterCell("J/F"))
+			return accent(renderEncounterToken("J/F"))
 		}
 
-		return accent(padEncounterCell("J"))
+		return accent(renderEncounterToken("J"))
 	}
 
 	if status.FishDepth == depthLevel && status.FishDistance == distanceLevel {
-		return accent(padEncounterCell("[F]"))
+		return accent(renderEncounterToken("[F]"))
 	}
 
-	return dim(padEncounterCell("[ ]"))
+	return dim(renderEncounterToken("[ ]"))
 }
 
 func renderEncounterEscapeColumnCell(status presentation.StatusView, depthLevel int) string {
 	if status.FishDistance > status.MaxDistance && status.FishDepth == depthLevel {
-		return accent(padEncounterCell("[F!]"))
+		return accent(renderEncounterToken("[F!]"))
 	}
 
-	return accent(padEncounterCell("[ESC]"))
+	return accent(renderEncounterToken("[ESC]"))
 }
 
 func renderEncounterRowPrefix(label string) string {
 	return fmt.Sprintf("%3s | ", label)
 }
 
-func padEncounterCell(content string) string {
-	if len(content) >= encounterCellWidth {
-		return content
+func renderEncounterShoreLabels(maxDistance int) string {
+	const (
+		leftLabel  = "Orilla"
+		rightLabel = "Mar abierto"
+	)
+
+	padding := encounterRenderableWidth(maxDistance) - len(leftLabel) - len(rightLabel)
+	if padding < 1 {
+		padding = 1
 	}
 
-	return content + strings.Repeat(" ", encounterCellWidth-len(content))
+	return "  " + leftLabel + strings.Repeat(" ", padding) + rightLabel
+}
+
+func encounterRenderableWidth(maxDistance int) int {
+	return (maxDistance+1)*encounterColumnSpan + encounterCellWidth
+}
+
+func centerEncounterText(label string, width int) string {
+	if len(label) >= width {
+		return label
+	}
+
+	leftPadding := (width - len(label)) / 2
+	rightPadding := width - len(label) - leftPadding
+
+	return strings.Repeat(" ", leftPadding) + label + strings.Repeat(" ", rightPadding)
+}
+
+func renderEncounterToken(label string) string {
+	return fmt.Sprintf("%-*s", encounterCellWidth, label)
 }

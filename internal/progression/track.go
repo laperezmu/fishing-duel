@@ -16,7 +16,11 @@ func (policy TrackPolicy) Apply(state *match.State, round match.ResolvedRound) {
 	switch round.Outcome {
 	case domain.PlayerWin:
 		state.Stats.PlayerWins++
-		delta.DistanceShift -= state.Encounter.Config.PlayerWinStep
+		if state.Encounter.Distance <= state.Encounter.Config.CaptureDistance && state.Encounter.Depth > state.Encounter.Config.SurfaceDepth {
+			delta.DepthShift--
+		} else {
+			delta.DistanceShift -= state.Encounter.Config.PlayerWinStep
+		}
 	case domain.FishWin:
 		state.Stats.FishWins++
 		delta.DistanceShift += state.Encounter.Config.FishWinStep

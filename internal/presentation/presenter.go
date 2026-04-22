@@ -48,12 +48,12 @@ func DefaultCatalog() Catalog {
 			encounter.StatusOngoing:  "encuentro en curso",
 		},
 		EndReasons: map[encounter.EndReason]string{
-			encounter.EndReasonTrackCapture: "captura por acercarlo hasta el jugador",
+			encounter.EndReasonTrackCapture: "captura por acercarlo a la orilla y subirlo a la superficie",
 			encounter.EndReasonTrackEscape:  "escape por superar la distancia maxima alcanzable",
 			encounter.EndReasonDepthEscape:  "escape por bajar mas alla de la profundidad alcanzable",
 			encounter.EndReasonSplashEscape: "escape por chapoteo en superficie",
-			encounter.EndReasonDeckCapture:  "captura al agotar la baraja con distancia 2 o menor",
-			encounter.EndReasonDeckEscape:   "escape al agotar la baraja con distancia mayor que 2",
+			encounter.EndReasonDeckCapture:  "captura al agotar la baraja con distancia 2 o menor y profundidad 1 o menor",
+			encounter.EndReasonDeckEscape:   "escape al agotar la baraja sin cumplir la distancia o profundidad de cierre",
 			encounter.EndReasonNone:         "sin resolver",
 		},
 	}

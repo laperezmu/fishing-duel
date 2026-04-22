@@ -15,6 +15,7 @@ import (
 func TestTrackPolicyApply(t *testing.T) {
 	tests := []struct {
 		title          string
+		initialState   func(*testing.T) match.State
 		policy         TrackPolicy
 		round          match.ResolvedRound
 		wantDistance   int
@@ -26,8 +27,9 @@ func TestTrackPolicyApply(t *testing.T) {
 		wantEndReason  encounter.EndReason
 	}{
 		{
-			title:  "moves the fish closer when the player wins",
-			policy: TrackPolicy{},
+			title:        "moves the fish closer when the player wins",
+			initialState: newMatchState,
+			policy:       TrackPolicy{},
 			round: match.ResolvedRound{
 				PlayerMove:         domain.Blue,
 				FishCard:           cards.NewFishCard(domain.Red),
@@ -39,8 +41,9 @@ func TestTrackPolicyApply(t *testing.T) {
 			wantPlayerWins: 1,
 		},
 		{
-			title:  "moves the fish away when the fish wins",
-			policy: TrackPolicy{},
+			title:        "moves the fish away when the fish wins",
+			initialState: newMatchState,
+			policy:       TrackPolicy{},
 			round: match.ResolvedRound{
 				PlayerMove:         domain.Blue,
 				FishCard:           cards.NewFishCard(domain.Yellow),
@@ -52,8 +55,9 @@ func TestTrackPolicyApply(t *testing.T) {
 			wantFishWins: 1,
 		},
 		{
-			title:  "applies a depth modifier from the fish card when the trigger matches",
-			policy: TrackPolicy{},
+			title:        "applies a depth modifier from the fish card when the trigger matches",
+			initialState: newMatchState,
+			policy:       TrackPolicy{},
 			round: match.ResolvedRound{
 				PlayerMove: domain.Blue,
 				FishCard: cards.NewFishCard(domain.Yellow, cards.EncounterModifier{
@@ -71,7 +75,27 @@ func TestTrackPolicyApply(t *testing.T) {
 			wantFishWins: 1,
 		},
 		{
-			title: "triggers a splash event when a card raises the fish above the surface",
+			title: "raises the fish toward the surface when the player wins at capture distance",
+			initialState: func(t *testing.T) match.State {
+				state := newMatchState(t)
+				state.Encounter.Distance = state.Encounter.Config.CaptureDistance
+				state.Encounter.Depth = 2
+				return state
+			},
+			policy: TrackPolicy{},
+			round: match.ResolvedRound{
+				PlayerMove:         domain.Blue,
+				FishCard:           cards.NewFishCard(domain.Red),
+				EncounterModifiers: nil,
+				Outcome:            domain.PlayerWin,
+			},
+			wantDistance:   0,
+			wantDepth:      1,
+			wantPlayerWins: 1,
+		},
+		{
+			title:        "triggers a splash event when a card raises the fish above the surface",
+			initialState: newMatchState,
 			policy: TrackPolicy{SplashEscapeDecider: SplashEscapeDeciderFunc(func(float64) bool {
 				return false
 			})},
@@ -96,7 +120,8 @@ func TestTrackPolicyApply(t *testing.T) {
 			},
 		},
 		{
-			title: "marks a splash escape when the decider resolves a slip",
+			title:        "marks a splash escape when the decider resolves a slip",
+			initialState: newMatchState,
 			policy: TrackPolicy{SplashEscapeDecider: SplashEscapeDeciderFunc(func(float64) bool {
 				return true
 			})},
@@ -125,7 +150,7 @@ func TestTrackPolicyApply(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.title, func(t *testing.T) {
-			state := newMatchState(t)
+			state := test.initialState(t)
 
 			test.policy.Apply(&state, test.round)
 

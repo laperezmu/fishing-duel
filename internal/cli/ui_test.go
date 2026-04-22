@@ -32,8 +32,8 @@ func TestShowIntroIncludesColoredOptions(t *testing.T) {
 	assert.Contains(t, printed, "Tensa el sedal y arrastra al pez hacia la orilla.")
 	assert.Contains(t, printed, "Orilla")
 	assert.Contains(t, printed, "[ESC]")
-	assert.Contains(t, printed, "0    ")
-	assert.Contains(t, printed, "ESC |")
+	assert.Contains(t, printed, "ESC")
+	assert.Contains(t, printed, "ESC | ")
 	assert.Contains(t, printed, "  0 | ")
 	assert.Contains(t, printed, "  1 | ")
 	assert.Contains(t, printed, colorizeMove(domain.Blue, "Tirar"))
@@ -43,6 +43,7 @@ func TestShowIntroIncludesColoredOptions(t *testing.T) {
 	assert.Contains(t, printed, "[F]")
 	assert.Contains(t, printed, "~~~~")
 	assert.Contains(t, printed, "Profundidad actual: 1")
+	assert.Contains(t, printed, "Baraja agotada: captura con distancia <= 2 y profundidad <= 1")
 }
 
 func TestChooseMoveShowsLastRoundSummary(t *testing.T) {

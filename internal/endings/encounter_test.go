@@ -19,11 +19,18 @@ func TestEncounterEndConditionApply(t *testing.T) {
 		wantEndReason encounter.EndReason
 	}{
 		{
-			title:         "captures the fish when distance reaches the capture threshold",
-			state:         newMatchState(t, 0, 1),
+			title:         "captures the fish when distance reaches the capture threshold at the surface",
+			state:         newMatchState(t, 0, 0),
 			wantFinished:  true,
 			wantStatus:    encounter.StatusCaptured,
 			wantEndReason: encounter.EndReasonTrackCapture,
+		},
+		{
+			title:         "keeps the encounter open when the fish is close enough but still below the surface",
+			state:         newMatchState(t, 0, 1),
+			wantFinished:  false,
+			wantStatus:    encounter.StatusOngoing,
+			wantEndReason: encounter.EndReasonNone,
 		},
 		{
 			title:         "escapes when the fish exceeds the player's max distance",
@@ -52,7 +59,7 @@ func TestEncounterEndConditionApply(t *testing.T) {
 			wantEndReason: encounter.EndReasonSplashEscape,
 		},
 		{
-			title: "captures when the deck is exhausted near the player",
+			title: "captures when the deck is exhausted near the player and close to the surface",
 			state: func() match.State {
 				state := newMatchState(t, 2, 1)
 				state.Deck.Exhausted = true
@@ -61,6 +68,17 @@ func TestEncounterEndConditionApply(t *testing.T) {
 			wantFinished:  true,
 			wantStatus:    encounter.StatusCaptured,
 			wantEndReason: encounter.EndReasonDeckCapture,
+		},
+		{
+			title: "escapes when the deck is exhausted near the player but the fish is too deep",
+			state: func() match.State {
+				state := newMatchState(t, 2, 2)
+				state.Deck.Exhausted = true
+				return state
+			}(),
+			wantFinished:  true,
+			wantStatus:    encounter.StatusEscaped,
+			wantEndReason: encounter.EndReasonDeckEscape,
 		},
 		{
 			title: "escapes when the deck is exhausted far from the player",
