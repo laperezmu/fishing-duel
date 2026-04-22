@@ -21,7 +21,8 @@ func TestShowIntroIncludesColoredOptions(t *testing.T) {
 	err := ui.ShowIntro(presenter.Intro())
 	require.NoError(t, err)
 
-	move, err := ui.ChooseMove(presenter.Status(samplePromptState(t)), presenter.Intro().Options)
+	status := presenter.Status(samplePromptState(t))
+	move, err := ui.ChooseMove(status, status.MoveOptions)
 	require.NoError(t, err)
 	assert.Equal(t, domain.Blue, move)
 
@@ -33,6 +34,7 @@ func TestShowIntroIncludesColoredOptions(t *testing.T) {
 	assert.Contains(t, printed, colorizeMove(domain.Blue, "Tirar"))
 	assert.Contains(t, printed, colorizeMove(domain.Red, "Recoger"))
 	assert.Contains(t, printed, colorizeMove(domain.Yellow, "Soltar"))
+	assert.Contains(t, printed, "[3/3]")
 }
 
 func TestChooseMoveShowsLastRoundSummary(t *testing.T) {
@@ -52,19 +54,14 @@ func TestChooseMoveShowsLastRoundSummary(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	_, err = ui.ChooseMove(presentation.StatusView{
-		RoundNumber:               2,
-		FishDistance:              2,
-		CaptureDistance:           0,
-		EscapeDistance:            5,
-		ExhaustionCaptureDistance: 2,
-		ActiveCards:               8,
-		DiscardCards:              1,
-		RecycleCount:              0,
-		PlayerWins:                1,
-		FishWins:                  0,
-		Draws:                     0,
-	}, presenter.Intro().Options)
+	nextRoundStatus := presenter.Status(samplePromptState(t))
+	nextRoundStatus.RoundNumber = 2
+	nextRoundStatus.FishDistance = 2
+	nextRoundStatus.ActiveCards = 8
+	nextRoundStatus.DiscardCards = 1
+	nextRoundStatus.PlayerWins = 1
+
+	_, err = ui.ChooseMove(nextRoundStatus, nextRoundStatus.MoveOptions)
 	require.NoError(t, err)
 
 	printed := out.String()
@@ -73,6 +70,23 @@ func TestChooseMoveShowsLastRoundSummary(t *testing.T) {
 	assert.Contains(t, printed, colorizeMove(domain.Yellow, "Zafarse"))
 	assert.Contains(t, printed, colorizeRoundOutcome(domain.PlayerWin, "gana el jugador"))
 	assert.Contains(t, printed, "Distancia : 2")
+}
+
+func TestChooseMoveRejectsUnavailableMoveUntilPlayerSelectsAvailableOption(t *testing.T) {
+	var out bytes.Buffer
+	ui := NewUI(strings.NewReader("1\n2\n"), &out)
+	presenter := presentation.NewPresenter(presentation.DefaultCatalog())
+	require.NoError(t, ui.ShowIntro(presenter.Intro()))
+
+	status := presenter.Status(samplePromptState(t))
+	status.MoveOptions[0].RemainingUses = 0
+	status.MoveOptions[0].Available = false
+	status.MoveOptions[0].RestoresOnRound = 3
+
+	move, err := ui.ChooseMove(status, status.MoveOptions)
+	require.NoError(t, err)
+	assert.Equal(t, domain.Red, move)
+	assert.Contains(t, out.String(), "la accion tirar recarga en la ronda 3")
 }
 
 func samplePromptState(t *testing.T) match.State {
@@ -86,5 +100,10 @@ func samplePromptState(t *testing.T) match.State {
 			ActiveCards: 9,
 		},
 		Encounter: encounterState,
+		PlayerMoves: match.PlayerMoveResources{Moves: []match.PlayerMoveState{
+			{Move: domain.Blue, MaxUses: 3, RemainingUses: 3},
+			{Move: domain.Red, MaxUses: 3, RemainingUses: 3},
+			{Move: domain.Yellow, MaxUses: 3, RemainingUses: 3},
+		}},
 	}
 }

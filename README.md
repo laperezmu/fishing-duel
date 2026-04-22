@@ -9,6 +9,7 @@ Motor de juego en Go para un duelo de pesca por rondas. El proyecto esta separad
 - `internal/deck/`: mazo del pez, descarte y reciclado.
 - `internal/encounter/`: configuracion y estado del track de distancia.
 - `internal/match/`: estado compartido y resultado acumulado de la partida.
+- `internal/playermoves/`: recursos y recarga de movimientos del jugador.
 - `internal/rules/`: resolucion de rondas `Blue/Red/Yellow`.
 - `internal/progression/`: efectos de una ronda sobre el estado del encuentro.
 - `internal/endings/`: condiciones de fin de partida.

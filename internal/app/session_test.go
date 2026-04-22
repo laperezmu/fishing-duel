@@ -76,7 +76,7 @@ func TestSessionRun(t *testing.T) {
 		fixture.engine.On("State").Return(fixture.finishedState).Twice()
 		fixture.ui.On("ShowIntro", fixture.intro).Return(nil).Once()
 		fixture.presenter.On("Status", fixture.ongoingState).Return(fixture.status).Once()
-		fixture.ui.On("ChooseMove", fixture.status, fixture.intro.Options).Return(domain.Blue, nil).Once()
+		fixture.ui.On("ChooseMove", fixture.status, fixture.status.MoveOptions).Return(domain.Blue, nil).Once()
 		fixture.presenter.On("Round", fixture.roundResult).Return(fixture.round).Once()
 		fixture.ui.On("ShowRound", fixture.round).Return(nil).Once()
 		fixture.presenter.On("Summary", fixture.finishedState).Return(fixture.summary).Once()
@@ -107,7 +107,7 @@ func TestSessionRun(t *testing.T) {
 				fixture.engine.On("State").Return(fixture.ongoingState).Twice()
 				fixture.ui.On("ShowIntro", fixture.intro).Return(nil).Once()
 				fixture.presenter.On("Status", fixture.ongoingState).Return(fixture.status).Once()
-				fixture.ui.On("ChooseMove", fixture.status, fixture.intro.Options).Return(domain.Blue, errors.New("choose failed")).Once()
+				fixture.ui.On("ChooseMove", fixture.status, fixture.status.MoveOptions).Return(domain.Blue, errors.New("choose failed")).Once()
 			},
 			wantErr: "choose move: choose failed",
 		},
@@ -117,7 +117,7 @@ func TestSessionRun(t *testing.T) {
 				fixture.engine.On("State").Return(fixture.ongoingState).Twice()
 				fixture.ui.On("ShowIntro", fixture.intro).Return(nil).Once()
 				fixture.presenter.On("Status", fixture.ongoingState).Return(fixture.status).Once()
-				fixture.ui.On("ChooseMove", fixture.status, fixture.intro.Options).Return(domain.Blue, nil).Once()
+				fixture.ui.On("ChooseMove", fixture.status, fixture.status.MoveOptions).Return(domain.Blue, nil).Once()
 				fixture.engine.On("PlayRound", domain.Blue).Return(match.RoundResult{}, errors.New("round failed")).Once()
 			},
 			wantErr: "play round: round failed",
@@ -128,7 +128,7 @@ func TestSessionRun(t *testing.T) {
 				fixture.engine.On("State").Return(fixture.ongoingState).Twice()
 				fixture.ui.On("ShowIntro", fixture.intro).Return(nil).Once()
 				fixture.presenter.On("Status", fixture.ongoingState).Return(fixture.status).Once()
-				fixture.ui.On("ChooseMove", fixture.status, fixture.intro.Options).Return(domain.Blue, nil).Once()
+				fixture.ui.On("ChooseMove", fixture.status, fixture.status.MoveOptions).Return(domain.Blue, nil).Once()
 				fixture.engine.On("PlayRound", domain.Blue).Return(fixture.roundResult, nil).Once()
 				fixture.presenter.On("Round", fixture.roundResult).Return(fixture.round).Once()
 				fixture.ui.On("ShowRound", fixture.round).Return(errors.New("round view failed")).Once()
@@ -143,7 +143,7 @@ func TestSessionRun(t *testing.T) {
 				fixture.engine.On("State").Return(fixture.finishedState).Twice()
 				fixture.ui.On("ShowIntro", fixture.intro).Return(nil).Once()
 				fixture.presenter.On("Status", fixture.ongoingState).Return(fixture.status).Once()
-				fixture.ui.On("ChooseMove", fixture.status, fixture.intro.Options).Return(domain.Blue, nil).Once()
+				fixture.ui.On("ChooseMove", fixture.status, fixture.status.MoveOptions).Return(domain.Blue, nil).Once()
 				fixture.presenter.On("Round", fixture.roundResult).Return(fixture.round).Once()
 				fixture.ui.On("ShowRound", fixture.round).Return(nil).Once()
 				fixture.presenter.On("Summary", fixture.finishedState).Return(fixture.summary).Once()
@@ -197,7 +197,7 @@ func newSessionFixture(t *testing.T) sessionFixture {
 			{Index: 3, Move: domain.Yellow, Label: "Soltar"},
 		},
 	}
-	status := presentation.StatusView{RoundNumber: 1}
+	status := presentation.StatusView{RoundNumber: 1, MoveOptions: intro.Options}
 	ongoingState := match.State{Round: 0, Finished: false}
 	finishedState := match.State{Round: 1, Finished: true}
 	roundResult := match.RoundResult{Round: 1, PlayerMove: domain.Blue, Outcome: domain.PlayerWin, State: finishedState}

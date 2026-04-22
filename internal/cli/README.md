@@ -8,6 +8,7 @@ Adaptador de interfaz de linea de comandos.
 - Leer input del usuario.
 - Mantener el ultimo estado visual para redibujar la pantalla.
 - Limpiar la terminal entre pasos para evitar spam.
+- Comunicar con claridad que acciones del jugador estan disponibles o recargando.
 
 ## Archivos principales
 

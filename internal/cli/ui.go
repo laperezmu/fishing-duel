@@ -45,8 +45,8 @@ func (ui *UI) ChooseMove(status presentation.StatusView, options []presentation.
 			return 0, fmt.Errorf("entrada finalizada")
 		}
 
-		move, ok := parseMove(ui.scanner.Text(), options)
-		if ok {
+		move, err := parseMove(ui.scanner.Text(), options)
+		if err == nil {
 			ui.lastRound = nil
 			if _, err := io.WriteString(ui.out, clearSequence); err != nil {
 				return 0, err
@@ -54,7 +54,7 @@ func (ui *UI) ChooseMove(status presentation.StatusView, options []presentation.
 			return move, nil
 		}
 
-		message = "Opcion no valida. Usa 1, 2 o 3."
+		message = err.Error()
 	}
 }
 
@@ -69,25 +69,37 @@ func (ui *UI) ShowGameOver(view presentation.SummaryView) error {
 	return err
 }
 
-func parseMove(input string, options []presentation.MoveOption) (domain.Move, bool) {
+func parseMove(input string, options []presentation.MoveOption) (domain.Move, error) {
 	trimmed := strings.TrimSpace(strings.ToLower(input))
 
 	for _, option := range options {
 		if trimmed == strings.ToLower(option.Label) {
-			return option.Move, true
+			return selectMoveOption(option)
 		}
 	}
 
 	choice, err := strconv.Atoi(trimmed)
 	if err != nil {
-		return 0, false
+		return 0, fmt.Errorf("opcion no valida, usa 1, 2 o 3")
 	}
 
 	for _, option := range options {
 		if option.Index == choice {
-			return option.Move, true
+			return selectMoveOption(option)
 		}
 	}
 
-	return 0, false
+	return 0, fmt.Errorf("opcion no valida, usa 1, 2 o 3")
+}
+
+func selectMoveOption(option presentation.MoveOption) (domain.Move, error) {
+	if option.Available {
+		return option.Move, nil
+	}
+
+	if option.RestoresOnRound > 0 {
+		return 0, fmt.Errorf("la accion %s recarga en la ronda %d", strings.ToLower(option.Label), option.RestoresOnRound)
+	}
+
+	return 0, fmt.Errorf("la accion %s no tiene usos disponibles", strings.ToLower(option.Label))
 }

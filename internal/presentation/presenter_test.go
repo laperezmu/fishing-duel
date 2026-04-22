@@ -73,6 +73,11 @@ func TestPresenterStatus(t *testing.T) {
 			FishWins:   1,
 			Draws:      3,
 		},
+		PlayerMoves: match.PlayerMoveResources{Moves: []match.PlayerMoveState{
+			{Move: domain.Blue, MaxUses: 3, RemainingUses: 2},
+			{Move: domain.Red, MaxUses: 3, RemainingUses: 0, RestoresOnRound: 5},
+			{Move: domain.Yellow, MaxUses: 3, RemainingUses: 1},
+		}},
 	}
 
 	status := presenter.Status(state)
@@ -88,6 +93,11 @@ func TestPresenterStatus(t *testing.T) {
 	assert.Equal(t, 2, status.PlayerWins)
 	assert.Equal(t, 1, status.FishWins)
 	assert.Equal(t, 3, status.Draws)
+	require.Len(t, status.MoveOptions, 3)
+	assert.Equal(t, 2, status.MoveOptions[0].RemainingUses)
+	assert.True(t, status.MoveOptions[0].Available)
+	assert.Equal(t, 5, status.MoveOptions[1].RestoresOnRound)
+	assert.False(t, status.MoveOptions[1].Available)
 }
 
 func TestPresenterRound(t *testing.T) {

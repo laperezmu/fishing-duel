@@ -76,6 +76,7 @@ func (p Presenter) Status(state match.State) StatusView {
 		PlayerWins:                state.Stats.PlayerWins,
 		FishWins:                  state.Stats.FishWins,
 		Draws:                     state.Stats.Draws,
+		MoveOptions:               p.moveOptionsForState(state),
 	}
 }
 
@@ -110,6 +111,25 @@ func (p Presenter) moveOptions() []MoveOption {
 		{Index: 2, Move: domain.Red, Label: p.playerMoveLabel(domain.Red)},
 		{Index: 3, Move: domain.Yellow, Label: p.playerMoveLabel(domain.Yellow)},
 	}
+}
+
+func (p Presenter) moveOptionsForState(state match.State) []MoveOption {
+	moveOptions := p.moveOptions()
+	for optionIndex := range moveOptions {
+		for _, moveState := range state.PlayerMoves.Moves {
+			if moveState.Move != moveOptions[optionIndex].Move {
+				continue
+			}
+
+			moveOptions[optionIndex].RemainingUses = moveState.RemainingUses
+			moveOptions[optionIndex].MaxUses = moveState.MaxUses
+			moveOptions[optionIndex].Available = moveState.RemainingUses > 0
+			moveOptions[optionIndex].RestoresOnRound = moveState.RestoresOnRound
+			break
+		}
+	}
+
+	return moveOptions
 }
 
 func (p Presenter) playerMoveLabel(move domain.Move) string {
