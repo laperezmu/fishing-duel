@@ -12,8 +12,10 @@ Modelo compartido del estado acumulado de una partida.
 
 - `State`: estado completo de la partida.
 - `DeckState`: snapshot tecnico del mazo del pez.
+- `PlayerRig`: capacidades operativas actuales del jugador.
 - `PlayerMoveResources`: estado acumulado de usos y recarga de las acciones del jugador.
 - `Stats`: victorias, derrotas y empates acumulados.
+- `ResolvedRound`: resultado base de una ronda antes de derivar la vista final.
 - `RoundResult`: resultado de una ronda ya ejecutada.
 
 ## Regla de arquitectura

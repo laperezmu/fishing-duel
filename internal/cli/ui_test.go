@@ -5,6 +5,7 @@ import (
 	"pesca/internal/domain"
 	"pesca/internal/encounter"
 	"pesca/internal/match"
+	"pesca/internal/playerrig"
 	"pesca/internal/presentation"
 	"strings"
 	"testing"
@@ -31,10 +32,18 @@ func TestShowIntroIncludesColoredOptions(t *testing.T) {
 	assert.Contains(t, printed, "Tensa el sedal y arrastra al pez hacia la orilla.")
 	assert.Contains(t, printed, "Orilla")
 	assert.Contains(t, printed, "[ESC]")
+	assert.Contains(t, printed, "ESC")
+	assert.Contains(t, printed, "ESC | ")
+	assert.Contains(t, printed, "  0 | ")
+	assert.Contains(t, printed, "  1 | ")
 	assert.Contains(t, printed, colorizeMove(domain.Blue, "Tirar"))
 	assert.Contains(t, printed, colorizeMove(domain.Red, "Recoger"))
 	assert.Contains(t, printed, colorizeMove(domain.Yellow, "Soltar"))
 	assert.Contains(t, printed, "[3/3]")
+	assert.Contains(t, printed, "[F]")
+	assert.Contains(t, printed, "~~~~")
+	assert.Contains(t, printed, "Profundidad actual: 1")
+	assert.Contains(t, printed, "Baraja agotada: captura con distancia <= 2 y profundidad <= 1")
 }
 
 func TestChooseMoveShowsLastRoundSummary(t *testing.T) {
@@ -44,19 +53,21 @@ func TestChooseMoveShowsLastRoundSummary(t *testing.T) {
 	require.NoError(t, ui.ShowIntro(presenter.Intro()))
 
 	err := ui.ShowRound(presentation.RoundView{
-		Status:       presentation.StatusView{FishDistance: 2},
+		Status:       presentation.StatusView{FishDistance: 2, FishDepth: 1},
 		PlayerMove:   domain.Blue,
 		FishMove:     domain.Yellow,
 		PlayerLabel:  "Tirar",
 		FishLabel:    "Zafarse",
 		Outcome:      domain.PlayerWin,
 		OutcomeLabel: "gana el jugador",
+		EventLabel:   "chapotea: permanece sujeto",
 	})
 	require.NoError(t, err)
 
 	nextRoundStatus := presenter.Status(samplePromptState(t))
 	nextRoundStatus.RoundNumber = 2
 	nextRoundStatus.FishDistance = 2
+	nextRoundStatus.FishDepth = 1
 	nextRoundStatus.ActiveCards = 8
 	nextRoundStatus.DiscardCards = 1
 	nextRoundStatus.PlayerWins = 1
@@ -70,6 +81,8 @@ func TestChooseMoveShowsLastRoundSummary(t *testing.T) {
 	assert.Contains(t, printed, colorizeMove(domain.Yellow, "Zafarse"))
 	assert.Contains(t, printed, colorizeRoundOutcome(domain.PlayerWin, "gana el jugador"))
 	assert.Contains(t, printed, "Distancia : 2")
+	assert.Contains(t, printed, "Profundidad : 1")
+	assert.Contains(t, printed, "Evento    : chapotea: permanece sujeto")
 }
 
 func TestChooseMoveRejectsUnavailableMoveUntilPlayerSelectsAvailableOption(t *testing.T) {
@@ -100,6 +113,7 @@ func samplePromptState(t *testing.T) match.State {
 			ActiveCards: 9,
 		},
 		Encounter: encounterState,
+		PlayerRig: playerrig.State{MaxDistance: 5, MaxDepth: 4},
 		PlayerMoves: match.PlayerMoveResources{Moves: []match.PlayerMoveState{
 			{Move: domain.Blue, MaxUses: 3, RemainingUses: 3},
 			{Move: domain.Red, MaxUses: 3, RemainingUses: 3},

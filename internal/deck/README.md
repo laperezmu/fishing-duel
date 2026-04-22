@@ -5,7 +5,7 @@ Administracion de la baraja del pez.
 ## Responsabilidad
 
 - Mantener mazo activo y descarte.
-- Robar cartas.
+- Robar cartas del pez con su movimiento y modificadores.
 - Rebarajar cuando el mazo se vacia.
 - Aplicar una politica de reciclado.
 

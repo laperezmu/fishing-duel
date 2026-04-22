@@ -1,7 +1,7 @@
 package deck
 
 import (
-	"pesca/internal/domain"
+	"pesca/internal/cards"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -11,7 +11,7 @@ import (
 func TestDeckDrawRecyclesAndRemovesThreeCards(t *testing.T) {
 	fishDeck := New(
 		NewStandardFishCards(),
-		func([]domain.Move) {},
+		func([]cards.FishCard) {},
 		RemoveCardsRecyclePolicy{CardsToRemove: 3},
 	)
 

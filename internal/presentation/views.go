@@ -23,8 +23,11 @@ type IntroView struct {
 type StatusView struct {
 	RoundNumber               int
 	FishDistance              int
+	FishDepth                 int
+	SurfaceDepth              int
+	MaxDistance               int
+	MaxDepth                  int
 	CaptureDistance           int
-	EscapeDistance            int
 	ExhaustionCaptureDistance int
 	ActiveCards               int
 	DiscardCards              int
@@ -43,11 +46,13 @@ type RoundView struct {
 	FishLabel    string
 	Outcome      domain.RoundOutcome
 	OutcomeLabel string
+	EventLabel   string
 }
 
 type SummaryView struct {
 	TotalRounds     int
 	FishDistance    int
+	FishDepth       int
 	EncounterStatus encounter.Status
 	OutcomeLabel    string
 	EndReasonLabel  string

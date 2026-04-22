@@ -5,11 +5,13 @@ Motor de juego en Go para un duelo de pesca por rondas. El proyecto esta separad
 ## Mapa del proyecto
 
 - `cmd/fishing-duel/`: composicion del ejecutable CLI.
+- `internal/cards/`: cartas y modificadores reutilizables del encounter.
 - `internal/domain/`: tipos base del juego.
 - `internal/deck/`: mazo del pez, descarte y reciclado.
 - `internal/encounter/`: configuracion y estado del track de distancia.
 - `internal/match/`: estado compartido y resultado acumulado de la partida.
 - `internal/playermoves/`: recursos y recarga de movimientos del jugador.
+- `internal/playerrig/`: limites operativos de las herramientas del jugador.
 - `internal/rules/`: resolucion de rondas `Blue/Red/Yellow`.
 - `internal/progression/`: efectos de una ronda sobre el estado del encuentro.
 - `internal/endings/`: condiciones de fin de partida.
@@ -45,7 +47,7 @@ Motor de juego en Go para un duelo de pesca por rondas. El proyecto esta separad
 
 ## Convencion recomendada
 
-- `domain`, `deck`, `encounter`, `match`, `rules`, `progression`, `endings` y `game` no deberian depender de ninguna UI.
+- `cards`, `domain`, `deck`, `encounter`, `match`, `playermoves`, `playerrig`, `rules`, `progression`, `endings` y `game` no deberian depender de ninguna UI.
 - `presentation` convierte estado tecnico a contenido mostrable.
 - `app` coordina el flujo.
 - `cmd/...` solo compone dependencias.

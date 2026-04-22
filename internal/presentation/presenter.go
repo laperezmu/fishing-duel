@@ -11,6 +11,8 @@ type Catalog struct {
 	PlayerMoveLabels map[domain.Move]string
 	FishMoveLabels   map[domain.Move]string
 	RoundOutcomes    map[domain.RoundOutcome]string
+	EncounterEvents  map[encounter.EventKind]string
+	EventOutcomes    map[bool]string
 	EncounterResults map[encounter.Status]string
 	EndReasons       map[encounter.EndReason]string
 }
@@ -33,16 +35,25 @@ func DefaultCatalog() Catalog {
 			domain.PlayerWin: "gana el jugador",
 			domain.FishWin:   "gana el pez",
 		},
+		EncounterEvents: map[encounter.EventKind]string{
+			encounter.EventKindSplash: "chapotea en la superficie",
+		},
+		EventOutcomes: map[bool]string{
+			false: "permanece sujeto",
+			true:  "se suelta del anzuelo",
+		},
 		EncounterResults: map[encounter.Status]string{
 			encounter.StatusCaptured: "pez capturado",
 			encounter.StatusEscaped:  "pez escapado",
 			encounter.StatusOngoing:  "encuentro en curso",
 		},
 		EndReasons: map[encounter.EndReason]string{
-			encounter.EndReasonTrackCapture: "captura por acercarlo hasta el jugador",
-			encounter.EndReasonTrackEscape:  "escape por superar la distancia maxima",
-			encounter.EndReasonDeckCapture:  "captura al agotar la baraja con distancia 2 o menor",
-			encounter.EndReasonDeckEscape:   "escape al agotar la baraja con distancia mayor que 2",
+			encounter.EndReasonTrackCapture: "captura por acercarlo a la orilla y subirlo a la superficie",
+			encounter.EndReasonTrackEscape:  "escape por superar la distancia maxima alcanzable",
+			encounter.EndReasonDepthEscape:  "escape por bajar mas alla de la profundidad alcanzable",
+			encounter.EndReasonSplashEscape: "escape por chapoteo en superficie",
+			encounter.EndReasonDeckCapture:  "captura al agotar la baraja con distancia 2 o menor y profundidad 1 o menor",
+			encounter.EndReasonDeckEscape:   "escape al agotar la baraja sin cumplir la distancia o profundidad de cierre",
 			encounter.EndReasonNone:         "sin resolver",
 		},
 	}
@@ -67,8 +78,11 @@ func (p Presenter) Status(state match.State) StatusView {
 	return StatusView{
 		RoundNumber:               state.Round + 1,
 		FishDistance:              state.Encounter.Distance,
+		FishDepth:                 state.Encounter.Depth,
+		SurfaceDepth:              state.Encounter.Config.SurfaceDepth,
+		MaxDistance:               state.PlayerRig.MaxDistance,
+		MaxDepth:                  state.PlayerRig.MaxDepth,
 		CaptureDistance:           state.Encounter.Config.CaptureDistance,
-		EscapeDistance:            state.Encounter.Config.EscapeDistance,
 		ExhaustionCaptureDistance: state.Encounter.Config.ExhaustionCaptureDistance,
 		ActiveCards:               state.Deck.ActiveCards,
 		DiscardCards:              state.Deck.DiscardCards,
@@ -89,6 +103,7 @@ func (p Presenter) Round(result match.RoundResult) RoundView {
 		FishLabel:    p.fishMoveLabel(result.FishMove),
 		Outcome:      result.Outcome,
 		OutcomeLabel: p.roundOutcomeLabel(result.Outcome),
+		EventLabel:   p.eventLabel(result.State.Encounter.LastEvent),
 	}
 }
 
@@ -96,6 +111,7 @@ func (p Presenter) Summary(state match.State) SummaryView {
 	return SummaryView{
 		TotalRounds:     state.Round,
 		FishDistance:    state.Encounter.Distance,
+		FishDepth:       state.Encounter.Depth,
 		EncounterStatus: state.Encounter.Status,
 		OutcomeLabel:    p.encounterOutcomeLabel(state.Encounter.Status),
 		EndReasonLabel:  p.endReasonLabel(state.Encounter.EndReason),
@@ -103,6 +119,28 @@ func (p Presenter) Summary(state match.State) SummaryView {
 		FishWins:        state.Stats.FishWins,
 		Draws:           state.Stats.Draws,
 	}
+}
+
+func (p Presenter) eventLabel(event encounter.Event) string {
+	if event.Kind == encounter.EventKindNone {
+		return ""
+	}
+
+	eventLabel := string(event.Kind)
+	if configuredLabel, ok := p.catalog.EncounterEvents[event.Kind]; ok {
+		eventLabel = configuredLabel
+	}
+
+	outcomeLabel := ""
+	if configuredOutcomeLabel, ok := p.catalog.EventOutcomes[event.Escaped]; ok {
+		outcomeLabel = configuredOutcomeLabel
+	}
+
+	if outcomeLabel == "" {
+		return eventLabel
+	}
+
+	return eventLabel + ": " + outcomeLabel
 }
 
 func (p Presenter) moveOptions() []MoveOption {

@@ -1,8 +1,10 @@
 package match
 
 import (
+	"pesca/internal/cards"
 	"pesca/internal/domain"
 	"pesca/internal/encounter"
+	"pesca/internal/playerrig"
 )
 
 type DeckState struct {
@@ -33,15 +35,24 @@ type State struct {
 	Round       int
 	Deck        DeckState
 	Encounter   encounter.State
+	PlayerRig   playerrig.State
 	PlayerMoves PlayerMoveResources
 	Stats       Stats
 	Finished    bool
+}
+
+type ResolvedRound struct {
+	PlayerMove         domain.Move
+	FishCard           cards.FishCard
+	EncounterModifiers []cards.EncounterModifier
+	Outcome            domain.RoundOutcome
 }
 
 type RoundResult struct {
 	Round      int
 	PlayerMove domain.Move
 	FishMove   domain.Move
+	FishCard   cards.FishCard
 	Outcome    domain.RoundOutcome
 	State      State
 }
