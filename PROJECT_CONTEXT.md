@@ -84,22 +84,34 @@ Minimum required sections before implementation starts:
 - Criterios de aceptacion
 - Scope
 
+## Documentation Structure
+
+- `docs/features/` stores feature plans that enter the implementation workflow.
+- `docs/backlog/` stores product backlog, discovery tasks and future roadmap items.
+
 ## Plan Storage Convention
 
 Every new feature plan must:
-- Be stored under the root `docs/` directory
+- Be stored under `docs/features/`
 - Be enumerated with a sequential numeric prefix
 - Use the feature plan template defined in this file
 
 Recommended naming format:
-- `docs/001-nombre-corto.md`
-- `docs/002-nombre-corto.md`
+- `docs/features/001-nombre-corto.md`
+- `docs/features/002-nombre-corto.md`
 
 The numbering is part of the workflow and should advance with each new plan.
 
 Implementation branch naming:
-- `docs/001-nombre-corto.md` -> branch `001-nombre-corto`
-- `docs/002-nombre-corto.md` -> branch `002-nombre-corto`
+- `docs/features/001-nombre-corto.md` -> branch `001-nombre-corto`
+- `docs/features/002-nombre-corto.md` -> branch `002-nombre-corto`
+
+## Backlog Convention
+
+- Product backlog items live in `docs/backlog/`.
+- Use `docs/backlog/TEMPLATE.md` for new entries.
+- Each backlog item should use an identifier `BL-###`.
+- When a backlog item becomes implementation-ready, convert it into a feature plan under `docs/features/`.
 
 ## Testing Conventions
 

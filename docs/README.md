@@ -1,16 +1,18 @@
 # Docs
 
-This directory stores feature plans for the project.
+La documentacion del proyecto se divide en dos capas principales.
 
-## Convention
+## Estructura
 
-- Each new plan lives in this directory.
-- Each plan uses a sequential numeric prefix.
-- Suggested format: `001-nombre-corto.md`.
-- Plans should follow the template defined in `PROJECT_CONTEXT.md`.
-- Each implementation branch uses the plan filename without the `.md` suffix.
+- `docs/features/`: planes de features trabajadas bajo el flujo de implementacion.
+- `docs/backlog/`: backlog de investigacion y desarrollo futuro del juego.
 
-## Examples
+## Regla practica
 
-- `docs/001-seleccion-de-pez.md`
-- `docs/002-perfiles-de-encuentro.md`
+- Si una tarea ya se va a implementar, se crea como plan en `docs/features/`.
+- Si una idea aun necesita discovery, definicion o priorizacion, vive en `docs/backlog/`.
+
+## Referencias
+
+- La plantilla de plan de feature sigue definida en `PROJECT_CONTEXT.md`.
+- El backlog tiene su propia guia y template en `docs/backlog/`.
