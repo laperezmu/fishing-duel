@@ -8,11 +8,15 @@ import (
 
 const clearSequence = ansiCursorHome + ansiClearScreen
 
+const (
+	encounterCellWidth = 5
+	encounterStride    = encounterCellWidth + 4
+)
+
 func renderPromptScreen(title string, status presentation.StatusView, options []presentation.MoveOption, lastRound *presentation.RoundView, message string) string {
 	var sections []string
 	sections = append(sections, renderHeader(title))
 	sections = append(sections, renderTrackSection(status))
-	sections = append(sections, renderDepthSection(status))
 	sections = append(sections, renderStatsSection(status))
 	if lastRound != nil {
 		sections = append(sections, renderLastRoundSection(*lastRound))
@@ -50,28 +54,21 @@ func renderHeader(title string) string {
 }
 
 func renderTrackSection(status presentation.StatusView) string {
-	return strings.Join([]string{
+	lines := []string{
 		accent("Sedal"),
-		"  Orilla  " + renderTrack(status.FishDistance, status.MaxDistance) + "  Mar abierto",
-		fmt.Sprintf("  Distancia actual: %d | Captura <= %d | Escape > %d | Baraja <= %d", status.FishDistance, status.CaptureDistance, status.MaxDistance, status.ExhaustionCaptureDistance),
-	}, "\n")
-}
-
-func renderDepthSection(status presentation.StatusView) string {
-	lines := []string{accent("Profundidad")}
+		renderEncounterAxis(status.MaxDistance),
+	}
 
 	for depthLevel := status.SurfaceDepth; depthLevel <= status.MaxDepth; depthLevel++ {
-		lines = append(lines, fmt.Sprintf("  %-10s %s", depthLabel(depthLevel, status.SurfaceDepth, status.MaxDepth), renderDepthMarker(depthLevel, status.FishDepth, status.SurfaceDepth)))
-		if depthLevel < status.MaxDepth || status.FishDepth > status.MaxDepth {
-			lines = append(lines, "             "+dim("|"))
-		}
+		lines = append(lines, renderEncounterRow(status, depthLevel))
 	}
 
-	if status.FishDepth > status.MaxDepth {
-		lines = append(lines, fmt.Sprintf("  %-10s %s", "Escape", accent("[F!]")))
-	}
-
-	lines = append(lines, fmt.Sprintf("  Profundidad actual: %d | Superficie <= %d | Escape > %d", status.FishDepth, status.SurfaceDepth, status.MaxDepth))
+	lines = append(lines,
+		renderEncounterEscapeRow(status),
+		"  Orilla                                      Mar abierto",
+		fmt.Sprintf("  Distancia actual: %d | Captura <= %d | Escape > %d | Baraja <= %d", status.FishDistance, status.CaptureDistance, status.MaxDistance, status.ExhaustionCaptureDistance),
+		fmt.Sprintf("  Profundidad actual: %d | Superficie <= %d | Escape > %d", status.FishDepth, status.SurfaceDepth, status.MaxDepth),
+	)
 
 	return strings.Join(lines, "\n")
 }
@@ -137,60 +134,79 @@ func renderGameOverSection(summary presentation.SummaryView) string {
 	}, "\n")
 }
 
-func renderTrack(fishDistance, escapeDistance int) string {
-	segments := []string{renderPlayerMarker(fishDistance)}
-	for trackPosition := 1; trackPosition <= escapeDistance; trackPosition++ {
-		segments = append(segments, renderTrackMarker(trackPosition, fishDistance))
+func renderEncounterAxis(maxDistance int) string {
+	labels := make([]string, 0, maxDistance+2)
+	for distanceLevel := 0; distanceLevel <= maxDistance; distanceLevel++ {
+		labels = append(labels, fmt.Sprintf("%-*d", encounterStride, distanceLevel))
 	}
-	segments = append(segments, renderEscapeMarker())
-	if fishDistance > escapeDistance {
-		segments = append(segments, accent("F!"))
-	}
+	labels = append(labels, "ESC")
 
-	return strings.Join(segments, dim("~~~~"))
+	return strings.Repeat(" ", len(renderEncounterRowPrefix("ESC"))) + strings.Join(labels, "")
 }
 
-func renderPlayerMarker(fishDistance int) string {
-	if fishDistance <= 0 {
-		return accent("[J/F]")
+func renderEncounterRow(status presentation.StatusView, depthLevel int) string {
+	rowLabel := renderEncounterRowPrefix(fmt.Sprintf("%d", depthLevel))
+	cells := make([]string, 0, status.MaxDistance+2)
+	for distanceLevel := 0; distanceLevel <= status.MaxDistance; distanceLevel++ {
+		cells = append(cells, renderEncounterCell(status, depthLevel, distanceLevel))
 	}
-	return accent("[J]")
+	cells = append(cells, renderEncounterEscapeColumnCell(status, depthLevel))
+
+	return rowLabel + strings.Join(cells, dim("~~~~"))
 }
 
-func renderTrackMarker(trackPosition, fishDistance int) string {
-	if trackPosition == fishDistance {
-		return accent("[F]")
-	}
-	return dim(fmt.Sprintf("[%d]", trackPosition))
-}
-
-func renderEscapeMarker() string {
-	return accent("[ESC]")
-}
-
-func depthLabel(depthLevel, surfaceDepth, maxDepth int) string {
-	if depthLevel == surfaceDepth {
-		return "Superficie"
-	}
-	if depthLevel == maxDepth {
-		return "Fondo"
-	}
-
-	return fmt.Sprintf("Nivel %d", depthLevel)
-}
-
-func renderDepthMarker(depthLevel, fishDepth, surfaceDepth int) string {
-	if depthLevel == surfaceDepth {
-		if fishDepth <= surfaceDepth {
-			return accent("[SUP/F]")
+func renderEncounterEscapeRow(status presentation.StatusView) string {
+	cells := make([]string, 0, status.MaxDistance+2)
+	for distanceLevel := 0; distanceLevel <= status.MaxDistance; distanceLevel++ {
+		if status.FishDepth > status.MaxDepth && status.FishDistance == distanceLevel {
+			cells = append(cells, accent(padEncounterCell("[F!]")))
+			continue
 		}
 
-		return accent("[SUP]")
+		cells = append(cells, accent(padEncounterCell("[ESC]")))
 	}
 
-	if depthLevel == fishDepth {
-		return accent("[F]")
+	if status.FishDepth > status.MaxDepth && status.FishDistance > status.MaxDistance {
+		cells = append(cells, accent(padEncounterCell("[F!]")))
+	} else {
+		cells = append(cells, accent(padEncounterCell("[ESC]")))
 	}
 
-	return dim(fmt.Sprintf("[%d]", depthLevel))
+	return renderEncounterRowPrefix("ESC") + strings.Join(cells, dim("~~~~"))
+}
+
+func renderEncounterCell(status presentation.StatusView, depthLevel, distanceLevel int) string {
+	if depthLevel == status.SurfaceDepth && distanceLevel == 0 {
+		if status.FishDepth <= status.SurfaceDepth && status.FishDistance <= 0 {
+			return accent(padEncounterCell("J/F"))
+		}
+
+		return accent(padEncounterCell("J"))
+	}
+
+	if status.FishDepth == depthLevel && status.FishDistance == distanceLevel {
+		return accent(padEncounterCell("[F]"))
+	}
+
+	return dim(padEncounterCell("[ ]"))
+}
+
+func renderEncounterEscapeColumnCell(status presentation.StatusView, depthLevel int) string {
+	if status.FishDistance > status.MaxDistance && status.FishDepth == depthLevel {
+		return accent(padEncounterCell("[F!]"))
+	}
+
+	return accent(padEncounterCell("[ESC]"))
+}
+
+func renderEncounterRowPrefix(label string) string {
+	return fmt.Sprintf("%3s | ", label)
+}
+
+func padEncounterCell(content string) string {
+	if len(content) >= encounterCellWidth {
+		return content
+	}
+
+	return content + strings.Repeat(" ", encounterCellWidth-len(content))
 }
