@@ -202,7 +202,6 @@ func renderCustomFishDeckSelectionSection(customFishDecks []deck.CustomFishDeck)
 		lines = append(lines,
 			fmt.Sprintf("  %d) %s", index+1, customFishDeck.Name),
 			fmt.Sprintf("     %s", customFishDeck.Description),
-			fmt.Sprintf("     Cartas %d | %s | Reciclado retira %d", len(customFishDeck.FishCards), renderCustomFishDeckOrder(customFishDeck), customFishDeck.CardsToRemove),
 		)
 	}
 

@@ -80,7 +80,7 @@ func TestPresenterStatus(t *testing.T) {
 			Draws:      3,
 		},
 		PlayerMoves: match.PlayerMoveResources{Moves: []match.PlayerMoveState{
-			{Move: domain.Blue, MaxUses: 3, RemainingUses: 2, ActiveCards: []cards.PlayerCard{cards.NewPlayerCard(domain.Blue, cards.CardEffect{Trigger: cards.TriggerOnDraw, CaptureDistanceBonus: 1}), cards.NewPlayerCard(domain.Blue)}},
+			{Move: domain.Blue, MaxUses: 3, RemainingUses: 2, ActiveCards: []cards.PlayerCard{cards.NewNamedPlayerCard("Anzuelo tenso", "Capturas desde un paso mas lejos este round.", domain.Blue, cards.CardEffect{Trigger: cards.TriggerOnDraw, CaptureDistanceBonus: 1}), cards.NewPlayerCard(domain.Blue)}},
 			{Move: domain.Red, MaxUses: 3, RemainingUses: 0, RestoresOnRound: 5},
 			{Move: domain.Yellow, MaxUses: 3, RemainingUses: 1},
 		}},
@@ -104,7 +104,7 @@ func TestPresenterStatus(t *testing.T) {
 	assert.Equal(t, 3, status.Draws)
 	require.Len(t, status.MoveOptions, 3)
 	assert.Equal(t, 2, status.MoveOptions[0].RemainingUses)
-	assert.Equal(t, "draw capt +1", status.MoveOptions[0].CardHint)
+	assert.Equal(t, "Anzuelo tenso", status.MoveOptions[0].CardHint)
 	assert.True(t, status.MoveOptions[0].Available)
 	assert.Equal(t, 5, status.MoveOptions[1].RestoresOnRound)
 	assert.False(t, status.MoveOptions[1].Available)

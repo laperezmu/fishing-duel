@@ -215,6 +215,9 @@ func (p Presenter) playerCardHint(moveState match.PlayerMoveState) string {
 	}
 
 	topCard := moveState.ActiveCards[0]
+	if topCard.Name != "" {
+		return topCard.Name
+	}
 	if len(topCard.Effects) == 0 {
 		return ""
 	}

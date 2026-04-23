@@ -15,7 +15,7 @@ func TestDefaultPlayerDeckPresets(t *testing.T) {
 	require.Len(t, presets, 4)
 	assert.Equal(t, "classic", presets[0].ID)
 	assert.Equal(t, "Clasico", presets[0].Name)
-	assert.Contains(t, presets[1].Description, "on_draw")
+	assert.Contains(t, presets[1].Description, "ventajas temporales")
 	require.NotEmpty(t, presets[1].Details)
 	assert.Contains(t, presets[1].Details[0], "Azul")
 }

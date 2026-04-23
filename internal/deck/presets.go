@@ -35,7 +35,7 @@ func DefaultCustomFishDecks() []CustomFishDeck {
 			Name:        "Clasico",
 			Description: "Baraja base de 9 cartas sin efectos con reciclado clasico.",
 			Details: []string{
-				"9 cartas lisas sin efectos: 3 rojas, 3 azules y 3 amarillas.",
+				"Nueve cartas lisas sin efectos: tres rojas, tres azules y tres amarillas.",
 				"Orden: barajada antes de empezar y en cada reciclado.",
 				"Reciclado: retira 3 cartas por ciclo.",
 			},
@@ -46,11 +46,11 @@ func DefaultCustomFishDecks() []CustomFishDeck {
 		{
 			ID:          "hooked-opening",
 			Name:        "Apertura con anzuelo",
-			Description: "Baraja del pez centrada en `on_draw` para thresholds y cierres tempranos.",
+			Description: "Baraja del pez pensada para abrir el round con ventajas temporales y cierres tempranos.",
 			Details: []string{
-				"Rojo: `draw capt +1`.",
-				"Azul: `draw sup +1`.",
-				"Amarillo: `draw baraja +1`.",
+				"Rojo - Tiron de apertura: al revelarse permite capturar desde un paso mas lejos ese round.",
+				"Azul - Salto de espuma: al revelarse el pez cuenta como un nivel mas cerca de la superficie ese round.",
+				"Amarillo - Ultima ventana: al revelarse amplia el margen de captura cuando se agota la baraja ese round.",
 				"Orden: fijo para probar cada apertura de forma reproducible.",
 			},
 			FishCards: []cards.FishCard{
@@ -67,9 +67,9 @@ func DefaultCustomFishDecks() []CustomFishDeck {
 			Name:        "Presion vertical",
 			Description: "Baraja del pez orientada a hundirse al ganar y subir al perder.",
 			Details: []string{
-				"Azul: `si gana prof +1` o `si pierde prof -1` segun la carta.",
-				"Rojo: `si pierde prof -1`.",
-				"Amarillo: `si gana prof +1`.",
+				"Azul - Tiron al fondo: si gana, el pez baja un nivel mas profundo.",
+				"Rojo - Respiro corto: si pierde, el pez sube un nivel hacia la superficie.",
+				"Amarillo - Caida larga: si gana, el pez baja un nivel mas profundo.",
 				"Orden: fijo para validar la capa vertical paso a paso.",
 			},
 			FishCards: []cards.FishCard{
@@ -84,11 +84,11 @@ func DefaultCustomFishDecks() []CustomFishDeck {
 		{
 			ID:          "mixed-current",
 			Name:        "Corriente mixta",
-			Description: "Baraja del pez que mezcla `on_draw` y respuestas post-outcome en una sola secuencia.",
+			Description: "Baraja del pez que mezcla ventajas al revelarse con respuestas segun el resultado.",
 			Details: []string{
-				"Rojo: `draw capt +1` y `si pierde prof -1`.",
-				"Azul: `draw sup +1` y `si gana dist +1`.",
-				"Amarillo: `empate dist +1`.",
+				"Rojo - Corriente cerrada: al revelarse amplia la captura y, si pierde, sube un nivel hacia la superficie.",
+				"Azul - Oleaje abierto: al revelarse se acerca a la superficie y, si gana, empuja un paso hacia mar abierto.",
+				"Amarillo - Deriva neutra: en empate gana un paso hacia el escape horizontal.",
 				"Orden: fijo para revisar el pipeline completo round a round.",
 			},
 			FishCards: []cards.FishCard{
@@ -116,7 +116,7 @@ func DefaultCustomFishDecks() []CustomFishDeck {
 func cloneFishCards(fishCards []cards.FishCard) []cards.FishCard {
 	clonedFishCards := make([]cards.FishCard, 0, len(fishCards))
 	for _, fishCard := range fishCards {
-		clonedFishCards = append(clonedFishCards, cards.NewFishCard(fishCard.Move, fishCard.Effects...))
+		clonedFishCards = append(clonedFishCards, cards.CloneFishCard(fishCard))
 	}
 
 	return clonedFishCards

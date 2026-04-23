@@ -40,27 +40,27 @@ func DefaultPlayerDeckPresets() []PlayerDeckPreset {
 		{
 			ID:          "hooked-opening",
 			Name:        "Apertura preparada",
-			Description: "Cartas del jugador con `on_draw` para manipular thresholds temporales del round.",
+			Description: "Barajas del jugador pensadas para abrir el round con ventajas temporales al revelar la carta.",
 			Details: []string{
-				"Azul: primera carta `on_draw capt +1`, luego 2 cartas lisas.",
-				"Rojo: primera carta `on_draw sup +1`, luego 2 cartas lisas.",
-				"Amarillo: primera carta `on_draw baraja +1`, luego 2 cartas lisas.",
+				"Azul - Anzuelo tenso: al revelar la carta permite capturar desde un paso mas lejos ese round.",
+				"Rojo - Giro de superficie: al revelar la carta deja al pez contar como un nivel mas cerca de la superficie ese round.",
+				"Amarillo - Reserva final: al revelar la carta amplia el margen de captura cuando se agota la baraja ese round.",
 				"Objetivo: validar aperturas tacticas del jugador sin alterar la UX actual.",
 			},
 			Config: Config{
 				InitialDecks: map[domain.Move][]cards.PlayerCard{
 					domain.Blue: {
-						cards.NewPlayerCard(domain.Blue, cards.CardEffect{Trigger: cards.TriggerOnDraw, CaptureDistanceBonus: 1}),
+						cards.NewNamedPlayerCard("Anzuelo tenso", "Capturas desde un paso mas lejos este round.", domain.Blue, cards.CardEffect{Trigger: cards.TriggerOnDraw, CaptureDistanceBonus: 1}),
 						cards.NewPlayerCard(domain.Blue),
 						cards.NewPlayerCard(domain.Blue),
 					},
 					domain.Red: {
-						cards.NewPlayerCard(domain.Red, cards.CardEffect{Trigger: cards.TriggerOnDraw, SurfaceDepthBonus: 1}),
+						cards.NewNamedPlayerCard("Giro de superficie", "El pez cuenta como un nivel mas cerca de la superficie este round.", domain.Red, cards.CardEffect{Trigger: cards.TriggerOnDraw, SurfaceDepthBonus: 1}),
 						cards.NewPlayerCard(domain.Red),
 						cards.NewPlayerCard(domain.Red),
 					},
 					domain.Yellow: {
-						cards.NewPlayerCard(domain.Yellow, cards.CardEffect{Trigger: cards.TriggerOnDraw, ExhaustionCaptureDistanceBonus: 1}),
+						cards.NewNamedPlayerCard("Reserva final", "Amplia el margen de captura por agotamiento durante este round.", domain.Yellow, cards.CardEffect{Trigger: cards.TriggerOnDraw, ExhaustionCaptureDistanceBonus: 1}),
 						cards.NewPlayerCard(domain.Yellow),
 						cards.NewPlayerCard(domain.Yellow),
 					},
@@ -73,25 +73,25 @@ func DefaultPlayerDeckPresets() []PlayerDeckPreset {
 			Name:        "Respuesta vertical",
 			Description: "Cartas del jugador que castigan resultados con cambios de profundidad.",
 			Details: []string{
-				"Azul: primera carta `si gana prof -1`, luego 2 cartas lisas.",
-				"Rojo: primera carta `si pierde prof -1`, luego 2 cartas lisas.",
-				"Amarillo: primera carta `empate prof -1`, luego 2 cartas lisas.",
+				"Azul - Tiron certero: si ganas, subes al pez un nivel hacia la superficie.",
+				"Rojo - Recobro paciente: si pierdes, aun asi haces subir al pez un nivel.",
+				"Amarillo - Tregua corta: en empate, fuerzas al pez a subir un nivel.",
 				"Objetivo: validar respuestas verticales del jugador segun el outcome.",
 			},
 			Config: Config{
 				InitialDecks: map[domain.Move][]cards.PlayerCard{
 					domain.Blue: {
-						cards.NewPlayerCard(domain.Blue, cards.CardEffect{Trigger: cards.TriggerOnOwnerWin, DepthShift: -1}),
+						cards.NewNamedPlayerCard("Tiron certero", "Si ganas, subes al pez un nivel hacia la superficie.", domain.Blue, cards.CardEffect{Trigger: cards.TriggerOnOwnerWin, DepthShift: -1}),
 						cards.NewPlayerCard(domain.Blue),
 						cards.NewPlayerCard(domain.Blue),
 					},
 					domain.Red: {
-						cards.NewPlayerCard(domain.Red, cards.CardEffect{Trigger: cards.TriggerOnOwnerLose, DepthShift: -1}),
+						cards.NewNamedPlayerCard("Recobro paciente", "Si pierdes, haces subir al pez un nivel de todos modos.", domain.Red, cards.CardEffect{Trigger: cards.TriggerOnOwnerLose, DepthShift: -1}),
 						cards.NewPlayerCard(domain.Red),
 						cards.NewPlayerCard(domain.Red),
 					},
 					domain.Yellow: {
-						cards.NewPlayerCard(domain.Yellow, cards.CardEffect{Trigger: cards.TriggerOnRoundDraw, DepthShift: -1}),
+						cards.NewNamedPlayerCard("Tregua corta", "Si empatas, haces subir al pez un nivel.", domain.Yellow, cards.CardEffect{Trigger: cards.TriggerOnRoundDraw, DepthShift: -1}),
 						cards.NewPlayerCard(domain.Yellow),
 						cards.NewPlayerCard(domain.Yellow),
 					},
@@ -102,17 +102,17 @@ func DefaultPlayerDeckPresets() []PlayerDeckPreset {
 		{
 			ID:          "mixed-current",
 			Name:        "Corriente mixta",
-			Description: "Barajas del jugador con efectos en draw y post-outcome para probar el pipeline completo.",
+			Description: "Barajas del jugador que mezclan ventajas al revelarse con respuestas segun el resultado.",
 			Details: []string{
-				"Azul: primera carta `draw capt +1` y `si gana dist -1`, luego 2 cartas lisas.",
-				"Rojo: primera carta `si pierde prof -1`, luego 2 cartas lisas.",
-				"Amarillo: primera carta `empate sup +1`, luego 2 cartas lisas.",
+				"Azul - Carrera corta: al revelarse acerca la captura y, si ganas, arrastra al pez un paso mas hacia la orilla.",
+				"Rojo - Rescate profundo: si pierdes, haces subir al pez un nivel hacia la superficie.",
+				"Amarillo - Calma tensa: en empate el pez cuenta como un nivel mas cerca de la superficie ese round.",
 				"Objetivo: validar convivencia entre fases y triggers del jugador.",
 			},
 			Config: Config{
 				InitialDecks: map[domain.Move][]cards.PlayerCard{
 					domain.Blue: {
-						cards.NewPlayerCard(domain.Blue,
+						cards.NewNamedPlayerCard("Carrera corta", "Acerca la captura al revelarse y tira del pez si ganas.", domain.Blue,
 							cards.CardEffect{Trigger: cards.TriggerOnDraw, CaptureDistanceBonus: 1},
 							cards.CardEffect{Trigger: cards.TriggerOnOwnerWin, DistanceShift: -1},
 						),
@@ -120,14 +120,14 @@ func DefaultPlayerDeckPresets() []PlayerDeckPreset {
 						cards.NewPlayerCard(domain.Blue),
 					},
 					domain.Red: {
-						cards.NewPlayerCard(domain.Red,
+						cards.NewNamedPlayerCard("Rescate profundo", "Si pierdes, haces subir al pez un nivel.", domain.Red,
 							cards.CardEffect{Trigger: cards.TriggerOnOwnerLose, DepthShift: -1},
 						),
 						cards.NewPlayerCard(domain.Red),
 						cards.NewPlayerCard(domain.Red),
 					},
 					domain.Yellow: {
-						cards.NewPlayerCard(domain.Yellow,
+						cards.NewNamedPlayerCard("Calma tensa", "En empate el pez cuenta como un nivel mas cerca de la superficie.", domain.Yellow,
 							cards.CardEffect{Trigger: cards.TriggerOnRoundDraw, SurfaceDepthBonus: 1},
 						),
 						cards.NewPlayerCard(domain.Yellow),
@@ -145,7 +145,7 @@ func cloneInitialDecks(initialDecks map[domain.Move][]cards.PlayerCard) map[doma
 	for move, configuredDeck := range initialDecks {
 		clonedDeck := make([]cards.PlayerCard, 0, len(configuredDeck))
 		for _, playerCard := range configuredDeck {
-			clonedDeck = append(clonedDeck, cards.NewPlayerCard(playerCard.Move, playerCard.Effects...))
+			clonedDeck = append(clonedDeck, cards.ClonePlayerCard(playerCard))
 		}
 		clonedDecks[move] = clonedDeck
 	}

@@ -43,7 +43,7 @@ func TestShowIntroIncludesColoredOptions(t *testing.T) {
 	assert.Contains(t, printed, colorizeMove(domain.Red, "Recoger"))
 	assert.Contains(t, printed, colorizeMove(domain.Yellow, "Soltar"))
 	assert.Contains(t, printed, "[3/3]")
-	assert.Contains(t, printed, "{draw capt +1}")
+	assert.Contains(t, printed, "{Anzuelo tenso}")
 	assert.Contains(t, printed, "[F]")
 	assert.Contains(t, printed, "~~~~")
 	assert.Contains(t, printed, "Profundidad actual: 1")
@@ -115,7 +115,7 @@ func TestChoosePlayerDeckPreset(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, "Apertura", preset.Name)
 	assert.Contains(t, out.String(), "Preset del jugador")
-	assert.Contains(t, out.String(), "Azul: draw capt +1")
+	assert.Contains(t, out.String(), "Azul - Anzuelo tenso")
 	assert.Contains(t, out.String(), clearSequence)
 }
 
@@ -130,7 +130,7 @@ func TestChooseCustomFishDeck(t *testing.T) {
 	assert.Contains(t, out.String(), "Preset del pez")
 	assert.Contains(t, out.String(), "Confirmar preset")
 	assert.Contains(t, out.String(), "Apertura")
-	assert.Contains(t, out.String(), "Rojo: draw capt +1")
+	assert.Contains(t, out.String(), "Rojo - Tiron de apertura")
 	assert.Contains(t, out.String(), clearSequence)
 }
 
@@ -161,14 +161,14 @@ func TestPresetSelectionScreensHideCardDetailsFromTheList(t *testing.T) {
 	playerSelection := renderPlayerDeckSelectionSection(samplePlayerDeckPresets())
 	fishSelection := renderCustomFishDeckSelectionSection(sampleCustomFishDecks())
 
-	assert.NotContains(t, playerSelection, "Azul: draw capt +1")
-	assert.NotContains(t, fishSelection, "Rojo: draw capt +1")
+	assert.NotContains(t, playerSelection, "Azul - Anzuelo tenso")
+	assert.NotContains(t, fishSelection, "Rojo - Tiron de apertura")
 
 	playerConfirmation := renderPlayerDeckConfirmationSection(samplePlayerDeckPresets()[1])
 	fishConfirmation := renderCustomFishDeckConfirmationSection(sampleCustomFishDecks()[1])
 
-	assert.Contains(t, playerConfirmation, "Azul: draw capt +1")
-	assert.Contains(t, fishConfirmation, "Rojo: draw capt +1")
+	assert.Contains(t, playerConfirmation, "Azul - Anzuelo tenso")
+	assert.Contains(t, fishConfirmation, "Rojo - Tiron de apertura")
 }
 
 func samplePromptState(t *testing.T) match.State {
@@ -184,7 +184,7 @@ func samplePromptState(t *testing.T) match.State {
 		Encounter: encounterState,
 		PlayerRig: playerrig.State{MaxDistance: 5, MaxDepth: 4},
 		PlayerMoves: match.PlayerMoveResources{Moves: []match.PlayerMoveState{
-			{Move: domain.Blue, MaxUses: 3, RemainingUses: 3, ActiveCards: []cards.PlayerCard{cards.NewPlayerCard(domain.Blue, cards.CardEffect{Trigger: cards.TriggerOnDraw, CaptureDistanceBonus: 1}), cards.NewPlayerCard(domain.Blue), cards.NewPlayerCard(domain.Blue)}},
+			{Move: domain.Blue, MaxUses: 3, RemainingUses: 3, ActiveCards: []cards.PlayerCard{cards.NewNamedPlayerCard("Anzuelo tenso", "Capturas desde un paso mas lejos este round.", domain.Blue, cards.CardEffect{Trigger: cards.TriggerOnDraw, CaptureDistanceBonus: 1}), cards.NewPlayerCard(domain.Blue), cards.NewPlayerCard(domain.Blue)}},
 			{Move: domain.Red, MaxUses: 3, RemainingUses: 3, ActiveCards: []cards.PlayerCard{cards.NewPlayerCard(domain.Red), cards.NewPlayerCard(domain.Red), cards.NewPlayerCard(domain.Red)}},
 			{Move: domain.Yellow, MaxUses: 3, RemainingUses: 3, ActiveCards: []cards.PlayerCard{cards.NewPlayerCard(domain.Yellow), cards.NewPlayerCard(domain.Yellow), cards.NewPlayerCard(domain.Yellow)}},
 		}},
@@ -206,7 +206,7 @@ func sampleCustomFishDecks() []deck.CustomFishDeck {
 			ID:          "hooked-opening",
 			Name:        "Apertura",
 			Description: "Con on_draw.",
-			Details:     []string{"Rojo: draw capt +1."},
+			Details:     []string{"Rojo - Tiron de apertura: al revelarse permite capturar desde un paso mas lejos ese round."},
 			FishCards: []cards.FishCard{
 				cards.NewFishCard(domain.Red, cards.CardEffect{Trigger: cards.TriggerOnDraw, CaptureDistanceBonus: 1}),
 			},
@@ -229,10 +229,10 @@ func samplePlayerDeckPresets() []playermoves.PlayerDeckPreset {
 			ID:          "hooked-opening",
 			Name:        "Apertura",
 			Description: "Con on_draw.",
-			Details:     []string{"Azul: draw capt +1."},
+			Details:     []string{"Azul - Anzuelo tenso: al revelar la carta permite capturar desde un paso mas lejos ese round."},
 			Config: playermoves.Config{
 				InitialDecks: map[domain.Move][]cards.PlayerCard{
-					domain.Blue:   {cards.NewPlayerCard(domain.Blue, cards.CardEffect{Trigger: cards.TriggerOnDraw, CaptureDistanceBonus: 1})},
+					domain.Blue:   {cards.NewNamedPlayerCard("Anzuelo tenso", "Capturas desde un paso mas lejos este round.", domain.Blue, cards.CardEffect{Trigger: cards.TriggerOnDraw, CaptureDistanceBonus: 1})},
 					domain.Red:    {cards.NewPlayerCard(domain.Red)},
 					domain.Yellow: {cards.NewPlayerCard(domain.Yellow)},
 				},
