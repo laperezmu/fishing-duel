@@ -126,6 +126,13 @@ Este documento concentra los pendientes activos de discovery y delivery para lle
 - **Dependencias**: `BL-008`, `BL-009`
 - **Prioridad**: Media
 
+### BL-018 Mejorar arquitectura y gobierno de paquetes
+- **Tipo**: Calidad + Delivery
+- **Objetivo**: contener el crecimiento de `internal/` con reglas claras de organizacion y una primera refactorizacion acotada de paquetes.
+- **Resultado esperado**: estrategia de estructura de paquetes mas sostenible, mas una mejora concreta que reduzca acoplamiento o dispersion actual.
+- **Dependencias**: plan 014
+- **Prioridad**: Alta
+
 ## Orden sugerido
 
 1. `BL-005`
@@ -139,8 +146,9 @@ Este documento concentra los pendientes activos de discovery y delivery para lle
 9. `BL-012`
 10. `BL-009`
 11. `BL-017`
-12. `BL-013`
-13. `BL-015`
-14. `BL-016`
-15. `BL-010`
-16. `BL-014`
+12. `BL-018`
+13. `BL-013`
+14. `BL-015`
+15. `BL-016`
+16. `BL-010`
+17. `BL-014`

@@ -1,20 +1,21 @@
-package playermoves
+package playerprofiles
 
 import (
 	"pesca/internal/cards"
 	"pesca/internal/domain"
+	"pesca/internal/player/playermoves"
 )
 
-type PlayerDeckPreset struct {
+type DeckPreset struct {
 	ID          string
 	Name        string
 	Description string
 	Details     []string
-	Config      Config
+	Config      playermoves.Config
 }
 
-func (preset PlayerDeckPreset) BuildConfig(shuffler func([]cards.PlayerCard)) Config {
-	config := Config{
+func (preset DeckPreset) BuildConfig(shuffler func([]cards.PlayerCard)) playermoves.Config {
+	config := playermoves.Config{
 		InitialDecks:        cloneInitialDecks(preset.Config.InitialDecks),
 		DeckShuffler:        shuffler,
 		RecoveryDelayRounds: preset.Config.RecoveryDelayRounds,
@@ -23,8 +24,8 @@ func (preset PlayerDeckPreset) BuildConfig(shuffler func([]cards.PlayerCard)) Co
 	return config
 }
 
-func DefaultPlayerDeckPresets() []PlayerDeckPreset {
-	return []PlayerDeckPreset{
+func DefaultPresets() []DeckPreset {
+	return []DeckPreset{
 		{
 			ID:          "classic",
 			Name:        "Clasico",
@@ -35,7 +36,7 @@ func DefaultPlayerDeckPresets() []PlayerDeckPreset {
 				"Amarillo: 3 cartas lisas sin efectos.",
 				"Recuperacion: 1 ronda tras vaciar una baraja de color.",
 			},
-			Config: DefaultConfig(),
+			Config: playermoves.DefaultConfig(),
 		},
 		{
 			ID:          "hooked-opening",
@@ -47,7 +48,7 @@ func DefaultPlayerDeckPresets() []PlayerDeckPreset {
 				"Amarillo - Reserva final: al revelar la carta amplia el margen de captura cuando se agota la baraja ese round.",
 				"Objetivo: validar aperturas tacticas del jugador sin alterar la UX actual.",
 			},
-			Config: Config{
+			Config: playermoves.Config{
 				InitialDecks: map[domain.Move][]cards.PlayerCard{
 					domain.Blue: {
 						cards.NewNamedPlayerCard("Anzuelo tenso", "Capturas desde un paso mas lejos este round.", domain.Blue, cards.CardEffect{Trigger: cards.TriggerOnDraw, CaptureDistanceBonus: 1}),
@@ -78,7 +79,7 @@ func DefaultPlayerDeckPresets() []PlayerDeckPreset {
 				"Amarillo - Tregua corta: en empate, fuerzas al pez a subir un nivel.",
 				"Objetivo: validar respuestas verticales del jugador segun el outcome.",
 			},
-			Config: Config{
+			Config: playermoves.Config{
 				InitialDecks: map[domain.Move][]cards.PlayerCard{
 					domain.Blue: {
 						cards.NewNamedPlayerCard("Tiron certero", "Si ganas, subes al pez un nivel hacia la superficie.", domain.Blue, cards.CardEffect{Trigger: cards.TriggerOnOwnerWin, DepthShift: -1}),
@@ -109,7 +110,7 @@ func DefaultPlayerDeckPresets() []PlayerDeckPreset {
 				"Amarillo - Calma tensa: en empate el pez cuenta como un nivel mas cerca de la superficie ese round.",
 				"Objetivo: validar convivencia entre fases y triggers del jugador.",
 			},
-			Config: Config{
+			Config: playermoves.Config{
 				InitialDecks: map[domain.Move][]cards.PlayerCard{
 					domain.Blue: {
 						cards.NewNamedPlayerCard("Carrera corta", "Acerca la captura al revelarse y tira del pez si ganas.", domain.Blue,

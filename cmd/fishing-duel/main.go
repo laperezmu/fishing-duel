@@ -7,13 +7,14 @@ import (
 	"pesca/internal/app"
 	"pesca/internal/cards"
 	"pesca/internal/cli"
-	"pesca/internal/deck"
+	"pesca/internal/content/fishprofiles"
+	"pesca/internal/content/playerprofiles"
 	"pesca/internal/encounter"
 	"pesca/internal/endings"
 	"pesca/internal/game"
 	"pesca/internal/match"
-	"pesca/internal/playermoves"
-	"pesca/internal/playerrig"
+	"pesca/internal/player/playermoves"
+	"pesca/internal/player/playerrig"
 	"pesca/internal/presentation"
 	"pesca/internal/progression"
 	"pesca/internal/rules"
@@ -33,16 +34,16 @@ func main() {
 		})
 	}
 	ui := cli.NewUI(os.Stdin, os.Stdout)
-	playerDeckPreset, err := ui.ChoosePlayerDeckPreset("Pesca: duelo contra el pez", playermoves.DefaultPlayerDeckPresets())
+	playerDeckPreset, err := ui.ChoosePlayerDeckPreset("Pesca: duelo contra el pez", playerprofiles.DefaultPresets())
 	if err != nil {
 		exitWithError("error eligiendo preset del jugador", err)
 	}
-	customFishDeck, err := ui.ChooseCustomFishDeck("Pesca: duelo contra el pez", deck.DefaultCustomFishDecks())
+	fishDeckPreset, err := ui.ChooseFishDeckPreset("Pesca: duelo contra el pez", fishprofiles.DefaultPresets())
 	if err != nil {
 		exitWithError("error eligiendo preset de baraja", err)
 	}
 
-	fishDeck := customFishDeck.Build(shuffler)
+	fishDeck := fishDeckPreset.BuildDeck(shuffler)
 
 	encounterState, err := encounter.NewState(encounter.DefaultConfig())
 	if err != nil {

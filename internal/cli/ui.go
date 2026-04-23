@@ -4,9 +4,9 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"pesca/internal/deck"
+	"pesca/internal/content/fishprofiles"
+	"pesca/internal/content/playerprofiles"
 	"pesca/internal/domain"
-	"pesca/internal/playermoves"
 	"pesca/internal/presentation"
 	"strconv"
 	"strings"
@@ -31,24 +31,24 @@ func (ui *UI) ShowIntro(view presentation.IntroView) error {
 	return nil
 }
 
-func (ui *UI) ChoosePlayerDeckPreset(title string, presets []playermoves.PlayerDeckPreset) (playermoves.PlayerDeckPreset, error) {
+func (ui *UI) ChoosePlayerDeckPreset(title string, presets []playerprofiles.DeckPreset) (playerprofiles.DeckPreset, error) {
 	if len(presets) == 0 {
-		return playermoves.PlayerDeckPreset{}, fmt.Errorf("no hay presets de baraja del jugador disponibles")
+		return playerprofiles.DeckPreset{}, fmt.Errorf("no hay presets de baraja del jugador disponibles")
 	}
 
 	message := ""
 	for {
 		if _, err := io.WriteString(ui.out, renderPlayerDeckSelectionScreen(title, presets, message)); err != nil {
-			return playermoves.PlayerDeckPreset{}, err
+			return playerprofiles.DeckPreset{}, err
 		}
 		if _, err := fmt.Fprint(ui.out, "Elige un preset del jugador: "); err != nil {
-			return playermoves.PlayerDeckPreset{}, err
+			return playerprofiles.DeckPreset{}, err
 		}
 		if !ui.scanner.Scan() {
 			if err := ui.scanner.Err(); err != nil {
-				return playermoves.PlayerDeckPreset{}, err
+				return playerprofiles.DeckPreset{}, err
 			}
-			return playermoves.PlayerDeckPreset{}, fmt.Errorf("entrada finalizada")
+			return playerprofiles.DeckPreset{}, fmt.Errorf("entrada finalizada")
 		}
 
 		selectedIndex, err := parsePresetChoice(ui.scanner.Text(), len(presets))
@@ -60,11 +60,11 @@ func (ui *UI) ChoosePlayerDeckPreset(title string, presets []playermoves.PlayerD
 		selectedPreset := presets[selectedIndex]
 		confirmed, err := ui.confirmPlayerDeckPreset(title, selectedPreset)
 		if err != nil {
-			return playermoves.PlayerDeckPreset{}, err
+			return playerprofiles.DeckPreset{}, err
 		}
 		if confirmed {
 			if _, err := io.WriteString(ui.out, clearSequence); err != nil {
-				return playermoves.PlayerDeckPreset{}, err
+				return playerprofiles.DeckPreset{}, err
 			}
 			return selectedPreset, nil
 		}
@@ -73,42 +73,42 @@ func (ui *UI) ChoosePlayerDeckPreset(title string, presets []playermoves.PlayerD
 	}
 }
 
-func (ui *UI) ChooseCustomFishDeck(title string, customFishDecks []deck.CustomFishDeck) (deck.CustomFishDeck, error) {
-	if len(customFishDecks) == 0 {
-		return deck.CustomFishDeck{}, fmt.Errorf("no hay presets de baraja disponibles")
+func (ui *UI) ChooseFishDeckPreset(title string, presets []fishprofiles.FishDeckPreset) (fishprofiles.FishDeckPreset, error) {
+	if len(presets) == 0 {
+		return fishprofiles.FishDeckPreset{}, fmt.Errorf("no hay presets de baraja disponibles")
 	}
 
 	message := ""
 	for {
-		if _, err := io.WriteString(ui.out, renderCustomFishDeckSelectionScreen(title, customFishDecks, message)); err != nil {
-			return deck.CustomFishDeck{}, err
+		if _, err := io.WriteString(ui.out, renderFishDeckSelectionScreen(title, presets, message)); err != nil {
+			return fishprofiles.FishDeckPreset{}, err
 		}
 		if _, err := fmt.Fprint(ui.out, "Elige un preset del pez: "); err != nil {
-			return deck.CustomFishDeck{}, err
+			return fishprofiles.FishDeckPreset{}, err
 		}
 		if !ui.scanner.Scan() {
 			if err := ui.scanner.Err(); err != nil {
-				return deck.CustomFishDeck{}, err
+				return fishprofiles.FishDeckPreset{}, err
 			}
-			return deck.CustomFishDeck{}, fmt.Errorf("entrada finalizada")
+			return fishprofiles.FishDeckPreset{}, fmt.Errorf("entrada finalizada")
 		}
 
-		selectedIndex, err := parsePresetChoice(ui.scanner.Text(), len(customFishDecks))
+		selectedIndex, err := parsePresetChoice(ui.scanner.Text(), len(presets))
 		if err != nil {
 			message = err.Error()
 			continue
 		}
 
-		selectedCustomFishDeck := customFishDecks[selectedIndex]
-		confirmed, err := ui.confirmCustomFishDeck(title, selectedCustomFishDeck)
+		selectedPreset := presets[selectedIndex]
+		confirmed, err := ui.confirmFishDeckPreset(title, selectedPreset)
 		if err != nil {
-			return deck.CustomFishDeck{}, err
+			return fishprofiles.FishDeckPreset{}, err
 		}
 		if confirmed {
 			if _, err := io.WriteString(ui.out, clearSequence); err != nil {
-				return deck.CustomFishDeck{}, err
+				return fishprofiles.FishDeckPreset{}, err
 			}
-			return selectedCustomFishDeck, nil
+			return selectedPreset, nil
 		}
 
 		message = "seleccion cancelada, elige otro preset"
@@ -155,7 +155,7 @@ func (ui *UI) ShowGameOver(view presentation.SummaryView) error {
 	return err
 }
 
-func (ui *UI) confirmPlayerDeckPreset(title string, preset playermoves.PlayerDeckPreset) (bool, error) {
+func (ui *UI) confirmPlayerDeckPreset(title string, preset playerprofiles.DeckPreset) (bool, error) {
 	message := ""
 	for {
 		if _, err := io.WriteString(ui.out, renderPlayerDeckConfirmationScreen(title, preset, message)); err != nil {
@@ -180,10 +180,10 @@ func (ui *UI) confirmPlayerDeckPreset(title string, preset playermoves.PlayerDec
 	}
 }
 
-func (ui *UI) confirmCustomFishDeck(title string, customFishDeck deck.CustomFishDeck) (bool, error) {
+func (ui *UI) confirmFishDeckPreset(title string, preset fishprofiles.FishDeckPreset) (bool, error) {
 	message := ""
 	for {
-		if _, err := io.WriteString(ui.out, renderCustomFishDeckConfirmationScreen(title, customFishDeck, message)); err != nil {
+		if _, err := io.WriteString(ui.out, renderFishDeckConfirmationScreen(title, preset, message)); err != nil {
 			return false, err
 		}
 		if _, err := fmt.Fprint(ui.out, "Confirmar preset del pez? [s/n]: "); err != nil {

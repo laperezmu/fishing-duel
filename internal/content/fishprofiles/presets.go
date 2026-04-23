@@ -1,13 +1,13 @@
-package deck
+package fishprofiles
 
 import (
 	"pesca/internal/cards"
-	"pesca/internal/fishprofiles"
+	"pesca/internal/deck"
 )
 
-type CustomFishDeck struct {
+type FishDeckPreset struct {
 	ID            string
-	ArchetypeID   fishprofiles.ArchetypeID
+	ArchetypeID   ArchetypeID
 	Name          string
 	Description   string
 	Details       []string
@@ -16,24 +16,24 @@ type CustomFishDeck struct {
 	Shuffle       bool
 }
 
-func (customFishDeck CustomFishDeck) Build(shuffler Shuffler) *Deck {
+func (preset FishDeckPreset) BuildDeck(shuffler deck.Shuffler) *deck.Deck {
 	configuredShuffler := shuffler
-	if !customFishDeck.Shuffle {
+	if !preset.Shuffle {
 		configuredShuffler = nil
 	}
 
-	return New(
-		cloneFishCards(customFishDeck.FishCards),
+	return deck.New(
+		cloneFishCards(preset.FishCards),
 		configuredShuffler,
-		RemoveCardsRecyclePolicy{CardsToRemove: customFishDeck.CardsToRemove},
+		deck.RemoveCardsRecyclePolicy{CardsToRemove: preset.CardsToRemove},
 	)
 }
 
-func DefaultCustomFishDecks() []CustomFishDeck {
-	profiles := fishprofiles.DefaultProfiles()
-	customFishDecks := make([]CustomFishDeck, 0, len(profiles))
+func DefaultPresets() []FishDeckPreset {
+	profiles := DefaultProfiles()
+	presets := make([]FishDeckPreset, 0, len(profiles))
 	for _, profile := range profiles {
-		customFishDecks = append(customFishDecks, CustomFishDeck{
+		presets = append(presets, FishDeckPreset{
 			ID:            profile.ID,
 			ArchetypeID:   profile.ArchetypeID,
 			Name:          profile.Name,
@@ -45,7 +45,7 @@ func DefaultCustomFishDecks() []CustomFishDeck {
 		})
 	}
 
-	return customFishDecks
+	return presets
 }
 
 func cloneFishCards(fishCards []cards.FishCard) []cards.FishCard {

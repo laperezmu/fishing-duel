@@ -1,19 +1,18 @@
 # Discoveries
 
-Esta carpeta contiene documentos de discovery ya activos o resultados de investigacion que apoyan futuras features.
+Esta carpeta contiene documentos legacy de discovery o investigacion creados antes de la convencion actual de documento unico por feature.
 
 ## Objetivo
 
-- Separar el backlog de ideas pendientes de los documentos de discovery que ya estan en desarrollo.
-- Dar un lugar estable a taxonomias, analisis y decisiones previas a una implementacion tecnica.
-- Facilitar que una feature de discovery tenga su plan en `docs/features/` y su salida principal en `docs/discoveries/`.
+- Preservar contexto historico sin seguir multiplicando documentos activos por feature.
+- Dar un lugar estable a taxonomias y analisis previos que aun puedan servir como referencia.
 
 ## Convencion
 
-- Usa un prefijo numerico alineado con la feature o iniciativa que origina el discovery cuando aplique.
-- El plan de la feature sigue viviendo en `docs/features/`.
+- Usa un prefijo numerico alineado con la feature o iniciativa que origino el documento cuando aplique.
+- El plan activo de una feature vive en `docs/features/`.
 - El backlog sigue capturando ideas, prioridades y dependencias en `docs/backlog/`.
-- Cuando una feature de discovery produzca un documento de trabajo, ese documento vive en `docs/discoveries/`.
+- No se deben crear nuevos discoveries separados para features nuevas salvo que el usuario lo pida explicitamente.
 
 ## Documentos iniciales
 

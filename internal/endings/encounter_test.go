@@ -3,7 +3,7 @@ package endings
 import (
 	"pesca/internal/encounter"
 	"pesca/internal/match"
-	"pesca/internal/playerrig"
+	"pesca/internal/player/playerrig"
 	"testing"
 
 	"github.com/stretchr/testify/assert"

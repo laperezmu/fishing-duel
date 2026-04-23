@@ -1,4 +1,4 @@
-package playermoves
+package playerprofiles
 
 import (
 	"pesca/internal/cards"
@@ -9,8 +9,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestDefaultPlayerDeckPresets(t *testing.T) {
-	presets := DefaultPlayerDeckPresets()
+func TestDefaultPresets(t *testing.T) {
+	presets := DefaultPresets()
 
 	require.Len(t, presets, 4)
 	assert.Equal(t, "classic", presets[0].ID)
@@ -20,8 +20,8 @@ func TestDefaultPlayerDeckPresets(t *testing.T) {
 	assert.Contains(t, presets[1].Details[0], "Azul")
 }
 
-func TestPlayerDeckPresetBuildConfig(t *testing.T) {
-	preset := DefaultPlayerDeckPresets()[3]
+func TestDeckPresetBuildConfig(t *testing.T) {
+	preset := DefaultPresets()[3]
 	shuffleCalls := 0
 	config := preset.BuildConfig(func([]cards.PlayerCard) {
 		shuffleCalls++

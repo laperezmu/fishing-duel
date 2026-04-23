@@ -1,4 +1,4 @@
-# internal/playerrig
+# internal/player/playerrig
 
 Define las capacidades operativas de las herramientas del jugador.
 
