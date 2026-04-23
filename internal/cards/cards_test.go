@@ -136,3 +136,28 @@ func TestNewPlayerCard(t *testing.T) {
 	assert.Equal(t, domain.Blue, card.Move)
 	assert.Equal(t, effect, card.Effects[0])
 }
+
+func TestNewNamedPlayerCard(t *testing.T) {
+	card := NewNamedPlayerCard("Anzuelo tenso", "Capturas desde un paso mas lejos este round.", domain.Blue, CardEffect{Trigger: TriggerOnDraw, CaptureDistanceBonus: 1})
+
+	require.Len(t, card.Effects, 1)
+	assert.Equal(t, "Anzuelo tenso", card.Name)
+	assert.Equal(t, "Capturas desde un paso mas lejos este round.", card.Summary)
+}
+
+func TestCloneCardsPreserveMetadata(t *testing.T) {
+	fishCard := NewNamedFishCard("Tiron de apertura", "Permite capturar desde un paso mas lejos este round.", domain.Red, CardEffect{Trigger: TriggerOnDraw, CaptureDistanceBonus: 1})
+	playerCard := NewNamedPlayerCard("Anzuelo tenso", "Capturas desde un paso mas lejos este round.", domain.Blue, CardEffect{Trigger: TriggerOnDraw, CaptureDistanceBonus: 1})
+
+	clonedFishCard := CloneFishCard(fishCard)
+	clonedPlayerCard := ClonePlayerCard(playerCard)
+
+	assert.Equal(t, fishCard, clonedFishCard)
+	assert.Equal(t, playerCard, clonedPlayerCard)
+
+	fishCard.Effects[0].CaptureDistanceBonus = 9
+	playerCard.Effects[0].CaptureDistanceBonus = 9
+
+	assert.Equal(t, 1, clonedFishCard.Effects[0].CaptureDistanceBonus)
+	assert.Equal(t, 1, clonedPlayerCard.Effects[0].CaptureDistanceBonus)
+}

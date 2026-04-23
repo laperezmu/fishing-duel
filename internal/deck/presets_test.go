@@ -13,7 +13,7 @@ func TestCustomFishDeckBuildCopiesCardsAndUsesDeckConfig(t *testing.T) {
 	customFishDeck := CustomFishDeck{
 		Name: "Prueba",
 		FishCards: []cards.FishCard{
-			cards.NewFishCard(domain.Red, cards.CardEffect{Trigger: cards.TriggerOnDraw, CaptureDistanceBonus: 1}),
+			cards.NewNamedFishCard("Tiron de apertura", "Permite capturar desde un paso mas lejos este round.", domain.Red, cards.CardEffect{Trigger: cards.TriggerOnDraw, CaptureDistanceBonus: 1}),
 		},
 		CardsToRemove: 0,
 		Shuffle:       false,
@@ -24,6 +24,8 @@ func TestCustomFishDeckBuildCopiesCardsAndUsesDeckConfig(t *testing.T) {
 	})
 
 	require.Len(t, builtDeck.activeCards, 1)
+	assert.Equal(t, "Tiron de apertura", builtDeck.activeCards[0].Name)
+	assert.Equal(t, "Permite capturar desde un paso mas lejos este round.", builtDeck.activeCards[0].Summary)
 	assert.Equal(t, domain.Red, builtDeck.activeCards[0].Move)
 	require.Len(t, builtDeck.activeCards[0].Effects, 1)
 	assert.Equal(t, 1, builtDeck.activeCards[0].Effects[0].CaptureDistanceBonus)
@@ -37,11 +39,14 @@ func TestDefaultCustomFishDecks(t *testing.T) {
 	customFishDecks := DefaultCustomFishDecks()
 
 	require.Len(t, customFishDecks, 4)
+	assert.Equal(t, "classic", customFishDecks[0].ID)
 	assert.Equal(t, "Clasico", customFishDecks[0].Name)
+	assert.NotEmpty(t, customFishDecks[0].Details)
 	assert.True(t, customFishDecks[0].Shuffle)
+	assert.Equal(t, "mixed-current", customFishDecks[3].ID)
 	assert.False(t, customFishDecks[1].Shuffle)
-	assert.Contains(t, customFishDecks[1].Description, "on_draw")
-	assert.Contains(t, customFishDecks[3].Description, "pipeline")
+	assert.Contains(t, customFishDecks[1].Description, "ventajas temporales")
+	assert.Contains(t, customFishDecks[3].Description, "respuestas segun el resultado")
 
 	hasDrawEffect := false
 	for _, fishCard := range customFishDecks[1].FishCards {

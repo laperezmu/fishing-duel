@@ -62,7 +62,7 @@ func (config Config) initialDeckFor(move domain.Move) []cards.PlayerCard {
 	configuredDeck := config.InitialDecks[move]
 	clonedDeck := make([]cards.PlayerCard, 0, len(configuredDeck))
 	for _, playerCard := range configuredDeck {
-		clonedDeck = append(clonedDeck, cards.NewPlayerCard(playerCard.Move, playerCard.Effects...))
+		clonedDeck = append(clonedDeck, cards.ClonePlayerCard(playerCard))
 	}
 
 	return clonedDeck

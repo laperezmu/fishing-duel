@@ -81,11 +81,15 @@ func FilterEffects(effects []CardEffect, context EffectContext) []CardEffect {
 }
 
 type FishCard struct {
+	Name    string
+	Summary string
 	Move    domain.Move
 	Effects []CardEffect
 }
 
 type PlayerCard struct {
+	Name    string
+	Summary string
 	Move    domain.Move
 	Effects []CardEffect
 }
@@ -97,9 +101,37 @@ func NewFishCard(move domain.Move, effects ...CardEffect) FishCard {
 	}
 }
 
+func NewNamedFishCard(name, summary string, move domain.Move, effects ...CardEffect) FishCard {
+	card := NewFishCard(move, effects...)
+	card.Name = name
+	card.Summary = summary
+	return card
+}
+
 func NewPlayerCard(move domain.Move, effects ...CardEffect) PlayerCard {
 	return PlayerCard{
 		Move:    move,
 		Effects: append([]CardEffect(nil), effects...),
 	}
+}
+
+func NewNamedPlayerCard(name, summary string, move domain.Move, effects ...CardEffect) PlayerCard {
+	card := NewPlayerCard(move, effects...)
+	card.Name = name
+	card.Summary = summary
+	return card
+}
+
+func CloneFishCard(card FishCard) FishCard {
+	clonedCard := NewFishCard(card.Move, card.Effects...)
+	clonedCard.Name = card.Name
+	clonedCard.Summary = card.Summary
+	return clonedCard
+}
+
+func ClonePlayerCard(card PlayerCard) PlayerCard {
+	clonedCard := NewPlayerCard(card.Move, card.Effects...)
+	clonedCard.Name = card.Name
+	clonedCard.Summary = card.Summary
+	return clonedCard
 }

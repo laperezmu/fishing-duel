@@ -6,8 +6,10 @@ import (
 )
 
 type CustomFishDeck struct {
+	ID            string
 	Name          string
 	Description   string
+	Details       []string
 	FishCards     []cards.FishCard
 	CardsToRemove int
 	Shuffle       bool
@@ -29,15 +31,28 @@ func (customFishDeck CustomFishDeck) Build(shuffler Shuffler) *Deck {
 func DefaultCustomFishDecks() []CustomFishDeck {
 	return []CustomFishDeck{
 		{
-			Name:          "Clasico",
-			Description:   "Baraja base de 9 cartas sin efectos, mezclada y con reciclado clasico.",
+			ID:          "classic",
+			Name:        "Clasico",
+			Description: "Baraja base de 9 cartas sin efectos con reciclado clasico.",
+			Details: []string{
+				"Nueve cartas lisas sin efectos: tres rojas, tres azules y tres amarillas.",
+				"Orden: barajada antes de empezar y en cada reciclado.",
+				"Reciclado: retira 3 cartas por ciclo.",
+			},
 			FishCards:     NewStandardFishCards(),
 			CardsToRemove: 3,
 			Shuffle:       true,
 		},
 		{
+			ID:          "hooked-opening",
 			Name:        "Apertura con anzuelo",
-			Description: "Prueba efectos `on_draw` que alteran distancia de captura, superficie y cierre por agotamiento.",
+			Description: "Baraja del pez pensada para abrir el round con ventajas temporales y cierres tempranos.",
+			Details: []string{
+				"Rojo - Tiron de apertura: al revelarse permite capturar desde un paso mas lejos ese round.",
+				"Azul - Salto de espuma: al revelarse el pez cuenta como un nivel mas cerca de la superficie ese round.",
+				"Amarillo - Ultima ventana: al revelarse amplia el margen de captura cuando se agota la baraja ese round.",
+				"Orden: fijo para probar cada apertura de forma reproducible.",
+			},
 			FishCards: []cards.FishCard{
 				cards.NewFishCard(domain.Red, cards.CardEffect{Trigger: cards.TriggerOnDraw, CaptureDistanceBonus: 1}),
 				cards.NewFishCard(domain.Blue, cards.CardEffect{Trigger: cards.TriggerOnDraw, SurfaceDepthBonus: 1}),
@@ -48,8 +63,15 @@ func DefaultCustomFishDecks() []CustomFishDeck {
 			Shuffle:       false,
 		},
 		{
+			ID:          "vertical-pressure",
 			Name:        "Presion vertical",
-			Description: "Prueba hundimiento al ganar y subida al perder para validar la capa de profundidad.",
+			Description: "Baraja del pez orientada a hundirse al ganar y subir al perder.",
+			Details: []string{
+				"Azul - Tiron al fondo: si gana, el pez baja un nivel mas profundo.",
+				"Rojo - Respiro corto: si pierde, el pez sube un nivel hacia la superficie.",
+				"Amarillo - Caida larga: si gana, el pez baja un nivel mas profundo.",
+				"Orden: fijo para validar la capa vertical paso a paso.",
+			},
 			FishCards: []cards.FishCard{
 				cards.NewFishCard(domain.Blue, cards.CardEffect{Trigger: cards.TriggerOnOwnerWin, DepthShift: 1}),
 				cards.NewFishCard(domain.Red, cards.CardEffect{Trigger: cards.TriggerOnOwnerLose, DepthShift: -1}),
@@ -60,8 +82,15 @@ func DefaultCustomFishDecks() []CustomFishDeck {
 			Shuffle:       false,
 		},
 		{
+			ID:          "mixed-current",
 			Name:        "Corriente mixta",
-			Description: "Combina `on_draw` y efectos post-outcome para revisar el pipeline completo en una sola partida.",
+			Description: "Baraja del pez que mezcla ventajas al revelarse con respuestas segun el resultado.",
+			Details: []string{
+				"Rojo - Corriente cerrada: al revelarse amplia la captura y, si pierde, sube un nivel hacia la superficie.",
+				"Azul - Oleaje abierto: al revelarse se acerca a la superficie y, si gana, empuja un paso hacia mar abierto.",
+				"Amarillo - Deriva neutra: en empate gana un paso hacia el escape horizontal.",
+				"Orden: fijo para revisar el pipeline completo round a round.",
+			},
 			FishCards: []cards.FishCard{
 				cards.NewFishCard(domain.Red,
 					cards.CardEffect{Trigger: cards.TriggerOnDraw, CaptureDistanceBonus: 1},
@@ -87,7 +116,7 @@ func DefaultCustomFishDecks() []CustomFishDeck {
 func cloneFishCards(fishCards []cards.FishCard) []cards.FishCard {
 	clonedFishCards := make([]cards.FishCard, 0, len(fishCards))
 	for _, fishCard := range fishCards {
-		clonedFishCards = append(clonedFishCards, cards.NewFishCard(fishCard.Move, fishCard.Effects...))
+		clonedFishCards = append(clonedFishCards, cards.CloneFishCard(fishCard))
 	}
 
 	return clonedFishCards

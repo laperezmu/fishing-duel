@@ -1,9 +1,12 @@
 package presentation
 
 import (
+	"fmt"
+	"pesca/internal/cards"
 	"pesca/internal/domain"
 	"pesca/internal/encounter"
 	"pesca/internal/match"
+	"strings"
 )
 
 type Catalog struct {
@@ -159,6 +162,7 @@ func (p Presenter) moveOptionsForState(state match.State) []MoveOption {
 				continue
 			}
 
+			moveOptions[optionIndex].CardHint = p.playerCardHint(moveState)
 			moveOptions[optionIndex].RemainingUses = moveState.RemainingUses
 			moveOptions[optionIndex].MaxUses = moveState.MaxUses
 			moveOptions[optionIndex].Available = moveState.RemainingUses > 0
@@ -203,4 +207,60 @@ func (p Presenter) endReasonLabel(reason encounter.EndReason) string {
 		return label
 	}
 	return string(reason)
+}
+
+func (p Presenter) playerCardHint(moveState match.PlayerMoveState) string {
+	if len(moveState.ActiveCards) == 0 {
+		return ""
+	}
+
+	topCard := moveState.ActiveCards[0]
+	if topCard.Name != "" {
+		return topCard.Name
+	}
+	if len(topCard.Effects) == 0 {
+		return ""
+	}
+
+	parts := make([]string, 0, len(topCard.Effects))
+	for _, effect := range topCard.Effects {
+		impactParts := make([]string, 0, 5)
+		if effect.DistanceShift != 0 {
+			impactParts = append(impactParts, fmt.Sprintf("dist %+d", effect.DistanceShift))
+		}
+		if effect.DepthShift != 0 {
+			impactParts = append(impactParts, fmt.Sprintf("prof %+d", effect.DepthShift))
+		}
+		if effect.CaptureDistanceBonus != 0 {
+			impactParts = append(impactParts, fmt.Sprintf("capt %+d", effect.CaptureDistanceBonus))
+		}
+		if effect.SurfaceDepthBonus != 0 {
+			impactParts = append(impactParts, fmt.Sprintf("sup %+d", effect.SurfaceDepthBonus))
+		}
+		if effect.ExhaustionCaptureDistanceBonus != 0 {
+			impactParts = append(impactParts, fmt.Sprintf("baraja %+d", effect.ExhaustionCaptureDistanceBonus))
+		}
+		if len(impactParts) == 0 {
+			continue
+		}
+
+		parts = append(parts, triggerLabel(effect.Trigger)+" "+strings.Join(impactParts, ", "))
+	}
+
+	return strings.Join(parts, " | ")
+}
+
+func triggerLabel(trigger cards.Trigger) string {
+	switch trigger {
+	case cards.TriggerOnDraw:
+		return "draw"
+	case cards.TriggerOnOwnerWin:
+		return "si gana"
+	case cards.TriggerOnOwnerLose:
+		return "si pierde"
+	case cards.TriggerOnRoundDraw:
+		return "empate"
+	default:
+		return "efecto"
+	}
 }

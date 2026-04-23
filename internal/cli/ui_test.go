@@ -7,6 +7,7 @@ import (
 	"pesca/internal/domain"
 	"pesca/internal/encounter"
 	"pesca/internal/match"
+	"pesca/internal/playermoves"
 	"pesca/internal/playerrig"
 	"pesca/internal/presentation"
 	"strings"
@@ -42,6 +43,7 @@ func TestShowIntroIncludesColoredOptions(t *testing.T) {
 	assert.Contains(t, printed, colorizeMove(domain.Red, "Recoger"))
 	assert.Contains(t, printed, colorizeMove(domain.Yellow, "Soltar"))
 	assert.Contains(t, printed, "[3/3]")
+	assert.Contains(t, printed, "{Anzuelo tenso}")
 	assert.Contains(t, printed, "[F]")
 	assert.Contains(t, printed, "~~~~")
 	assert.Contains(t, printed, "Profundidad actual: 1")
@@ -104,6 +106,19 @@ func TestChooseMoveRejectsUnavailableMoveUntilPlayerSelectsAvailableOption(t *te
 	assert.Contains(t, out.String(), "la accion tirar recarga en la ronda 3")
 }
 
+func TestChoosePlayerDeckPreset(t *testing.T) {
+	var out bytes.Buffer
+	ui := NewUI(strings.NewReader("2\ns\n"), &out)
+
+	preset, err := ui.ChoosePlayerDeckPreset("Pesca: duelo contra el pez", samplePlayerDeckPresets())
+
+	require.NoError(t, err)
+	assert.Equal(t, "Apertura", preset.Name)
+	assert.Contains(t, out.String(), "Preset del jugador")
+	assert.Contains(t, out.String(), "Azul - Anzuelo tenso")
+	assert.Contains(t, out.String(), clearSequence)
+}
+
 func TestChooseCustomFishDeck(t *testing.T) {
 	var out bytes.Buffer
 	ui := NewUI(strings.NewReader("2\ns\n"), &out)
@@ -112,9 +127,10 @@ func TestChooseCustomFishDeck(t *testing.T) {
 
 	require.NoError(t, err)
 	assert.Equal(t, "Apertura", customFishDeck.Name)
-	assert.Contains(t, out.String(), "Presets de baraja del pez")
+	assert.Contains(t, out.String(), "Preset del pez")
 	assert.Contains(t, out.String(), "Confirmar preset")
 	assert.Contains(t, out.String(), "Apertura")
+	assert.Contains(t, out.String(), "Rojo - Tiron de apertura")
 	assert.Contains(t, out.String(), clearSequence)
 }
 
@@ -141,6 +157,20 @@ func TestChooseCustomFishDeckRejectsInvalidInput(t *testing.T) {
 	assert.Contains(t, out.String(), "confirmacion no valida, usa s o n")
 }
 
+func TestPresetSelectionScreensHideCardDetailsFromTheList(t *testing.T) {
+	playerSelection := renderPlayerDeckSelectionSection(samplePlayerDeckPresets())
+	fishSelection := renderCustomFishDeckSelectionSection(sampleCustomFishDecks())
+
+	assert.NotContains(t, playerSelection, "Azul - Anzuelo tenso")
+	assert.NotContains(t, fishSelection, "Rojo - Tiron de apertura")
+
+	playerConfirmation := renderPlayerDeckConfirmationSection(samplePlayerDeckPresets()[1])
+	fishConfirmation := renderCustomFishDeckConfirmationSection(sampleCustomFishDecks()[1])
+
+	assert.Contains(t, playerConfirmation, "Azul - Anzuelo tenso")
+	assert.Contains(t, fishConfirmation, "Rojo - Tiron de apertura")
+}
+
 func samplePromptState(t *testing.T) match.State {
 	t.Helper()
 
@@ -154,9 +184,9 @@ func samplePromptState(t *testing.T) match.State {
 		Encounter: encounterState,
 		PlayerRig: playerrig.State{MaxDistance: 5, MaxDepth: 4},
 		PlayerMoves: match.PlayerMoveResources{Moves: []match.PlayerMoveState{
-			{Move: domain.Blue, MaxUses: 3, RemainingUses: 3},
-			{Move: domain.Red, MaxUses: 3, RemainingUses: 3},
-			{Move: domain.Yellow, MaxUses: 3, RemainingUses: 3},
+			{Move: domain.Blue, MaxUses: 3, RemainingUses: 3, ActiveCards: []cards.PlayerCard{cards.NewNamedPlayerCard("Anzuelo tenso", "Capturas desde un paso mas lejos este round.", domain.Blue, cards.CardEffect{Trigger: cards.TriggerOnDraw, CaptureDistanceBonus: 1}), cards.NewPlayerCard(domain.Blue), cards.NewPlayerCard(domain.Blue)}},
+			{Move: domain.Red, MaxUses: 3, RemainingUses: 3, ActiveCards: []cards.PlayerCard{cards.NewPlayerCard(domain.Red), cards.NewPlayerCard(domain.Red), cards.NewPlayerCard(domain.Red)}},
+			{Move: domain.Yellow, MaxUses: 3, RemainingUses: 3, ActiveCards: []cards.PlayerCard{cards.NewPlayerCard(domain.Yellow), cards.NewPlayerCard(domain.Yellow), cards.NewPlayerCard(domain.Yellow)}},
 		}},
 	}
 }
@@ -164,20 +194,50 @@ func samplePromptState(t *testing.T) match.State {
 func sampleCustomFishDecks() []deck.CustomFishDeck {
 	return []deck.CustomFishDeck{
 		{
+			ID:            "classic",
 			Name:          "Clasico",
 			Description:   "Sin efectos.",
+			Details:       []string{"3 cartas lisas."},
 			FishCards:     []cards.FishCard{cards.NewFishCard(domain.Blue)},
 			CardsToRemove: 3,
 			Shuffle:       true,
 		},
 		{
+			ID:          "hooked-opening",
 			Name:        "Apertura",
 			Description: "Con on_draw.",
+			Details:     []string{"Rojo - Tiron de apertura: al revelarse permite capturar desde un paso mas lejos ese round."},
 			FishCards: []cards.FishCard{
 				cards.NewFishCard(domain.Red, cards.CardEffect{Trigger: cards.TriggerOnDraw, CaptureDistanceBonus: 1}),
 			},
 			CardsToRemove: 0,
 			Shuffle:       false,
+		},
+	}
+}
+
+func samplePlayerDeckPresets() []playermoves.PlayerDeckPreset {
+	return []playermoves.PlayerDeckPreset{
+		{
+			ID:          "classic",
+			Name:        "Clasico",
+			Description: "Sin efectos.",
+			Details:     []string{"Azul: 3 cartas lisas."},
+			Config:      playermoves.DefaultConfig(),
+		},
+		{
+			ID:          "hooked-opening",
+			Name:        "Apertura",
+			Description: "Con on_draw.",
+			Details:     []string{"Azul - Anzuelo tenso: al revelar la carta permite capturar desde un paso mas lejos ese round."},
+			Config: playermoves.Config{
+				InitialDecks: map[domain.Move][]cards.PlayerCard{
+					domain.Blue:   {cards.NewNamedPlayerCard("Anzuelo tenso", "Capturas desde un paso mas lejos este round.", domain.Blue, cards.CardEffect{Trigger: cards.TriggerOnDraw, CaptureDistanceBonus: 1})},
+					domain.Red:    {cards.NewPlayerCard(domain.Red)},
+					domain.Yellow: {cards.NewPlayerCard(domain.Yellow)},
+				},
+				RecoveryDelayRounds: 1,
+			},
 		},
 	}
 }

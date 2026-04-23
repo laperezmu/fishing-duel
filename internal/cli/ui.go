@@ -6,6 +6,7 @@ import (
 	"io"
 	"pesca/internal/deck"
 	"pesca/internal/domain"
+	"pesca/internal/playermoves"
 	"pesca/internal/presentation"
 	"strconv"
 	"strings"
@@ -30,6 +31,48 @@ func (ui *UI) ShowIntro(view presentation.IntroView) error {
 	return nil
 }
 
+func (ui *UI) ChoosePlayerDeckPreset(title string, presets []playermoves.PlayerDeckPreset) (playermoves.PlayerDeckPreset, error) {
+	if len(presets) == 0 {
+		return playermoves.PlayerDeckPreset{}, fmt.Errorf("no hay presets de baraja del jugador disponibles")
+	}
+
+	message := ""
+	for {
+		if _, err := io.WriteString(ui.out, renderPlayerDeckSelectionScreen(title, presets, message)); err != nil {
+			return playermoves.PlayerDeckPreset{}, err
+		}
+		if _, err := fmt.Fprint(ui.out, "Elige un preset del jugador: "); err != nil {
+			return playermoves.PlayerDeckPreset{}, err
+		}
+		if !ui.scanner.Scan() {
+			if err := ui.scanner.Err(); err != nil {
+				return playermoves.PlayerDeckPreset{}, err
+			}
+			return playermoves.PlayerDeckPreset{}, fmt.Errorf("entrada finalizada")
+		}
+
+		selectedIndex, err := parsePresetChoice(ui.scanner.Text(), len(presets))
+		if err != nil {
+			message = err.Error()
+			continue
+		}
+
+		selectedPreset := presets[selectedIndex]
+		confirmed, err := ui.confirmPlayerDeckPreset(title, selectedPreset)
+		if err != nil {
+			return playermoves.PlayerDeckPreset{}, err
+		}
+		if confirmed {
+			if _, err := io.WriteString(ui.out, clearSequence); err != nil {
+				return playermoves.PlayerDeckPreset{}, err
+			}
+			return selectedPreset, nil
+		}
+
+		message = "seleccion cancelada, elige otro preset"
+	}
+}
+
 func (ui *UI) ChooseCustomFishDeck(title string, customFishDecks []deck.CustomFishDeck) (deck.CustomFishDeck, error) {
 	if len(customFishDecks) == 0 {
 		return deck.CustomFishDeck{}, fmt.Errorf("no hay presets de baraja disponibles")
@@ -40,7 +83,7 @@ func (ui *UI) ChooseCustomFishDeck(title string, customFishDecks []deck.CustomFi
 		if _, err := io.WriteString(ui.out, renderCustomFishDeckSelectionScreen(title, customFishDecks, message)); err != nil {
 			return deck.CustomFishDeck{}, err
 		}
-		if _, err := fmt.Fprint(ui.out, "Elige un preset: "); err != nil {
+		if _, err := fmt.Fprint(ui.out, "Elige un preset del pez: "); err != nil {
 			return deck.CustomFishDeck{}, err
 		}
 		if !ui.scanner.Scan() {
@@ -50,7 +93,7 @@ func (ui *UI) ChooseCustomFishDeck(title string, customFishDecks []deck.CustomFi
 			return deck.CustomFishDeck{}, fmt.Errorf("entrada finalizada")
 		}
 
-		selectedIndex, err := parseCustomFishDeckChoice(ui.scanner.Text(), len(customFishDecks))
+		selectedIndex, err := parsePresetChoice(ui.scanner.Text(), len(customFishDecks))
 		if err != nil {
 			message = err.Error()
 			continue
@@ -112,13 +155,38 @@ func (ui *UI) ShowGameOver(view presentation.SummaryView) error {
 	return err
 }
 
+func (ui *UI) confirmPlayerDeckPreset(title string, preset playermoves.PlayerDeckPreset) (bool, error) {
+	message := ""
+	for {
+		if _, err := io.WriteString(ui.out, renderPlayerDeckConfirmationScreen(title, preset, message)); err != nil {
+			return false, err
+		}
+		if _, err := fmt.Fprint(ui.out, "Confirmar preset del jugador? [s/n]: "); err != nil {
+			return false, err
+		}
+		if !ui.scanner.Scan() {
+			if err := ui.scanner.Err(); err != nil {
+				return false, err
+			}
+			return false, fmt.Errorf("entrada finalizada")
+		}
+
+		confirmed, err := parseConfirmation(ui.scanner.Text())
+		if err == nil {
+			return confirmed, nil
+		}
+
+		message = err.Error()
+	}
+}
+
 func (ui *UI) confirmCustomFishDeck(title string, customFishDeck deck.CustomFishDeck) (bool, error) {
 	message := ""
 	for {
 		if _, err := io.WriteString(ui.out, renderCustomFishDeckConfirmationScreen(title, customFishDeck, message)); err != nil {
 			return false, err
 		}
-		if _, err := fmt.Fprint(ui.out, "Confirmar preset? [s/n]: "); err != nil {
+		if _, err := fmt.Fprint(ui.out, "Confirmar preset del pez? [s/n]: "); err != nil {
 			return false, err
 		}
 		if !ui.scanner.Scan() {
@@ -160,7 +228,7 @@ func parseMove(input string, options []presentation.MoveOption) (domain.Move, er
 	return 0, fmt.Errorf("opcion no valida, usa 1, 2 o 3")
 }
 
-func parseCustomFishDeckChoice(input string, availablePresets int) (int, error) {
+func parsePresetChoice(input string, availablePresets int) (int, error) {
 	choice, err := strconv.Atoi(strings.TrimSpace(input))
 	if err != nil {
 		return 0, fmt.Errorf("opcion no valida, usa un numero de preset")
