@@ -30,3 +30,7 @@ type CombatContext struct {
 type CombatCondition interface {
 	Apply(CombatContext) (domain.RoundOutcome, bool)
 }
+
+type OutcomeHook interface {
+	Apply(CombatContext, domain.RoundOutcome) (domain.RoundOutcome, bool)
+}

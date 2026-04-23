@@ -2,39 +2,80 @@ package cards
 
 import "pesca/internal/domain"
 
+type Owner string
+
+const (
+	OwnerFish   Owner = "fish"
+	OwnerPlayer Owner = "player"
+)
+
 type Trigger int
 
 const (
-	TriggerOnDraw Trigger = iota
-	TriggerOnPlayerWin
-	TriggerOnFishWin
+	TriggerOnOwnerWin Trigger = iota
+	TriggerOnOwnerLose
+	TriggerOnRoundDraw
 )
 
-type EncounterModifier struct {
+type EffectContext struct {
+	Owner   Owner
+	Outcome domain.RoundOutcome
+}
+
+type CardEffect struct {
 	Trigger       Trigger
 	DistanceShift int
 	DepthShift    int
 }
 
-func (modifier EncounterModifier) Applies(outcome domain.RoundOutcome) bool {
-	switch modifier.Trigger {
-	case TriggerOnPlayerWin:
-		return outcome == domain.PlayerWin
-	case TriggerOnFishWin:
-		return outcome == domain.FishWin
+func (effect CardEffect) Applies(context EffectContext) bool {
+	switch effect.Trigger {
+	case TriggerOnOwnerWin:
+		return context.Owner == OwnerFish && context.Outcome == domain.FishWin ||
+			context.Owner == OwnerPlayer && context.Outcome == domain.PlayerWin
+	case TriggerOnOwnerLose:
+		return context.Owner == OwnerFish && context.Outcome == domain.PlayerWin ||
+			context.Owner == OwnerPlayer && context.Outcome == domain.FishWin
+	case TriggerOnRoundDraw:
+		return context.Outcome == domain.Draw
 	default:
-		return outcome == domain.Draw
+		return false
 	}
 }
 
-type FishCard struct {
-	Move               domain.Move
-	EncounterModifiers []EncounterModifier
+func FilterEffects(effects []CardEffect, context EffectContext) []CardEffect {
+	filteredEffects := make([]CardEffect, 0, len(effects))
+	for _, effect := range effects {
+		if !effect.Applies(context) {
+			continue
+		}
+
+		filteredEffects = append(filteredEffects, effect)
+	}
+
+	return filteredEffects
 }
 
-func NewFishCard(move domain.Move, encounterModifiers ...EncounterModifier) FishCard {
+type FishCard struct {
+	Move    domain.Move
+	Effects []CardEffect
+}
+
+type PlayerCard struct {
+	Move    domain.Move
+	Effects []CardEffect
+}
+
+func NewFishCard(move domain.Move, effects ...CardEffect) FishCard {
 	return FishCard{
-		Move:               move,
-		EncounterModifiers: append([]EncounterModifier(nil), encounterModifiers...),
+		Move:    move,
+		Effects: append([]CardEffect(nil), effects...),
+	}
+}
+
+func NewPlayerCard(move domain.Move, effects ...CardEffect) PlayerCard {
+	return PlayerCard{
+		Move:    move,
+		Effects: append([]CardEffect(nil), effects...),
 	}
 }

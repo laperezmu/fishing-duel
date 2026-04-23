@@ -31,8 +31,19 @@ type PlayerMoveResources struct {
 	Moves []PlayerMoveState
 }
 
+type RoundThresholdState struct {
+	CaptureDistanceBonus           int
+	ExhaustionCaptureDistanceBonus int
+	SurfaceDepthBonus              int
+}
+
+type RoundState struct {
+	Thresholds RoundThresholdState
+}
+
 type State struct {
 	Round       int
+	RoundState  RoundState
 	Deck        DeckState
 	Encounter   encounter.State
 	PlayerRig   playerrig.State
@@ -42,10 +53,10 @@ type State struct {
 }
 
 type ResolvedRound struct {
-	PlayerMove         domain.Move
-	FishCard           cards.FishCard
-	EncounterModifiers []cards.EncounterModifier
-	Outcome            domain.RoundOutcome
+	PlayerMove  domain.Move
+	FishCard    cards.FishCard
+	CardEffects []cards.CardEffect
+	Outcome     domain.RoundOutcome
 }
 
 type RoundResult struct {

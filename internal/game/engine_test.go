@@ -176,7 +176,10 @@ func TestEnginePlayRound(t *testing.T) {
 			state := arguments.Get(0).(match.State)
 			assert.Equal(t, 0, state.Round)
 		}).Return(nil).Once()
-		fishCard := cards.NewFishCard(domain.Red)
+		fishCard := cards.NewFishCard(domain.Red,
+			cards.CardEffect{Trigger: cards.TriggerOnOwnerLose, DepthShift: -1},
+			cards.CardEffect{Trigger: cards.TriggerOnOwnerWin, DistanceShift: 2},
+		)
 		drawCall := fixture.fishDeck.On("Draw").Return(fishCard, nil).Once()
 		evaluateCall := fixture.roundEvaluator.On("Evaluate", domain.Blue, domain.Red).Return(domain.PlayerWin).Once()
 		consumeMoveCall := fixture.playerMoveController.On("ConsumeMove", mock.AnythingOfType("*match.State"), domain.Blue).Run(func(arguments mock.Arguments) {
@@ -184,10 +187,13 @@ func TestEnginePlayRound(t *testing.T) {
 			assert.Equal(t, 1, state.Round)
 		}).Once()
 		progressionCall := fixture.progressionPolicy.On("Apply", mock.AnythingOfType("*match.State"), match.ResolvedRound{
-			PlayerMove:         domain.Blue,
-			FishCard:           fishCard,
-			EncounterModifiers: nil,
-			Outcome:            domain.PlayerWin,
+			PlayerMove: domain.Blue,
+			FishCard:   fishCard,
+			CardEffects: []cards.CardEffect{{
+				Trigger:    cards.TriggerOnOwnerLose,
+				DepthShift: -1,
+			}},
+			Outcome: domain.PlayerWin,
 		}).Run(func(arguments mock.Arguments) {
 			state := arguments.Get(0).(*match.State)
 			state.Stats.PlayerWins++
