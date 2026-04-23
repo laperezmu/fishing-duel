@@ -27,6 +27,11 @@ func main() {
 			fishCards[i], fishCards[j] = fishCards[j], fishCards[i]
 		})
 	}
+	playerCardShuffler := func(playerCards []cards.PlayerCard) {
+		rng.Shuffle(len(playerCards), func(i, j int) {
+			playerCards[i], playerCards[j] = playerCards[j], playerCards[i]
+		})
+	}
 	ui := cli.NewUI(os.Stdin, os.Stdout)
 	customFishDeck, err := ui.ChooseCustomFishDeck("Pesca: duelo contra el pez", deck.DefaultCustomFishDecks())
 	if err != nil {
@@ -44,7 +49,9 @@ func main() {
 		exitWithError("error configurando herramientas del jugador", err)
 	}
 
-	playerMoveController, err := playermoves.NewUsageController(playermoves.DefaultConfig())
+	playerMoveConfig := playermoves.DefaultConfig()
+	playerMoveConfig.DeckShuffler = playerCardShuffler
+	playerMoveController, err := playermoves.NewUsageController(playerMoveConfig)
 	if err != nil {
 		exitWithError("error configurando movimientos del jugador", err)
 	}

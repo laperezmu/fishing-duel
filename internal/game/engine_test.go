@@ -130,13 +130,14 @@ func TestEnginePlayRound(t *testing.T) {
 		fixture := newEngineFixture(t, match.State{PlayerRig: samplePlayerRigState()})
 		prepareRoundCall := fixture.playerMoveController.On("PrepareRound", mock.AnythingOfType("*match.State")).Once()
 		validateMoveCall := fixture.playerMoveController.On("ValidateMove", mock.Anything, domain.Blue).Return(nil).Once()
+		peekCardCall := fixture.playerMoveController.On("PeekMoveCard", mock.Anything, domain.Blue).Return(cards.NewPlayerCard(domain.Blue), nil).Once()
 		drawCall := fixture.fishDeck.On("Draw").Return(cards.FishCard{}, deck.ErrNoCardsAvailable).Once()
 		activeCountCall := fixture.fishDeck.On("ActiveCount").Return(4).Once()
 		discardCountCall := fixture.fishDeck.On("DiscardCount").Return(5).Once()
 		recycleCountCall := fixture.fishDeck.On("RecycleCount").Return(2).Once()
 		exhaustedCall := fixture.fishDeck.On("Exhausted").Return(false).Once()
 		endConditionCall := fixture.endCondition.On("Apply", mock.AnythingOfType("*match.State")).Once()
-		mock.InOrder(prepareRoundCall, validateMoveCall, drawCall, activeCountCall, discardCountCall, recycleCountCall, exhaustedCall, endConditionCall)
+		mock.InOrder(prepareRoundCall, validateMoveCall, peekCardCall, drawCall, activeCountCall, discardCountCall, recycleCountCall, exhaustedCall, endConditionCall)
 
 		result, err := fixture.engine.PlayRound(domain.Blue)
 
@@ -150,6 +151,7 @@ func TestEnginePlayRound(t *testing.T) {
 		fixture := newEngineFixture(t, match.State{PlayerRig: samplePlayerRigState()})
 		prepareRoundCall := fixture.playerMoveController.On("PrepareRound", mock.AnythingOfType("*match.State")).Once()
 		validateMoveCall := fixture.playerMoveController.On("ValidateMove", mock.Anything, domain.Blue).Return(nil).Once()
+		peekCardCall := fixture.playerMoveController.On("PeekMoveCard", mock.Anything, domain.Blue).Return(cards.NewPlayerCard(domain.Blue), nil).Once()
 		drawCall := fixture.fishDeck.On("Draw").Return(cards.FishCard{}, deck.ErrNoCardsAvailable).Once()
 		activeCountCall := fixture.fishDeck.On("ActiveCount").Return(0).Once()
 		discardCountCall := fixture.fishDeck.On("DiscardCount").Return(0).Once()
@@ -159,7 +161,7 @@ func TestEnginePlayRound(t *testing.T) {
 			state := arguments.Get(0).(*match.State)
 			state.Finished = true
 		}).Once()
-		mock.InOrder(prepareRoundCall, validateMoveCall, drawCall, activeCountCall, discardCountCall, recycleCountCall, exhaustedCall, endConditionCall)
+		mock.InOrder(prepareRoundCall, validateMoveCall, peekCardCall, drawCall, activeCountCall, discardCountCall, recycleCountCall, exhaustedCall, endConditionCall)
 
 		result, err := fixture.engine.PlayRound(domain.Blue)
 
@@ -171,6 +173,7 @@ func TestEnginePlayRound(t *testing.T) {
 
 	t.Run("orchestrates the round using the injected deck and player move controller", func(t *testing.T) {
 		fixture := newEngineFixture(t, match.State{PlayerRig: samplePlayerRigState()})
+		playerCard := cards.NewPlayerCard(domain.Blue, cards.CardEffect{Trigger: cards.TriggerOnDraw, SurfaceDepthBonus: 1})
 		prepareBeforeValidationCall := fixture.playerMoveController.On("PrepareRound", mock.AnythingOfType("*match.State")).Run(func(arguments mock.Arguments) {
 			state := arguments.Get(0).(*match.State)
 			assert.Equal(t, 0, state.Round)
@@ -179,6 +182,7 @@ func TestEnginePlayRound(t *testing.T) {
 			state := arguments.Get(0).(match.State)
 			assert.Equal(t, 0, state.Round)
 		}).Return(nil).Once()
+		peekCardCall := fixture.playerMoveController.On("PeekMoveCard", mock.Anything, domain.Blue).Return(playerCard, nil).Once()
 		fishCard := cards.NewFishCard(domain.Red,
 			cards.CardEffect{Trigger: cards.TriggerOnDraw, CaptureDistanceBonus: 1},
 			cards.CardEffect{Trigger: cards.TriggerOnOwnerLose, DepthShift: -1},
@@ -189,11 +193,15 @@ func TestEnginePlayRound(t *testing.T) {
 		consumeMoveCall := fixture.playerMoveController.On("ConsumeMove", mock.AnythingOfType("*match.State"), domain.Blue).Run(func(arguments mock.Arguments) {
 			state := arguments.Get(0).(*match.State)
 			assert.Equal(t, 1, state.Round)
-		}).Once()
+		}).Return(playerCard).Once()
 		progressionCall := fixture.progressionPolicy.On("Apply", mock.AnythingOfType("*match.State"), match.ResolvedRound{
 			PlayerMove: domain.Blue,
+			PlayerCard: playerCard,
 			FishCard:   fishCard,
 			DrawEffects: []cards.CardEffect{{
+				Trigger:           cards.TriggerOnDraw,
+				SurfaceDepthBonus: 1,
+			}, {
 				Trigger:              cards.TriggerOnDraw,
 				CaptureDistanceBonus: 1,
 			}},
@@ -205,6 +213,7 @@ func TestEnginePlayRound(t *testing.T) {
 		}).Run(func(arguments mock.Arguments) {
 			state := arguments.Get(0).(*match.State)
 			assert.Equal(t, 1, state.RoundState.Thresholds.CaptureDistanceBonus)
+			assert.Equal(t, 1, state.RoundState.Thresholds.SurfaceDepthBonus)
 			state.Stats.PlayerWins++
 		}).Once()
 		prepareDeckCall := fixture.fishDeck.On("PrepareNextRound").Once()
@@ -219,11 +228,13 @@ func TestEnginePlayRound(t *testing.T) {
 		endConditionCall := fixture.endCondition.On("Apply", mock.AnythingOfType("*match.State")).Run(func(arguments mock.Arguments) {
 			state := arguments.Get(0).(*match.State)
 			assert.Equal(t, 1, state.RoundState.Thresholds.CaptureDistanceBonus)
+			assert.Equal(t, 1, state.RoundState.Thresholds.SurfaceDepthBonus)
 		}).Once()
 
 		mock.InOrder(
 			prepareBeforeValidationCall,
 			validateMoveCall,
+			peekCardCall,
 			drawCall,
 			evaluateCall,
 			consumeMoveCall,
@@ -242,6 +253,7 @@ func TestEnginePlayRound(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, 1, result.Round)
 		assert.Equal(t, domain.Blue, result.PlayerMove)
+		assert.Equal(t, playerCard, result.PlayerCard)
 		assert.Equal(t, domain.Red, result.FishMove)
 		assert.Equal(t, fishCard, result.FishCard)
 		assert.Equal(t, domain.PlayerWin, result.Outcome)
@@ -262,6 +274,7 @@ func TestEnginePlayRound(t *testing.T) {
 		playerMoveController := &mockPlayerMoveController{}
 		roundEvaluator := &mockRoundEvaluator{}
 		fishDeck := &mockFishDeck{}
+		playerCard := cards.NewPlayerCard(domain.Blue)
 
 		initializeCall := playerMoveController.On("Initialize", mock.AnythingOfType("*match.State")).Run(func(arguments mock.Arguments) {
 			state := arguments.Get(0).(*match.State)
@@ -275,10 +288,11 @@ func TestEnginePlayRound(t *testing.T) {
 
 		prepareBeforeValidationCall := playerMoveController.On("PrepareRound", mock.AnythingOfType("*match.State")).Once()
 		validateMoveCall := playerMoveController.On("ValidateMove", mock.Anything, domain.Blue).Return(nil).Once()
+		peekCardCall := playerMoveController.On("PeekMoveCard", mock.Anything, domain.Blue).Return(playerCard, nil).Once()
 		fishCard := cards.NewFishCard(domain.Red, cards.CardEffect{Trigger: cards.TriggerOnDraw, CaptureDistanceBonus: 1})
 		drawCall := fishDeck.On("Draw").Return(fishCard, nil).Once()
 		evaluateCall := roundEvaluator.On("Evaluate", domain.Blue, domain.Red).Return(domain.Draw).Once()
-		consumeMoveCall := playerMoveController.On("ConsumeMove", mock.AnythingOfType("*match.State"), domain.Blue).Once()
+		consumeMoveCall := playerMoveController.On("ConsumeMove", mock.AnythingOfType("*match.State"), domain.Blue).Return(playerCard).Once()
 		prepareDeckAfterRoundCall := fishDeck.On("PrepareNextRound").Once()
 		activeCountAfterRoundCall := fishDeck.On("ActiveCount").Return(0).Once()
 		discardCountAfterRoundCall := fishDeck.On("DiscardCount").Return(1).Once()
@@ -295,6 +309,7 @@ func TestEnginePlayRound(t *testing.T) {
 			exhaustedInitCall,
 			prepareBeforeValidationCall,
 			validateMoveCall,
+			peekCardCall,
 			drawCall,
 			evaluateCall,
 			consumeMoveCall,
@@ -394,9 +409,9 @@ func (fixture engineFixture) assertExpectations(t *testing.T) {
 
 func samplePlayerMoveResources() match.PlayerMoveResources {
 	return match.PlayerMoveResources{Moves: []match.PlayerMoveState{
-		{Move: domain.Blue, MaxUses: 3, RemainingUses: 3},
-		{Move: domain.Red, MaxUses: 3, RemainingUses: 3},
-		{Move: domain.Yellow, MaxUses: 3, RemainingUses: 3},
+		{Move: domain.Blue, MaxUses: 3, RemainingUses: 3, ActiveCards: []cards.PlayerCard{cards.NewPlayerCard(domain.Blue), cards.NewPlayerCard(domain.Blue), cards.NewPlayerCard(domain.Blue)}},
+		{Move: domain.Red, MaxUses: 3, RemainingUses: 3, ActiveCards: []cards.PlayerCard{cards.NewPlayerCard(domain.Red), cards.NewPlayerCard(domain.Red), cards.NewPlayerCard(domain.Red)}},
+		{Move: domain.Yellow, MaxUses: 3, RemainingUses: 3, ActiveCards: []cards.PlayerCard{cards.NewPlayerCard(domain.Yellow), cards.NewPlayerCard(domain.Yellow), cards.NewPlayerCard(domain.Yellow)}},
 	}}
 }
 
@@ -453,8 +468,14 @@ func (mockController *mockPlayerMoveController) ValidateMove(state match.State, 
 	return arguments.Error(0)
 }
 
-func (mockController *mockPlayerMoveController) ConsumeMove(state *match.State, playerMove domain.Move) {
-	mockController.Called(state, playerMove)
+func (mockController *mockPlayerMoveController) PeekMoveCard(state match.State, playerMove domain.Move) (cards.PlayerCard, error) {
+	arguments := mockController.Called(state, playerMove)
+	return arguments.Get(0).(cards.PlayerCard), arguments.Error(1)
+}
+
+func (mockController *mockPlayerMoveController) ConsumeMove(state *match.State, playerMove domain.Move) cards.PlayerCard {
+	arguments := mockController.Called(state, playerMove)
+	return arguments.Get(0).(cards.PlayerCard)
 }
 
 type mockRoundEvaluator struct {

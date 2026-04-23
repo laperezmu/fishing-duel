@@ -25,6 +25,8 @@ type PlayerMoveState struct {
 	MaxUses         int
 	RemainingUses   int
 	RestoresOnRound int
+	ActiveCards     []cards.PlayerCard
+	DiscardedCards  []cards.PlayerCard
 }
 
 type PlayerMoveResources struct {
@@ -54,6 +56,7 @@ type State struct {
 
 type ResolvedRound struct {
 	PlayerMove     domain.Move
+	PlayerCard     cards.PlayerCard
 	FishCard       cards.FishCard
 	DrawEffects    []cards.CardEffect
 	OutcomeEffects []cards.CardEffect
@@ -63,6 +66,7 @@ type ResolvedRound struct {
 type RoundResult struct {
 	Round      int
 	PlayerMove domain.Move
+	PlayerCard cards.PlayerCard
 	FishMove   domain.Move
 	FishCard   cards.FishCard
 	Outcome    domain.RoundOutcome
