@@ -33,6 +33,10 @@ func main() {
 		})
 	}
 	ui := cli.NewUI(os.Stdin, os.Stdout)
+	playerDeckPreset, err := ui.ChoosePlayerDeckPreset("Pesca: duelo contra el pez", playermoves.DefaultPlayerDeckPresets())
+	if err != nil {
+		exitWithError("error eligiendo preset del jugador", err)
+	}
 	customFishDeck, err := ui.ChooseCustomFishDeck("Pesca: duelo contra el pez", deck.DefaultCustomFishDecks())
 	if err != nil {
 		exitWithError("error eligiendo preset de baraja", err)
@@ -49,8 +53,7 @@ func main() {
 		exitWithError("error configurando herramientas del jugador", err)
 	}
 
-	playerMoveConfig := playermoves.DefaultConfig()
-	playerMoveConfig.DeckShuffler = playerCardShuffler
+	playerMoveConfig := playerDeckPreset.BuildConfig(playerCardShuffler)
 	playerMoveController, err := playermoves.NewUsageController(playerMoveConfig)
 	if err != nil {
 		exitWithError("error configurando movimientos del jugador", err)

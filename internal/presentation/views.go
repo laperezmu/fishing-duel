@@ -9,6 +9,7 @@ type MoveOption struct {
 	Index           int
 	Move            domain.Move
 	Label           string
+	CardHint        string
 	RemainingUses   int
 	MaxUses         int
 	Available       bool

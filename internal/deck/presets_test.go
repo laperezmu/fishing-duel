@@ -37,11 +37,14 @@ func TestDefaultCustomFishDecks(t *testing.T) {
 	customFishDecks := DefaultCustomFishDecks()
 
 	require.Len(t, customFishDecks, 4)
+	assert.Equal(t, "classic", customFishDecks[0].ID)
 	assert.Equal(t, "Clasico", customFishDecks[0].Name)
+	assert.NotEmpty(t, customFishDecks[0].Details)
 	assert.True(t, customFishDecks[0].Shuffle)
+	assert.Equal(t, "mixed-current", customFishDecks[3].ID)
 	assert.False(t, customFishDecks[1].Shuffle)
 	assert.Contains(t, customFishDecks[1].Description, "on_draw")
-	assert.Contains(t, customFishDecks[3].Description, "pipeline")
+	assert.Contains(t, customFishDecks[3].Description, "post-outcome")
 
 	hasDrawEffect := false
 	for _, fishCard := range customFishDecks[1].FishCards {

@@ -3,6 +3,7 @@ package cli
 import (
 	"fmt"
 	"pesca/internal/deck"
+	"pesca/internal/playermoves"
 	"pesca/internal/presentation"
 	"strings"
 )
@@ -55,10 +56,34 @@ func renderCustomFishDeckSelectionScreen(title string, customFishDecks []deck.Cu
 	return clearSequence + strings.Join(sections, "\n\n") + "\n\n"
 }
 
+func renderPlayerDeckSelectionScreen(title string, presets []playermoves.PlayerDeckPreset, message string) string {
+	sections := []string{
+		renderHeader(title),
+		renderPlayerDeckSelectionSection(presets),
+	}
+	if message != "" {
+		sections = append(sections, accent("Aviso")+"\n  "+message)
+	}
+
+	return clearSequence + strings.Join(sections, "\n\n") + "\n\n"
+}
+
 func renderCustomFishDeckConfirmationScreen(title string, customFishDeck deck.CustomFishDeck, message string) string {
 	sections := []string{
 		renderHeader(title),
 		renderCustomFishDeckConfirmationSection(customFishDeck),
+	}
+	if message != "" {
+		sections = append(sections, accent("Aviso")+"\n  "+message)
+	}
+
+	return clearSequence + strings.Join(sections, "\n\n") + "\n\n"
+}
+
+func renderPlayerDeckConfirmationScreen(title string, preset playermoves.PlayerDeckPreset, message string) string {
+	sections := []string{
+		renderHeader(title),
+		renderPlayerDeckConfirmationSection(preset),
 	}
 	if message != "" {
 		sections = append(sections, accent("Aviso")+"\n  "+message)
@@ -141,8 +166,12 @@ func renderOptionsSection(options []presentation.MoveOption) string {
 
 func renderMoveOption(option presentation.MoveOption) string {
 	moveLabel := colorizeMove(option.Move, option.Label)
+	hint := ""
+	if option.CardHint != "" {
+		hint = " " + dim("{"+option.CardHint+"}")
+	}
 	if option.Available {
-		return fmt.Sprintf("%d) %s %s", option.Index, moveLabel, dim(fmt.Sprintf("[%d/%d]", option.RemainingUses, option.MaxUses)))
+		return fmt.Sprintf("%d) %s %s%s", option.Index, moveLabel, dim(fmt.Sprintf("[%d/%d]", option.RemainingUses, option.MaxUses)), hint)
 	}
 
 	if option.RestoresOnRound > 0 {
@@ -165,8 +194,8 @@ func renderGameOverSection(summary presentation.SummaryView) string {
 
 func renderCustomFishDeckSelectionSection(customFishDecks []deck.CustomFishDeck) string {
 	lines := []string{
-		accent("Presets de baraja del pez"),
-		"  Elige una configuracion para probar el duelo desde CLI.",
+		accent("Preset del pez"),
+		"  Elige una baraja del pez para el duelo.",
 	}
 
 	for index, customFishDeck := range customFishDecks {
@@ -182,15 +211,53 @@ func renderCustomFishDeckSelectionSection(customFishDecks []deck.CustomFishDeck)
 	return strings.Join(lines, "\n")
 }
 
+func renderPlayerDeckSelectionSection(presets []playermoves.PlayerDeckPreset) string {
+	lines := []string{
+		accent("Preset del jugador"),
+		"  Elige una baraja del jugador para probar el duelo.",
+	}
+
+	for index, preset := range presets {
+		lines = append(lines,
+			fmt.Sprintf("  %d) %s", index+1, preset.Name),
+			fmt.Sprintf("     %s", preset.Description),
+		)
+	}
+
+	lines = append(lines, "  Escribe el numero del preset para seleccionarlo.")
+
+	return strings.Join(lines, "\n")
+}
+
 func renderCustomFishDeckConfirmationSection(customFishDeck deck.CustomFishDeck) string {
-	return strings.Join([]string{
+	lines := []string{
 		accent("Confirmar preset"),
 		fmt.Sprintf("  Nombre      : %s", customFishDeck.Name),
 		fmt.Sprintf("  Descripcion : %s", customFishDeck.Description),
 		fmt.Sprintf("  Cartas      : %d", len(customFishDeck.FishCards)),
 		fmt.Sprintf("  Orden       : %s", renderCustomFishDeckOrder(customFishDeck)),
 		fmt.Sprintf("  Reciclado   : retira %d cartas por ciclo", customFishDeck.CardsToRemove),
-	}, "\n")
+	}
+	for _, detail := range customFishDeck.Details {
+		lines = append(lines, "  - "+detail)
+	}
+
+	return strings.Join(lines, "\n")
+}
+
+func renderPlayerDeckConfirmationSection(preset playermoves.PlayerDeckPreset) string {
+	lines := []string{
+		accent("Confirmar preset"),
+		fmt.Sprintf("  Nombre      : %s", preset.Name),
+		fmt.Sprintf("  Descripcion : %s", preset.Description),
+		fmt.Sprintf("  Barajas     : %d colores", len(preset.Config.InitialDecks)),
+		fmt.Sprintf("  Recupera    : %d ronda(s)", preset.Config.RecoveryDelayRounds),
+	}
+	for _, detail := range preset.Details {
+		lines = append(lines, "  - "+detail)
+	}
+
+	return strings.Join(lines, "\n")
 }
 
 func renderCustomFishDeckOrder(customFishDeck deck.CustomFishDeck) string {

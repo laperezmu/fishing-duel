@@ -6,8 +6,10 @@ import (
 )
 
 type CustomFishDeck struct {
+	ID            string
 	Name          string
 	Description   string
+	Details       []string
 	FishCards     []cards.FishCard
 	CardsToRemove int
 	Shuffle       bool
@@ -29,15 +31,28 @@ func (customFishDeck CustomFishDeck) Build(shuffler Shuffler) *Deck {
 func DefaultCustomFishDecks() []CustomFishDeck {
 	return []CustomFishDeck{
 		{
-			Name:          "Clasico",
-			Description:   "Baraja base de 9 cartas sin efectos, mezclada y con reciclado clasico.",
+			ID:          "classic",
+			Name:        "Clasico",
+			Description: "Baraja base de 9 cartas sin efectos con reciclado clasico.",
+			Details: []string{
+				"9 cartas lisas sin efectos: 3 rojas, 3 azules y 3 amarillas.",
+				"Orden: barajada antes de empezar y en cada reciclado.",
+				"Reciclado: retira 3 cartas por ciclo.",
+			},
 			FishCards:     NewStandardFishCards(),
 			CardsToRemove: 3,
 			Shuffle:       true,
 		},
 		{
+			ID:          "hooked-opening",
 			Name:        "Apertura con anzuelo",
-			Description: "Prueba efectos `on_draw` que alteran distancia de captura, superficie y cierre por agotamiento.",
+			Description: "Baraja del pez centrada en `on_draw` para thresholds y cierres tempranos.",
+			Details: []string{
+				"Rojo: `draw capt +1`.",
+				"Azul: `draw sup +1`.",
+				"Amarillo: `draw baraja +1`.",
+				"Orden: fijo para probar cada apertura de forma reproducible.",
+			},
 			FishCards: []cards.FishCard{
 				cards.NewFishCard(domain.Red, cards.CardEffect{Trigger: cards.TriggerOnDraw, CaptureDistanceBonus: 1}),
 				cards.NewFishCard(domain.Blue, cards.CardEffect{Trigger: cards.TriggerOnDraw, SurfaceDepthBonus: 1}),
@@ -48,8 +63,15 @@ func DefaultCustomFishDecks() []CustomFishDeck {
 			Shuffle:       false,
 		},
 		{
+			ID:          "vertical-pressure",
 			Name:        "Presion vertical",
-			Description: "Prueba hundimiento al ganar y subida al perder para validar la capa de profundidad.",
+			Description: "Baraja del pez orientada a hundirse al ganar y subir al perder.",
+			Details: []string{
+				"Azul: `si gana prof +1` o `si pierde prof -1` segun la carta.",
+				"Rojo: `si pierde prof -1`.",
+				"Amarillo: `si gana prof +1`.",
+				"Orden: fijo para validar la capa vertical paso a paso.",
+			},
 			FishCards: []cards.FishCard{
 				cards.NewFishCard(domain.Blue, cards.CardEffect{Trigger: cards.TriggerOnOwnerWin, DepthShift: 1}),
 				cards.NewFishCard(domain.Red, cards.CardEffect{Trigger: cards.TriggerOnOwnerLose, DepthShift: -1}),
@@ -60,8 +82,15 @@ func DefaultCustomFishDecks() []CustomFishDeck {
 			Shuffle:       false,
 		},
 		{
+			ID:          "mixed-current",
 			Name:        "Corriente mixta",
-			Description: "Combina `on_draw` y efectos post-outcome para revisar el pipeline completo en una sola partida.",
+			Description: "Baraja del pez que mezcla `on_draw` y respuestas post-outcome en una sola secuencia.",
+			Details: []string{
+				"Rojo: `draw capt +1` y `si pierde prof -1`.",
+				"Azul: `draw sup +1` y `si gana dist +1`.",
+				"Amarillo: `empate dist +1`.",
+				"Orden: fijo para revisar el pipeline completo round a round.",
+			},
 			FishCards: []cards.FishCard{
 				cards.NewFishCard(domain.Red,
 					cards.CardEffect{Trigger: cards.TriggerOnDraw, CaptureDistanceBonus: 1},
