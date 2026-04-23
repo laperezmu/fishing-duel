@@ -2,6 +2,8 @@ package cli
 
 import (
 	"bytes"
+	"pesca/internal/cards"
+	"pesca/internal/deck"
 	"pesca/internal/domain"
 	"pesca/internal/encounter"
 	"pesca/internal/match"
@@ -102,6 +104,43 @@ func TestChooseMoveRejectsUnavailableMoveUntilPlayerSelectsAvailableOption(t *te
 	assert.Contains(t, out.String(), "la accion tirar recarga en la ronda 3")
 }
 
+func TestChooseCustomFishDeck(t *testing.T) {
+	var out bytes.Buffer
+	ui := NewUI(strings.NewReader("2\ns\n"), &out)
+
+	customFishDeck, err := ui.ChooseCustomFishDeck("Pesca: duelo contra el pez", sampleCustomFishDecks())
+
+	require.NoError(t, err)
+	assert.Equal(t, "Apertura", customFishDeck.Name)
+	assert.Contains(t, out.String(), "Presets de baraja del pez")
+	assert.Contains(t, out.String(), "Confirmar preset")
+	assert.Contains(t, out.String(), "Apertura")
+	assert.Contains(t, out.String(), clearSequence)
+}
+
+func TestChooseCustomFishDeckReturnsToSelectionAfterCancellingConfirmation(t *testing.T) {
+	var out bytes.Buffer
+	ui := NewUI(strings.NewReader("1\nn\n2\ns\n"), &out)
+
+	customFishDeck, err := ui.ChooseCustomFishDeck("Pesca: duelo contra el pez", sampleCustomFishDecks())
+
+	require.NoError(t, err)
+	assert.Equal(t, "Apertura", customFishDeck.Name)
+	assert.Contains(t, out.String(), "seleccion cancelada, elige otro preset")
+}
+
+func TestChooseCustomFishDeckRejectsInvalidInput(t *testing.T) {
+	var out bytes.Buffer
+	ui := NewUI(strings.NewReader("9\n2\nquizas\ns\n"), &out)
+
+	customFishDeck, err := ui.ChooseCustomFishDeck("Pesca: duelo contra el pez", sampleCustomFishDecks())
+
+	require.NoError(t, err)
+	assert.Equal(t, "Apertura", customFishDeck.Name)
+	assert.Contains(t, out.String(), "opcion no valida, usa un numero entre 1 y 2")
+	assert.Contains(t, out.String(), "confirmacion no valida, usa s o n")
+}
+
 func samplePromptState(t *testing.T) match.State {
 	t.Helper()
 
@@ -119,5 +158,26 @@ func samplePromptState(t *testing.T) match.State {
 			{Move: domain.Red, MaxUses: 3, RemainingUses: 3},
 			{Move: domain.Yellow, MaxUses: 3, RemainingUses: 3},
 		}},
+	}
+}
+
+func sampleCustomFishDecks() []deck.CustomFishDeck {
+	return []deck.CustomFishDeck{
+		{
+			Name:          "Clasico",
+			Description:   "Sin efectos.",
+			FishCards:     []cards.FishCard{cards.NewFishCard(domain.Blue)},
+			CardsToRemove: 3,
+			Shuffle:       true,
+		},
+		{
+			Name:        "Apertura",
+			Description: "Con on_draw.",
+			FishCards: []cards.FishCard{
+				cards.NewFishCard(domain.Red, cards.CardEffect{Trigger: cards.TriggerOnDraw, CaptureDistanceBonus: 1}),
+			},
+			CardsToRemove: 0,
+			Shuffle:       false,
+		},
 	}
 }

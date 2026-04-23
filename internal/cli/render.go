@@ -2,6 +2,7 @@ package cli
 
 import (
 	"fmt"
+	"pesca/internal/deck"
 	"pesca/internal/presentation"
 	"strings"
 )
@@ -40,6 +41,30 @@ func renderGameOverScreen(title string, summary presentation.SummaryView, lastRo
 	sections = append(sections, renderGameOverSection(summary))
 
 	return clearSequence + strings.Join(sections, "\n\n") + "\n"
+}
+
+func renderCustomFishDeckSelectionScreen(title string, customFishDecks []deck.CustomFishDeck, message string) string {
+	sections := []string{
+		renderHeader(title),
+		renderCustomFishDeckSelectionSection(customFishDecks),
+	}
+	if message != "" {
+		sections = append(sections, accent("Aviso")+"\n  "+message)
+	}
+
+	return clearSequence + strings.Join(sections, "\n\n") + "\n\n"
+}
+
+func renderCustomFishDeckConfirmationScreen(title string, customFishDeck deck.CustomFishDeck, message string) string {
+	sections := []string{
+		renderHeader(title),
+		renderCustomFishDeckConfirmationSection(customFishDeck),
+	}
+	if message != "" {
+		sections = append(sections, accent("Aviso")+"\n  "+message)
+	}
+
+	return clearSequence + strings.Join(sections, "\n\n") + "\n\n"
 }
 
 func renderHeader(title string) string {
@@ -136,6 +161,44 @@ func renderGameOverSection(summary presentation.SummaryView) string {
 		fmt.Sprintf("  Profundidad : %d", summary.FishDepth),
 		fmt.Sprintf("  Rondas    : %d | Jugador %d | Pez %d | Empates %d", summary.TotalRounds, summary.PlayerWins, summary.FishWins, summary.Draws),
 	}, "\n")
+}
+
+func renderCustomFishDeckSelectionSection(customFishDecks []deck.CustomFishDeck) string {
+	lines := []string{
+		accent("Presets de baraja del pez"),
+		"  Elige una configuracion para probar el duelo desde CLI.",
+	}
+
+	for index, customFishDeck := range customFishDecks {
+		lines = append(lines,
+			fmt.Sprintf("  %d) %s", index+1, customFishDeck.Name),
+			fmt.Sprintf("     %s", customFishDeck.Description),
+			fmt.Sprintf("     Cartas %d | %s | Reciclado retira %d", len(customFishDeck.FishCards), renderCustomFishDeckOrder(customFishDeck), customFishDeck.CardsToRemove),
+		)
+	}
+
+	lines = append(lines, "  Escribe el numero del preset para seleccionarlo.")
+
+	return strings.Join(lines, "\n")
+}
+
+func renderCustomFishDeckConfirmationSection(customFishDeck deck.CustomFishDeck) string {
+	return strings.Join([]string{
+		accent("Confirmar preset"),
+		fmt.Sprintf("  Nombre      : %s", customFishDeck.Name),
+		fmt.Sprintf("  Descripcion : %s", customFishDeck.Description),
+		fmt.Sprintf("  Cartas      : %d", len(customFishDeck.FishCards)),
+		fmt.Sprintf("  Orden       : %s", renderCustomFishDeckOrder(customFishDeck)),
+		fmt.Sprintf("  Reciclado   : retira %d cartas por ciclo", customFishDeck.CardsToRemove),
+	}, "\n")
+}
+
+func renderCustomFishDeckOrder(customFishDeck deck.CustomFishDeck) string {
+	if customFishDeck.Shuffle {
+		return "barajada"
+	}
+
+	return "orden fijo"
 }
 
 func renderEncounterAxis(maxDistance int) string {
