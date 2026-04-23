@@ -53,10 +53,11 @@ type State struct {
 }
 
 type ResolvedRound struct {
-	PlayerMove  domain.Move
-	FishCard    cards.FishCard
-	CardEffects []cards.CardEffect
-	Outcome     domain.RoundOutcome
+	PlayerMove     domain.Move
+	FishCard       cards.FishCard
+	DrawEffects    []cards.CardEffect
+	OutcomeEffects []cards.CardEffect
+	Outcome        domain.RoundOutcome
 }
 
 type RoundResult struct {

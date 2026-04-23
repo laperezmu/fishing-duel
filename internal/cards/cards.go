@@ -9,16 +9,25 @@ const (
 	OwnerPlayer Owner = "player"
 )
 
+type Phase int
+
+const (
+	PhaseDraw Phase = iota
+	PhaseOutcome
+)
+
 type Trigger int
 
 const (
-	TriggerOnOwnerWin Trigger = iota
+	TriggerOnDraw Trigger = iota
+	TriggerOnOwnerWin
 	TriggerOnOwnerLose
 	TriggerOnRoundDraw
 )
 
 type EffectContext struct {
 	Owner   Owner
+	Phase   Phase
 	Outcome domain.RoundOutcome
 }
 
@@ -26,17 +35,32 @@ type CardEffect struct {
 	Trigger       Trigger
 	DistanceShift int
 	DepthShift    int
+
+	CaptureDistanceBonus           int
+	ExhaustionCaptureDistanceBonus int
+	SurfaceDepthBonus              int
 }
 
 func (effect CardEffect) Applies(context EffectContext) bool {
 	switch effect.Trigger {
+	case TriggerOnDraw:
+		return context.Phase == PhaseDraw
 	case TriggerOnOwnerWin:
+		if context.Phase != PhaseOutcome {
+			return false
+		}
 		return context.Owner == OwnerFish && context.Outcome == domain.FishWin ||
 			context.Owner == OwnerPlayer && context.Outcome == domain.PlayerWin
 	case TriggerOnOwnerLose:
+		if context.Phase != PhaseOutcome {
+			return false
+		}
 		return context.Owner == OwnerFish && context.Outcome == domain.PlayerWin ||
 			context.Owner == OwnerPlayer && context.Outcome == domain.FishWin
 	case TriggerOnRoundDraw:
+		if context.Phase != PhaseOutcome {
+			return false
+		}
 		return context.Outcome == domain.Draw
 	default:
 		return false

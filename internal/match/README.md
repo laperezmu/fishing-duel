@@ -17,7 +17,8 @@ Modelo compartido del estado acumulado de una partida.
 - `PlayerMoveResources`: estado acumulado de usos y recarga de las acciones del jugador.
 - `Stats`: victorias, derrotas y empates acumulados.
 - `ResolvedRound`: resultado base de una ronda antes de derivar la vista final.
-- `ResolvedRound.CardEffects`: efectos de carta ya filtrados y listos para aplicarse en progresion.
+- `ResolvedRound.DrawEffects`: efectos activados al revelar la carta activa del round.
+- `ResolvedRound.OutcomeEffects`: efectos activados despues de resolver el outcome base.
 - `RoundResult`: resultado de una ronda ya ejecutada.
 
 ## Regla de arquitectura

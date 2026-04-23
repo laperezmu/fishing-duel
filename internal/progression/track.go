@@ -13,11 +13,13 @@ type TrackPolicy struct {
 
 func (policy TrackPolicy) Apply(state *match.State, round match.ResolvedRound) {
 	delta := encounter.Delta{}
+	captureDistance := state.Encounter.Config.CaptureDistance + state.RoundState.Thresholds.CaptureDistanceBonus
+	surfaceDepth := state.Encounter.Config.SurfaceDepth + state.RoundState.Thresholds.SurfaceDepthBonus
 
 	switch round.Outcome {
 	case domain.PlayerWin:
 		state.Stats.PlayerWins++
-		if state.Encounter.Distance <= state.Encounter.Config.CaptureDistance && state.Encounter.Depth > state.Encounter.Config.SurfaceDepth {
+		if state.Encounter.Distance <= captureDistance && state.Encounter.Depth > surfaceDepth {
 			delta.DepthShift--
 		} else {
 			delta.DistanceShift -= state.Encounter.Config.PlayerWinStep
@@ -29,7 +31,7 @@ func (policy TrackPolicy) Apply(state *match.State, round match.ResolvedRound) {
 		state.Stats.Draws++
 	}
 
-	delta = accumulateCardEffects(delta, round.CardEffects)
+	delta = accumulateCardEffects(delta, round.OutcomeEffects)
 
 	encounter.ApplyDelta(&state.Encounter, delta, policy.SplashEscapeDecider)
 }
