@@ -12,18 +12,18 @@ Este documento concentra los pendientes activos de discovery y delivery para lle
 - **Prioridad**: Alta
 
 ### BL-006 Definir arquetipos de peces
-- **Tipo**: Discovery
-- **Objetivo**: decidir familias de pez con identidad de gameplay clara sobre la nueva base de efectos.
-- **Resultado esperado**: categorias como agresivo, evasivo, controlador, agotador, combo o boss.
-- **Dependencias**: plan 008
+- **Tipo**: Discovery + Delivery
+- **Objetivo**: definir arquetipos de pez faciles de configurar y llevarlos a una primera implementacion data-driven usable desde los presets del juego.
+- **Resultado esperado**: perfiles mecanicos configurables que construyen barajas de pez y reemplazan wiring manual en presets de inicio.
+- **Dependencias**: `docs/discoveries/008-taxonomia-de-efectos-de-carta.md`, plan 011, plan 013
 - **Prioridad**: Alta
 
-### BL-007 Disenar perfiles data-driven de pez
+### BL-007 Expandir perfiles data-driven de pez
 - **Tipo**: Delivery
-- **Objetivo**: describir peces por datos y no por wiring manual en codigo.
-- **Resultado esperado**: estructura configurable para mazo, efectos, recompensas y condiciones.
+- **Objetivo**: extender la primera base configurable de arquetipos hacia perfiles de pez mas ricos y mas cercanos a contenido final.
+- **Resultado esperado**: estructura ampliable para mazo, efectos, recompensas y condiciones mas alla del primer slice implementado en `BL-006`.
 - **Dependencias**: `BL-006`
-- **Prioridad**: Alta
+- **Prioridad**: Media
 
 ## Core Loop
 

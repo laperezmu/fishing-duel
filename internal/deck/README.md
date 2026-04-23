@@ -15,6 +15,7 @@ Administracion de la baraja del pez.
 - `Shuffler`: cambia la estrategia de mezcla.
 - `NewStandardFishCards()`: base para crear mazos predefinidos.
 - `CustomFishDeck`: preset reusable para construir barajas de prueba o configuraciones especificas.
+- `internal/fishprofiles/`: fuente de perfiles configurables para construir presets sin wiring manual repetido.
 
 ## Ejemplos de cambios futuros
 

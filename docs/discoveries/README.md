@@ -18,3 +18,4 @@ Esta carpeta contiene documentos de discovery ya activos o resultados de investi
 ## Documentos iniciales
 
 - `docs/discoveries/008-taxonomia-de-efectos-de-carta.md`: taxonomia de efectos de carta para guiar la siguiente iteracion tecnica.
+- `docs/discoveries/011-arquetipos-de-peces.md`: arquetipos mecanicos de pez y su primera traduccion a perfiles configurables.
