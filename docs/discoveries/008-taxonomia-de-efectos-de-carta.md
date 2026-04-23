@@ -25,8 +25,8 @@ Este documento busca servir como puente entre la implementacion actual y la sigu
 - `internal/cards/cards.go` define `FishCard` y `PlayerCard` como tipos distintos que comparten `CardEffect`.
 - `CardEffect` hoy puede desplazar `DistanceShift` y `DepthShift`.
 - Los triggers existentes en datos ya son relativos al owner de la carta: `TriggerOnOwnerWin`, `TriggerOnOwnerLose` y `TriggerOnRoundDraw`.
-- `internal/game/engine.go` resuelve la ronda base y luego entrega `match.ResolvedRound` a progresion.
-- `internal/progression/track.go` aplica primero la progresion base del outcome y despues suma los efectos de carta ya filtrados por el motor.
+- `internal/game/engine.go` ya ejecuta una fase real de `on_draw`, resuelve el outcome base y luego entrega `match.ResolvedRound` con efectos separados por fase.
+- `internal/progression/track.go` aplica primero la progresion base del outcome y despues suma los efectos espaciales post-outcome ya filtrados por el motor.
 - `internal/encounter/transition.go` transforma el resultado espacial en eventos derivados como `splash`.
 - `internal/endings/encounter.go` resuelve captura o escape despues de la progresion; hoy el cierre no lo decide directamente ninguna carta.
 - `internal/endings/encounter.go` ya expone un `RoundState` temporal para thresholds que deban durar solo un round.
@@ -35,7 +35,6 @@ Este documento busca servir como puente entre la implementacion actual y la sigu
 ### Lo que aun no existe
 - No existen `playerCards` integradas en el loop jugable actual.
 - No existe un sistema de prioridades o resolucion de conflictos entre efectos.
-- No existe aun una fase real de `on_draw` conectada al motor.
 
 ## Problemas detectados en el modelo previo
 
@@ -271,6 +270,7 @@ Agregan contexto para fases posteriores del mismo round o rounds futuros.
 - Pero ambos deberian emitir una misma estructura de `CardEffect` o equivalente.
 - No conviene forzar una carta comun unica.
 - La simetria debe vivir en contratos compartidos, mientras que las cartas pueden conservar diferencias de uso, presentacion e identidad visual.
+- En el caso del jugador, las cartas futuras no implican una mano de seleccion libre durante combate: la estructura esperada es una baraja por color o decision.
 
 ### 2. Reemplazar triggers absolutos por triggers relativos al owner
 - `TriggerOnPlayerWin` y `TriggerOnFishWin` eran un limite del modelo previo.
@@ -278,7 +278,7 @@ Agregan contexto para fases posteriores del mismo round o rounds futuros.
 
 ### 3. Hacer real la fase `on_draw` o eliminarla
 - No conviene mantener un trigger sin fase real de ejecucion.
-- La implementacion debe decidir entre soportarlo de verdad o sacarlo hasta necesitarlo.
+- La siguiente iteracion tecnica debe mantener `on_draw` como fase explicita del pipeline y no volver a esconderla dentro de filtrados implicitos.
 
 ### 4. Introducir un contexto de round orientado a efectos
 - `match.ResolvedRound` ya es un buen punto de partida.
@@ -299,9 +299,12 @@ Agregan contexto para fases posteriores del mismo round o rounds futuros.
 - La siguiente feature tecnica debe partir de un contrato comun reutilizable por `FishCard` y `playerCards`.
 - No se modelara una carta comun unica; se compartiran contratos comunes entre tipos de carta distintos.
 - Las diferencias de uso y presentacion entre cartas del pez y del jugador son validas y esperables.
+- Las `playerCards` no se eligen individualmente durante combate; el jugador opera sobre barajas por color.
+- La base esperada del jugador son 3 cartas iguales por color sin efectos.
 - Los thresholds alterados por carta viven como estado temporal del round.
 - El `rig` no puede ser modificado por cartas.
 - Ningun efecto temporal de carta dura mas de un round.
 - Los efectos futuros sobre outcome base deben seguir viviendo en `rules` mediante hooks mientras esa integracion escale de forma razonable.
 - Solo si ese enfoque deja de escalar se evaluara una capa nueva anterior a `rules`.
 - Esta feature ya implementa una primera version de contratos compartidos para efectos de carta y hooks optativos en `rules`.
+- La fase `on_draw` ya existe como punto real de resolucion en el motor.

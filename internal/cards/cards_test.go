@@ -16,10 +16,20 @@ func TestCardEffectApplies(t *testing.T) {
 		want    bool
 	}{
 		{
+			title:  "matches draw effects during the draw phase",
+			effect: CardEffect{Trigger: TriggerOnDraw},
+			context: EffectContext{
+				Owner: OwnerFish,
+				Phase: PhaseDraw,
+			},
+			want: true,
+		},
+		{
 			title:  "matches owner win for fish owned cards",
 			effect: CardEffect{Trigger: TriggerOnOwnerWin},
 			context: EffectContext{
 				Owner:   OwnerFish,
+				Phase:   PhaseOutcome,
 				Outcome: domain.FishWin,
 			},
 			want: true,
@@ -29,6 +39,7 @@ func TestCardEffectApplies(t *testing.T) {
 			effect: CardEffect{Trigger: TriggerOnOwnerLose},
 			context: EffectContext{
 				Owner:   OwnerFish,
+				Phase:   PhaseOutcome,
 				Outcome: domain.PlayerWin,
 			},
 			want: true,
@@ -38,6 +49,7 @@ func TestCardEffectApplies(t *testing.T) {
 			effect: CardEffect{Trigger: TriggerOnOwnerWin},
 			context: EffectContext{
 				Owner:   OwnerPlayer,
+				Phase:   PhaseOutcome,
 				Outcome: domain.PlayerWin,
 			},
 			want: true,
@@ -47,6 +59,7 @@ func TestCardEffectApplies(t *testing.T) {
 			effect: CardEffect{Trigger: TriggerOnRoundDraw},
 			context: EffectContext{
 				Owner:   OwnerPlayer,
+				Phase:   PhaseOutcome,
 				Outcome: domain.Draw,
 			},
 			want: true,
@@ -56,6 +69,7 @@ func TestCardEffectApplies(t *testing.T) {
 			effect: CardEffect{Trigger: TriggerOnOwnerLose},
 			context: EffectContext{
 				Owner:   OwnerPlayer,
+				Phase:   PhaseOutcome,
 				Outcome: domain.PlayerWin,
 			},
 			want: false,
@@ -79,12 +93,30 @@ func TestFilterEffects(t *testing.T) {
 	}, {
 		Trigger:       TriggerOnRoundDraw,
 		DistanceShift: -1,
+	}, {
+		Trigger:              TriggerOnDraw,
+		CaptureDistanceBonus: 1,
 	}}
 
-	filteredEffects := FilterEffects(effects, EffectContext{Owner: OwnerFish, Outcome: domain.PlayerWin})
+	filteredEffects := FilterEffects(effects, EffectContext{Owner: OwnerFish, Phase: PhaseOutcome, Outcome: domain.PlayerWin})
 
 	require.Len(t, filteredEffects, 1)
 	assert.Equal(t, effects[1], filteredEffects[0])
+}
+
+func TestFilterEffectsForDrawPhase(t *testing.T) {
+	effects := []CardEffect{{
+		Trigger:              TriggerOnDraw,
+		CaptureDistanceBonus: 1,
+	}, {
+		Trigger:    TriggerOnOwnerWin,
+		DepthShift: 1,
+	}}
+
+	filteredEffects := FilterEffects(effects, EffectContext{Owner: OwnerFish, Phase: PhaseDraw})
+
+	require.Len(t, filteredEffects, 1)
+	assert.Equal(t, effects[0], filteredEffects[0])
 }
 
 func TestNewFishCard(t *testing.T) {

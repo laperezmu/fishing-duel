@@ -6,6 +6,7 @@ Motor central del juego.
 
 - Orquestar una ronda completa.
 - Pedir una carta al mazo.
+- Resolver fases de efectos de carta como draw y post-outcome.
 - Consultar el evaluador de reglas.
 - Aplicar la politica de progresion.
 - Refrescar el snapshot del mazo.

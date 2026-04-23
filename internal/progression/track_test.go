@@ -31,10 +31,10 @@ func TestTrackPolicyApply(t *testing.T) {
 			initialState: newMatchState,
 			policy:       TrackPolicy{},
 			round: match.ResolvedRound{
-				PlayerMove:  domain.Blue,
-				FishCard:    cards.NewFishCard(domain.Red),
-				CardEffects: nil,
-				Outcome:     domain.PlayerWin,
+				PlayerMove:     domain.Blue,
+				FishCard:       cards.NewFishCard(domain.Red),
+				OutcomeEffects: nil,
+				Outcome:        domain.PlayerWin,
 			},
 			wantDistance:   2,
 			wantDepth:      1,
@@ -45,10 +45,10 @@ func TestTrackPolicyApply(t *testing.T) {
 			initialState: newMatchState,
 			policy:       TrackPolicy{},
 			round: match.ResolvedRound{
-				PlayerMove:  domain.Blue,
-				FishCard:    cards.NewFishCard(domain.Yellow),
-				CardEffects: nil,
-				Outcome:     domain.FishWin,
+				PlayerMove:     domain.Blue,
+				FishCard:       cards.NewFishCard(domain.Yellow),
+				OutcomeEffects: nil,
+				Outcome:        domain.FishWin,
 			},
 			wantDistance: 4,
 			wantDepth:    1,
@@ -61,7 +61,7 @@ func TestTrackPolicyApply(t *testing.T) {
 			round: match.ResolvedRound{
 				PlayerMove: domain.Blue,
 				FishCard:   cards.NewFishCard(domain.Yellow),
-				CardEffects: []cards.CardEffect{{
+				OutcomeEffects: []cards.CardEffect{{
 					Trigger:    cards.TriggerOnOwnerWin,
 					DepthShift: 1,
 				}},
@@ -81,10 +81,10 @@ func TestTrackPolicyApply(t *testing.T) {
 			},
 			policy: TrackPolicy{},
 			round: match.ResolvedRound{
-				PlayerMove:  domain.Blue,
-				FishCard:    cards.NewFishCard(domain.Red),
-				CardEffects: nil,
-				Outcome:     domain.PlayerWin,
+				PlayerMove:     domain.Blue,
+				FishCard:       cards.NewFishCard(domain.Red),
+				OutcomeEffects: nil,
+				Outcome:        domain.PlayerWin,
 			},
 			wantDistance:   0,
 			wantDepth:      1,
@@ -99,7 +99,7 @@ func TestTrackPolicyApply(t *testing.T) {
 			round: match.ResolvedRound{
 				PlayerMove: domain.Blue,
 				FishCard:   cards.NewFishCard(domain.Red),
-				CardEffects: []cards.CardEffect{{
+				OutcomeEffects: []cards.CardEffect{{
 					Trigger:    cards.TriggerOnOwnerLose,
 					DepthShift: -2,
 				}},
@@ -122,7 +122,7 @@ func TestTrackPolicyApply(t *testing.T) {
 			round: match.ResolvedRound{
 				PlayerMove: domain.Blue,
 				FishCard:   cards.NewFishCard(domain.Red),
-				CardEffects: []cards.CardEffect{{
+				OutcomeEffects: []cards.CardEffect{{
 					Trigger:    cards.TriggerOnOwnerLose,
 					DepthShift: -2,
 				}},
@@ -154,6 +154,24 @@ func TestTrackPolicyApply(t *testing.T) {
 			assert.Equal(t, test.wantEndReason, state.Encounter.EndReason)
 		})
 	}
+}
+
+func TestTrackPolicyApplyUsesRoundThresholdBonuses(t *testing.T) {
+	state := newMatchState(t)
+	state.Encounter.Distance = 1
+	state.Encounter.Depth = 2
+	state.RoundState.Thresholds.CaptureDistanceBonus = 1
+
+	TrackPolicy{}.Apply(&state, match.ResolvedRound{
+		PlayerMove:     domain.Blue,
+		FishCard:       cards.NewFishCard(domain.Red),
+		OutcomeEffects: nil,
+		Outcome:        domain.PlayerWin,
+	})
+
+	assert.Equal(t, 1, state.Encounter.Distance)
+	assert.Equal(t, 1, state.Encounter.Depth)
+	assert.Equal(t, 1, state.Stats.PlayerWins)
 }
 
 func TestAccumulateCardEffects(t *testing.T) {

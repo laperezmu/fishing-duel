@@ -102,18 +102,27 @@ func (engine *Engine) PlayRound(playerMove domain.Move) (match.RoundResult, erro
 		return match.RoundResult{}, err
 	}
 
-	roundOutcome := engine.roundEvaluator.Evaluate(playerMove, fishCard.Move)
 	engine.state.Round++
+	drawEffects := cards.FilterEffects(fishCard.Effects, cards.EffectContext{
+		Owner: cards.OwnerFish,
+		Phase: cards.PhaseDraw,
+	})
+	applyRoundScopedEffects(&engine.state, drawEffects)
+
+	roundOutcome := engine.roundEvaluator.Evaluate(playerMove, fishCard.Move)
 	engine.playerMoves.ConsumeMove(&engine.state, playerMove)
-	cardEffects := cards.FilterEffects(fishCard.Effects, cards.EffectContext{
+	outcomeEffects := cards.FilterEffects(fishCard.Effects, cards.EffectContext{
 		Owner:   cards.OwnerFish,
+		Phase:   cards.PhaseOutcome,
 		Outcome: roundOutcome,
 	})
+	applyRoundScopedEffects(&engine.state, outcomeEffects)
 	engine.progressionPolicy.Apply(&engine.state, match.ResolvedRound{
-		PlayerMove:  playerMove,
-		FishCard:    fishCard,
-		CardEffects: append([]cards.CardEffect(nil), cardEffects...),
-		Outcome:     roundOutcome,
+		PlayerMove:     playerMove,
+		FishCard:       fishCard,
+		DrawEffects:    append([]cards.CardEffect(nil), drawEffects...),
+		OutcomeEffects: append([]cards.CardEffect(nil), outcomeEffects...),
+		Outcome:        roundOutcome,
 	})
 
 	engine.fishDeck.PrepareNextRound()

@@ -4,10 +4,13 @@ import (
 	"pesca/internal/cards"
 	"pesca/internal/deck"
 	"pesca/internal/domain"
+	"pesca/internal/encounter"
+	"pesca/internal/endings"
 	"pesca/internal/game"
 	"pesca/internal/match"
 	"pesca/internal/playermoves"
 	"pesca/internal/playerrig"
+	"pesca/internal/progression"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -177,6 +180,7 @@ func TestEnginePlayRound(t *testing.T) {
 			assert.Equal(t, 0, state.Round)
 		}).Return(nil).Once()
 		fishCard := cards.NewFishCard(domain.Red,
+			cards.CardEffect{Trigger: cards.TriggerOnDraw, CaptureDistanceBonus: 1},
 			cards.CardEffect{Trigger: cards.TriggerOnOwnerLose, DepthShift: -1},
 			cards.CardEffect{Trigger: cards.TriggerOnOwnerWin, DistanceShift: 2},
 		)
@@ -189,13 +193,18 @@ func TestEnginePlayRound(t *testing.T) {
 		progressionCall := fixture.progressionPolicy.On("Apply", mock.AnythingOfType("*match.State"), match.ResolvedRound{
 			PlayerMove: domain.Blue,
 			FishCard:   fishCard,
-			CardEffects: []cards.CardEffect{{
+			DrawEffects: []cards.CardEffect{{
+				Trigger:              cards.TriggerOnDraw,
+				CaptureDistanceBonus: 1,
+			}},
+			OutcomeEffects: []cards.CardEffect{{
 				Trigger:    cards.TriggerOnOwnerLose,
 				DepthShift: -1,
 			}},
 			Outcome: domain.PlayerWin,
 		}).Run(func(arguments mock.Arguments) {
 			state := arguments.Get(0).(*match.State)
+			assert.Equal(t, 1, state.RoundState.Thresholds.CaptureDistanceBonus)
 			state.Stats.PlayerWins++
 		}).Once()
 		prepareDeckCall := fixture.fishDeck.On("PrepareNextRound").Once()
@@ -207,7 +216,10 @@ func TestEnginePlayRound(t *testing.T) {
 			state := arguments.Get(0).(*match.State)
 			assert.Equal(t, 1, state.Round)
 		}).Once()
-		endConditionCall := fixture.endCondition.On("Apply", mock.AnythingOfType("*match.State")).Once()
+		endConditionCall := fixture.endCondition.On("Apply", mock.AnythingOfType("*match.State")).Run(func(arguments mock.Arguments) {
+			state := arguments.Get(0).(*match.State)
+			assert.Equal(t, 1, state.RoundState.Thresholds.CaptureDistanceBonus)
+		}).Once()
 
 		mock.InOrder(
 			prepareBeforeValidationCall,
@@ -236,7 +248,84 @@ func TestEnginePlayRound(t *testing.T) {
 		assert.Equal(t, 6, result.State.Deck.ActiveCards)
 		assert.Equal(t, 3, result.State.Deck.DiscardCards)
 		assert.Equal(t, 1, result.State.Stats.PlayerWins)
+		assert.Equal(t, match.RoundState{}, result.State.RoundState)
+		assert.Equal(t, match.RoundState{}, fixture.engine.State().RoundState)
 		fixture.assertExpectations(t)
+	})
+
+	t.Run("captures using a real on draw threshold effect before end evaluation", func(t *testing.T) {
+		encounterState, err := encounter.NewState(encounter.DefaultConfig())
+		require.NoError(t, err)
+		encounterState.Distance = 1
+		encounterState.Depth = 0
+
+		playerMoveController := &mockPlayerMoveController{}
+		roundEvaluator := &mockRoundEvaluator{}
+		fishDeck := &mockFishDeck{}
+
+		initializeCall := playerMoveController.On("Initialize", mock.AnythingOfType("*match.State")).Run(func(arguments mock.Arguments) {
+			state := arguments.Get(0).(*match.State)
+			state.PlayerMoves = samplePlayerMoveResources()
+		}).Once()
+		prepareDeckCall := fishDeck.On("PrepareNextRound").Once()
+		activeCountInitCall := fishDeck.On("ActiveCount").Return(0).Once()
+		discardCountInitCall := fishDeck.On("DiscardCount").Return(0).Once()
+		recycleCountInitCall := fishDeck.On("RecycleCount").Return(0).Once()
+		exhaustedInitCall := fishDeck.On("Exhausted").Return(false).Once()
+
+		prepareBeforeValidationCall := playerMoveController.On("PrepareRound", mock.AnythingOfType("*match.State")).Once()
+		validateMoveCall := playerMoveController.On("ValidateMove", mock.Anything, domain.Blue).Return(nil).Once()
+		fishCard := cards.NewFishCard(domain.Red, cards.CardEffect{Trigger: cards.TriggerOnDraw, CaptureDistanceBonus: 1})
+		drawCall := fishDeck.On("Draw").Return(fishCard, nil).Once()
+		evaluateCall := roundEvaluator.On("Evaluate", domain.Blue, domain.Red).Return(domain.Draw).Once()
+		consumeMoveCall := playerMoveController.On("ConsumeMove", mock.AnythingOfType("*match.State"), domain.Blue).Once()
+		prepareDeckAfterRoundCall := fishDeck.On("PrepareNextRound").Once()
+		activeCountAfterRoundCall := fishDeck.On("ActiveCount").Return(0).Once()
+		discardCountAfterRoundCall := fishDeck.On("DiscardCount").Return(1).Once()
+		recycleCountAfterRoundCall := fishDeck.On("RecycleCount").Return(0).Once()
+		exhaustedAfterRoundCall := fishDeck.On("Exhausted").Return(false).Once()
+		prepareAfterRoundCall := playerMoveController.On("PrepareRound", mock.AnythingOfType("*match.State")).Once()
+
+		mock.InOrder(
+			initializeCall,
+			prepareDeckCall,
+			activeCountInitCall,
+			discardCountInitCall,
+			recycleCountInitCall,
+			exhaustedInitCall,
+			prepareBeforeValidationCall,
+			validateMoveCall,
+			drawCall,
+			evaluateCall,
+			consumeMoveCall,
+			prepareDeckAfterRoundCall,
+			activeCountAfterRoundCall,
+			discardCountAfterRoundCall,
+			recycleCountAfterRoundCall,
+			exhaustedAfterRoundCall,
+			prepareAfterRoundCall,
+		)
+
+		engine, err := game.NewEngine(
+			fishDeck,
+			playerMoveController,
+			roundEvaluator,
+			progression.TrackPolicy{},
+			endings.EncounterEndCondition{},
+			match.State{Encounter: encounterState, PlayerRig: samplePlayerRigState()},
+		)
+		require.NoError(t, err)
+
+		result, err := engine.PlayRound(domain.Blue)
+
+		require.NoError(t, err)
+		assert.True(t, result.State.Finished)
+		assert.Equal(t, encounter.StatusCaptured, result.State.Encounter.Status)
+		assert.Equal(t, encounter.EndReasonTrackCapture, result.State.Encounter.EndReason)
+		assert.Equal(t, match.RoundState{}, result.State.RoundState)
+		fishDeck.AssertExpectations(t)
+		playerMoveController.AssertExpectations(t)
+		roundEvaluator.AssertExpectations(t)
 	})
 }
 
