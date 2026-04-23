@@ -27,12 +27,13 @@ func main() {
 			fishCards[i], fishCards[j] = fishCards[j], fishCards[i]
 		})
 	}
+	ui := cli.NewUI(os.Stdin, os.Stdout)
+	customFishDeck, err := ui.ChooseCustomFishDeck("Pesca: duelo contra el pez", deck.DefaultCustomFishDecks())
+	if err != nil {
+		exitWithError("error eligiendo preset de baraja", err)
+	}
 
-	fishDeck := deck.New(
-		deck.NewStandardFishCards(),
-		shuffler,
-		deck.RemoveCardsRecyclePolicy{CardsToRemove: 3},
-	)
+	fishDeck := customFishDeck.Build(shuffler)
 
 	encounterState, err := encounter.NewState(encounter.DefaultConfig())
 	if err != nil {
@@ -63,7 +64,7 @@ func main() {
 	}
 
 	presenter := presentation.NewPresenter(presentation.DefaultCatalog())
-	session, err := app.NewSession(engine, cli.NewUI(os.Stdin, os.Stdout), presenter)
+	session, err := app.NewSession(engine, ui, presenter)
 	if err != nil {
 		exitWithError("error creando sesion", err)
 	}

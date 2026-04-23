@@ -6,6 +6,7 @@ Adaptador de interfaz de linea de comandos.
 
 - Renderizar las vistas de `internal/presentation/`.
 - Leer input del usuario.
+- Resolver pasos iniciales de configuracion CLI antes del loop principal, como seleccion de presets de prueba.
 - Mantener el ultimo estado visual para redibujar la pantalla.
 - Limpiar la terminal entre pasos para evitar spam.
 - Comunicar con claridad que acciones del jugador estan disponibles o recargando.

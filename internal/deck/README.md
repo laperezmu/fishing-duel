@@ -14,6 +14,7 @@ Administracion de la baraja del pez.
 - `RecyclePolicy`: cambia como vuelve el descarte al mazo.
 - `Shuffler`: cambia la estrategia de mezcla.
 - `NewStandardFishCards()`: base para crear mazos predefinidos.
+- `CustomFishDeck`: preset reusable para construir barajas de prueba o configuraciones especificas.
 
 ## Ejemplos de cambios futuros
 
