@@ -40,7 +40,7 @@ La meta de esta feature no es llenar el juego de contenido todavia, sino convert
   - una carta del jugador con `on_owner_win` que modifique distancia o profundidad
   - una carta del jugador con `on_owner_lose` o `on_round_draw` para validar respuestas defensivas o de tempo
 - Mantener una configuracion clasica por defecto con 3 cartas iguales sin efectos, pero anadir presets de prueba controlados para el jugador, de forma similar a lo que ya existe para el pez.
-- Extender `internal/playermoves/` para aceptar configuraciones concretas de barajas por color y no solo la baraja base uniforme.
+- Extender `internal/content/playerprofiles/` y `internal/player/playermoves/` para aceptar configuraciones concretas de barajas por color y no solo la baraja base uniforme.
 - Ajustar `cmd/fishing-duel/main.go` y el flujo CLI para poder arrancar partidas de prueba donde tanto el pez como el jugador usen configuraciones preparadas para validar efectos.
 - Si la legibilidad lo pide, enriquecer `internal/presentation/` e `internal/cli/` con una pista compacta sobre la carta visible del jugador por color, sin convertir la interfaz en una vista de mano completa.
 - Documentar los ejemplos iniciales de `playerCards` de forma que luego puedan servir de semilla para sistemas mayores de build, items o sinergias.

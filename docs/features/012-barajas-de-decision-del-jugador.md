@@ -23,7 +23,7 @@ Esta feature es una pieza clave para completar el sistema de efectos de cartas d
 ## Scope
 
 ### Incluye
-- Introducir un modelo de barajas del jugador por color dentro de `internal/playermoves/` o una capa cercana de dominio.
+- Introducir un modelo de barajas del jugador por color dentro de `internal/player/playermoves/` o una capa cercana de dominio.
 - Definir `playerCards` base sin efectos para los tres colores, con 3 cartas por color en la configuracion inicial.
 - Actualizar el estado compartido de partida para reflejar la carta visible, el descarte y la recuperacion de cada baraja de decision.
 - Adaptar la validacion y consumo de decisiones del jugador al nuevo sistema de cartas.
@@ -40,7 +40,7 @@ Esta feature es una pieza clave para completar el sistema de efectos de cartas d
 ## Propuesta de implementacion
 
 - Crear un modelo explicito de `playerCards` por color que comparta contratos de efecto con `FishCard`, pero conserve su identidad como cartas del jugador.
-- Evolucionar `internal/playermoves/` desde el sistema de `RemainingUses` hacia un sistema de barajas por color con:
+- Evolucionar `internal/player/playermoves/` desde el sistema de `RemainingUses` hacia un sistema de barajas por color con:
   - mazo activo por color
   - descarte por color
   - carta visible actual por color

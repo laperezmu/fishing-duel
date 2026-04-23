@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Introducir una seleccion inicial de presets de `CustomFishDeck` en la experiencia CLI para poder probar de forma rapida las mecanicas nuevas del encounter sin modificar codigo cada vez.
+Introducir una seleccion inicial de presets de baraja del pez en la experiencia CLI para poder probar de forma rapida las mecanicas nuevas del encounter sin modificar codigo cada vez.
 
 El resultado esperado es un flujo de arranque donde, antes de crear la partida, el jugador elige uno de varios presets de baraja del pez, confirma la seleccion y luego entra al loop habitual del juego.
 

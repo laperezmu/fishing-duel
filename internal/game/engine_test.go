@@ -8,8 +8,8 @@ import (
 	"pesca/internal/endings"
 	"pesca/internal/game"
 	"pesca/internal/match"
-	"pesca/internal/playermoves"
-	"pesca/internal/playerrig"
+	"pesca/internal/player/playermoves"
+	"pesca/internal/player/playerrig"
 	"pesca/internal/progression"
 	"testing"
 

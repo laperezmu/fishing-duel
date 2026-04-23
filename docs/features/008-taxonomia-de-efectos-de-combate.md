@@ -38,7 +38,7 @@ El resultado esperado de esta feature es un documento de discovery utilizable co
 
 - Crear un documento de discovery principal que sirva como referencia para efectos de cartas y que use ejemplos sacados del estado actual del proyecto.
 - Materializar ese documento en `docs/discoveries/008-taxonomia-de-efectos-de-carta.md` como salida principal de la feature.
-- Partir desde la arquitectura existente en `internal/cards/`, `internal/progression/`, `internal/endings/`, `internal/encounter/` y `internal/playerrig/` para inventariar lo ya resuelto.
+- Partir desde la arquitectura existente en `internal/cards/`, `internal/progression/`, `internal/endings/`, `internal/encounter/` y `internal/player/playerrig/` para inventariar lo ya resuelto.
 - Proponer una matriz simple con ejes de `emisor de carta -> trigger -> fase -> impacto -> restricciones` para evaluar nuevos efectos sin abrir decisiones desde cero cada vez.
 - Cerrar una primera definicion de orden de resolucion que preserve el flujo actual del engine y deje un punto claro para futuros efectos emitidos tanto por `FishCard` como por `playerCards`.
 - Implementar en `internal/cards/` contratos compartidos de efecto y tipos de carta separados por owner, sin forzar una carta comun unica.

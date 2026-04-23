@@ -8,6 +8,7 @@ Each plan must include:
 - Objective
 - Acceptance criteria
 - Scope of the change
+- A concrete implementation proposal with the intended organization or direction already stated
 
 Implementation should not start without at least this minimum planning step.
 
@@ -87,8 +88,8 @@ Minimum required sections before implementation starts:
 ## Documentation Structure
 
 - `docs/features/` stores feature plans that enter the implementation workflow.
-- `docs/discoveries/` stores active discovery documents and research outputs tied to future work.
 - `docs/backlog/` stores product backlog, prioritization and future roadmap items.
+- `docs/discoveries/` stores legacy discovery documents created before the single-document rule.
 
 ## Plan Storage Convention
 
@@ -96,6 +97,7 @@ Every new feature plan must:
 - Be stored under `docs/features/`
 - Be enumerated with a sequential numeric prefix
 - Use the feature plan template defined in this file
+- Be self-contained: analysis, proposal and implementation direction live in the same document
 
 Recommended naming format:
 - `docs/features/001-nombre-corto.md`
@@ -110,11 +112,16 @@ Implementation branch naming:
 ## Backlog Convention
 
 - Product backlog items live in `docs/backlog/`.
-- Active discovery documents live in `docs/discoveries/`.
 - Use `docs/backlog/TEMPLATE.md` for new entries.
 - Each backlog item should use an identifier `BL-###`.
-- When a backlog item moves into active discovery, document that work under `docs/discoveries/`.
 - When a backlog item becomes implementation-ready, convert it into a feature plan under `docs/features/`.
+
+## Single-Document Rule
+
+- Do not create a separate discovery document for a feature that already has a plan.
+- The feature plan itself must contain the analysis needed to justify the implementation proposal.
+- A plan must not defer its core organization proposal to a later discovery document.
+- `docs/discoveries/` remains as historical context only unless the user explicitly asks to preserve or migrate legacy material.
 
 ## Testing Conventions
 

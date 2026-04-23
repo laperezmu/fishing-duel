@@ -8,6 +8,7 @@ Esta carpeta contiene los planes de features del proyecto.
 - Formato sugerido: `001-nombre-corto.md`.
 - Los planes siguen la plantilla definida en `PROJECT_CONTEXT.md`.
 - La rama de implementacion usa el nombre del archivo sin `.md`.
+- Cada feature debe concentrar analisis, propuesta y ejecucion en un solo documento. No se crea un discovery aparte para completar el plan.
 
 ## Ejemplos
 

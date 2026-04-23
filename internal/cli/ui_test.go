@@ -3,12 +3,13 @@ package cli
 import (
 	"bytes"
 	"pesca/internal/cards"
-	"pesca/internal/deck"
+	"pesca/internal/content/fishprofiles"
+	"pesca/internal/content/playerprofiles"
 	"pesca/internal/domain"
 	"pesca/internal/encounter"
 	"pesca/internal/match"
-	"pesca/internal/playermoves"
-	"pesca/internal/playerrig"
+	"pesca/internal/player/playermoves"
+	"pesca/internal/player/playerrig"
 	"pesca/internal/presentation"
 	"strings"
 	"testing"
@@ -119,14 +120,14 @@ func TestChoosePlayerDeckPreset(t *testing.T) {
 	assert.Contains(t, out.String(), clearSequence)
 }
 
-func TestChooseCustomFishDeck(t *testing.T) {
+func TestChooseFishDeckPreset(t *testing.T) {
 	var out bytes.Buffer
 	ui := NewUI(strings.NewReader("2\ns\n"), &out)
 
-	customFishDeck, err := ui.ChooseCustomFishDeck("Pesca: duelo contra el pez", sampleCustomFishDecks())
+	preset, err := ui.ChooseFishDeckPreset("Pesca: duelo contra el pez", sampleFishDeckPresets())
 
 	require.NoError(t, err)
-	assert.Equal(t, "Apertura", customFishDeck.Name)
+	assert.Equal(t, "Apertura", preset.Name)
 	assert.Contains(t, out.String(), "Preset del pez")
 	assert.Contains(t, out.String(), "Confirmar preset")
 	assert.Contains(t, out.String(), "Apertura")
@@ -134,38 +135,38 @@ func TestChooseCustomFishDeck(t *testing.T) {
 	assert.Contains(t, out.String(), clearSequence)
 }
 
-func TestChooseCustomFishDeckReturnsToSelectionAfterCancellingConfirmation(t *testing.T) {
+func TestChooseFishDeckPresetReturnsToSelectionAfterCancellingConfirmation(t *testing.T) {
 	var out bytes.Buffer
 	ui := NewUI(strings.NewReader("1\nn\n2\ns\n"), &out)
 
-	customFishDeck, err := ui.ChooseCustomFishDeck("Pesca: duelo contra el pez", sampleCustomFishDecks())
+	preset, err := ui.ChooseFishDeckPreset("Pesca: duelo contra el pez", sampleFishDeckPresets())
 
 	require.NoError(t, err)
-	assert.Equal(t, "Apertura", customFishDeck.Name)
+	assert.Equal(t, "Apertura", preset.Name)
 	assert.Contains(t, out.String(), "seleccion cancelada, elige otro preset")
 }
 
-func TestChooseCustomFishDeckRejectsInvalidInput(t *testing.T) {
+func TestChooseFishDeckPresetRejectsInvalidInput(t *testing.T) {
 	var out bytes.Buffer
 	ui := NewUI(strings.NewReader("9\n2\nquizas\ns\n"), &out)
 
-	customFishDeck, err := ui.ChooseCustomFishDeck("Pesca: duelo contra el pez", sampleCustomFishDecks())
+	preset, err := ui.ChooseFishDeckPreset("Pesca: duelo contra el pez", sampleFishDeckPresets())
 
 	require.NoError(t, err)
-	assert.Equal(t, "Apertura", customFishDeck.Name)
+	assert.Equal(t, "Apertura", preset.Name)
 	assert.Contains(t, out.String(), "opcion no valida, usa un numero entre 1 y 2")
 	assert.Contains(t, out.String(), "confirmacion no valida, usa s o n")
 }
 
 func TestPresetSelectionScreensHideCardDetailsFromTheList(t *testing.T) {
 	playerSelection := renderPlayerDeckSelectionSection(samplePlayerDeckPresets())
-	fishSelection := renderCustomFishDeckSelectionSection(sampleCustomFishDecks())
+	fishSelection := renderFishDeckSelectionSection(sampleFishDeckPresets())
 
 	assert.NotContains(t, playerSelection, "Azul - Anzuelo tenso")
 	assert.NotContains(t, fishSelection, "Rojo - Tiron de apertura")
 
 	playerConfirmation := renderPlayerDeckConfirmationSection(samplePlayerDeckPresets()[1])
-	fishConfirmation := renderCustomFishDeckConfirmationSection(sampleCustomFishDecks()[1])
+	fishConfirmation := renderFishDeckConfirmationSection(sampleFishDeckPresets()[1])
 
 	assert.Contains(t, playerConfirmation, "Azul - Anzuelo tenso")
 	assert.Contains(t, fishConfirmation, "Rojo - Tiron de apertura")
@@ -191,10 +192,11 @@ func samplePromptState(t *testing.T) match.State {
 	}
 }
 
-func sampleCustomFishDecks() []deck.CustomFishDeck {
-	return []deck.CustomFishDeck{
+func sampleFishDeckPresets() []fishprofiles.FishDeckPreset {
+	return []fishprofiles.FishDeckPreset{
 		{
 			ID:            "classic",
+			ArchetypeID:   fishprofiles.ArchetypeBaselineCycle,
 			Name:          "Clasico",
 			Description:   "Sin efectos.",
 			Details:       []string{"3 cartas lisas."},
@@ -204,6 +206,7 @@ func sampleCustomFishDecks() []deck.CustomFishDeck {
 		},
 		{
 			ID:          "hooked-opening",
+			ArchetypeID: fishprofiles.ArchetypeDrawTempo,
 			Name:        "Apertura",
 			Description: "Con on_draw.",
 			Details:     []string{"Rojo - Tiron de apertura: al revelarse permite capturar desde un paso mas lejos ese round."},
@@ -216,8 +219,8 @@ func sampleCustomFishDecks() []deck.CustomFishDeck {
 	}
 }
 
-func samplePlayerDeckPresets() []playermoves.PlayerDeckPreset {
-	return []playermoves.PlayerDeckPreset{
+func samplePlayerDeckPresets() []playerprofiles.DeckPreset {
+	return []playerprofiles.DeckPreset{
 		{
 			ID:          "classic",
 			Name:        "Clasico",

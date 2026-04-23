@@ -2,8 +2,8 @@ package cli
 
 import (
 	"fmt"
-	"pesca/internal/deck"
-	"pesca/internal/playermoves"
+	"pesca/internal/content/fishprofiles"
+	"pesca/internal/content/playerprofiles"
 	"pesca/internal/presentation"
 	"strings"
 )
@@ -44,10 +44,10 @@ func renderGameOverScreen(title string, summary presentation.SummaryView, lastRo
 	return clearSequence + strings.Join(sections, "\n\n") + "\n"
 }
 
-func renderCustomFishDeckSelectionScreen(title string, customFishDecks []deck.CustomFishDeck, message string) string {
+func renderFishDeckSelectionScreen(title string, presets []fishprofiles.FishDeckPreset, message string) string {
 	sections := []string{
 		renderHeader(title),
-		renderCustomFishDeckSelectionSection(customFishDecks),
+		renderFishDeckSelectionSection(presets),
 	}
 	if message != "" {
 		sections = append(sections, accent("Aviso")+"\n  "+message)
@@ -56,7 +56,7 @@ func renderCustomFishDeckSelectionScreen(title string, customFishDecks []deck.Cu
 	return clearSequence + strings.Join(sections, "\n\n") + "\n\n"
 }
 
-func renderPlayerDeckSelectionScreen(title string, presets []playermoves.PlayerDeckPreset, message string) string {
+func renderPlayerDeckSelectionScreen(title string, presets []playerprofiles.DeckPreset, message string) string {
 	sections := []string{
 		renderHeader(title),
 		renderPlayerDeckSelectionSection(presets),
@@ -68,10 +68,10 @@ func renderPlayerDeckSelectionScreen(title string, presets []playermoves.PlayerD
 	return clearSequence + strings.Join(sections, "\n\n") + "\n\n"
 }
 
-func renderCustomFishDeckConfirmationScreen(title string, customFishDeck deck.CustomFishDeck, message string) string {
+func renderFishDeckConfirmationScreen(title string, preset fishprofiles.FishDeckPreset, message string) string {
 	sections := []string{
 		renderHeader(title),
-		renderCustomFishDeckConfirmationSection(customFishDeck),
+		renderFishDeckConfirmationSection(preset),
 	}
 	if message != "" {
 		sections = append(sections, accent("Aviso")+"\n  "+message)
@@ -80,7 +80,7 @@ func renderCustomFishDeckConfirmationScreen(title string, customFishDeck deck.Cu
 	return clearSequence + strings.Join(sections, "\n\n") + "\n\n"
 }
 
-func renderPlayerDeckConfirmationScreen(title string, preset playermoves.PlayerDeckPreset, message string) string {
+func renderPlayerDeckConfirmationScreen(title string, preset playerprofiles.DeckPreset, message string) string {
 	sections := []string{
 		renderHeader(title),
 		renderPlayerDeckConfirmationSection(preset),
@@ -192,16 +192,16 @@ func renderGameOverSection(summary presentation.SummaryView) string {
 	}, "\n")
 }
 
-func renderCustomFishDeckSelectionSection(customFishDecks []deck.CustomFishDeck) string {
+func renderFishDeckSelectionSection(presets []fishprofiles.FishDeckPreset) string {
 	lines := []string{
 		accent("Preset del pez"),
 		"  Elige una baraja del pez para el duelo.",
 	}
 
-	for index, customFishDeck := range customFishDecks {
+	for index, preset := range presets {
 		lines = append(lines,
-			fmt.Sprintf("  %d) %s", index+1, customFishDeck.Name),
-			fmt.Sprintf("     %s", customFishDeck.Description),
+			fmt.Sprintf("  %d) %s", index+1, preset.Name),
+			fmt.Sprintf("     %s", preset.Description),
 		)
 	}
 
@@ -210,7 +210,7 @@ func renderCustomFishDeckSelectionSection(customFishDecks []deck.CustomFishDeck)
 	return strings.Join(lines, "\n")
 }
 
-func renderPlayerDeckSelectionSection(presets []playermoves.PlayerDeckPreset) string {
+func renderPlayerDeckSelectionSection(presets []playerprofiles.DeckPreset) string {
 	lines := []string{
 		accent("Preset del jugador"),
 		"  Elige una baraja del jugador para probar el duelo.",
@@ -228,23 +228,24 @@ func renderPlayerDeckSelectionSection(presets []playermoves.PlayerDeckPreset) st
 	return strings.Join(lines, "\n")
 }
 
-func renderCustomFishDeckConfirmationSection(customFishDeck deck.CustomFishDeck) string {
+func renderFishDeckConfirmationSection(preset fishprofiles.FishDeckPreset) string {
 	lines := []string{
 		accent("Confirmar preset"),
-		fmt.Sprintf("  Nombre      : %s", customFishDeck.Name),
-		fmt.Sprintf("  Descripcion : %s", customFishDeck.Description),
-		fmt.Sprintf("  Cartas      : %d", len(customFishDeck.FishCards)),
-		fmt.Sprintf("  Orden       : %s", renderCustomFishDeckOrder(customFishDeck)),
-		fmt.Sprintf("  Reciclado   : retira %d cartas por ciclo", customFishDeck.CardsToRemove),
+		fmt.Sprintf("  Nombre      : %s", preset.Name),
+		fmt.Sprintf("  Arquetipo   : %s", preset.ArchetypeID),
+		fmt.Sprintf("  Descripcion : %s", preset.Description),
+		fmt.Sprintf("  Cartas      : %d", len(preset.FishCards)),
+		fmt.Sprintf("  Orden       : %s", renderFishDeckOrder(preset)),
+		fmt.Sprintf("  Reciclado   : retira %d cartas por ciclo", preset.CardsToRemove),
 	}
-	for _, detail := range customFishDeck.Details {
+	for _, detail := range preset.Details {
 		lines = append(lines, "  - "+detail)
 	}
 
 	return strings.Join(lines, "\n")
 }
 
-func renderPlayerDeckConfirmationSection(preset playermoves.PlayerDeckPreset) string {
+func renderPlayerDeckConfirmationSection(preset playerprofiles.DeckPreset) string {
 	lines := []string{
 		accent("Confirmar preset"),
 		fmt.Sprintf("  Nombre      : %s", preset.Name),
@@ -259,8 +260,8 @@ func renderPlayerDeckConfirmationSection(preset playermoves.PlayerDeckPreset) st
 	return strings.Join(lines, "\n")
 }
 
-func renderCustomFishDeckOrder(customFishDeck deck.CustomFishDeck) string {
-	if customFishDeck.Shuffle {
+func renderFishDeckOrder(preset fishprofiles.FishDeckPreset) string {
+	if preset.Shuffle {
 		return "barajada"
 	}
 

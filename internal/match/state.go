@@ -4,7 +4,7 @@ import (
 	"pesca/internal/cards"
 	"pesca/internal/domain"
 	"pesca/internal/encounter"
-	"pesca/internal/playerrig"
+	"pesca/internal/player/playerrig"
 )
 
 type DeckState struct {

@@ -149,7 +149,7 @@ Impactan recursos consumibles o enfriamientos del lado jugador.
 
 ### Estado actual
 - No implementado como efecto de carta.
-- Hoy los recursos viven en `internal/playermoves/` y son ajenos a cartas.
+- Hoy los recursos del jugador viven en `internal/player/playermoves/` y son ajenos a cartas.
 
 ### C. Efectos sobre estado del mazo o flujo de cartas
 

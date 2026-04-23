@@ -56,8 +56,8 @@ La idea es usar los sistemas ya construidos en combate para describir perfiles f
 
 ## Estructura inicial implementada
 
-- `internal/fishprofiles/profiles.go` define `ArchetypeID`, `CardPattern` y `Profile`.
-- `internal/deck/presets.go` deriva los presets jugables desde esos perfiles.
+- `internal/content/fishprofiles/profiles.go` define `ArchetypeID`, `CardPattern` y `Profile`.
+- `internal/content/fishprofiles/presets.go` deriva los presets jugables desde esos perfiles.
 - Esta capa aun vive en Go, pero ya separa configuracion de wiring manual.
 
 ## Siguiente expansion natural
