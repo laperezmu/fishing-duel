@@ -8,7 +8,7 @@ Este documento concentra los pendientes activos de discovery y delivery para lle
 - **Tipo**: Delivery
 - **Objetivo**: consolidar una arquitectura preparada para cartas de pez y de jugador sin seguir agregando casos aislados.
 - **Resultado esperado**: sistema tecnico para encadenar efectos de carta por fases, trigger y owner.
-- **Dependencias**: `docs/discoveries/008-taxonomia-de-efectos-de-carta.md`, plan 009
+- **Dependencias**: `docs/discoveries/008-taxonomia-de-efectos-de-carta.md`, plan 009, plan 012
 - **Prioridad**: Alta
 
 ### BL-006 Definir arquetipos de peces

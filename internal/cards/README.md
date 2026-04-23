@@ -4,7 +4,7 @@ Define cartas y modificadores de encounter reutilizables por combatientes.
 
 ## Responsabilidad
 
-- Describir cartas del pez y, en el futuro, cartas del jugador.
+- Describir cartas del pez y cartas del jugador.
 - Representar efectos configurables ligados a cartas mediante contratos compartidos.
 - Mantener los triggers de activacion desacoplados del motor.
 

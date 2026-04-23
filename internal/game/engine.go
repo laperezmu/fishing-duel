@@ -35,7 +35,8 @@ type PlayerMoveController interface {
 	Initialize(state *match.State)
 	PrepareRound(state *match.State)
 	ValidateMove(state match.State, playerMove domain.Move) error
-	ConsumeMove(state *match.State, playerMove domain.Move)
+	PeekMoveCard(state match.State, playerMove domain.Move) (cards.PlayerCard, error)
+	ConsumeMove(state *match.State, playerMove domain.Move) cards.PlayerCard
 }
 
 type Engine struct {
@@ -91,6 +92,10 @@ func (engine *Engine) PlayRound(playerMove domain.Move) (match.RoundResult, erro
 	if err := engine.playerMoves.ValidateMove(engine.state, playerMove); err != nil {
 		return match.RoundResult{}, err
 	}
+	playerCard, err := engine.playerMoves.PeekMoveCard(engine.state, playerMove)
+	if err != nil {
+		return match.RoundResult{}, err
+	}
 
 	fishCard, err := engine.fishDeck.Draw()
 	if err != nil {
@@ -103,22 +108,32 @@ func (engine *Engine) PlayRound(playerMove domain.Move) (match.RoundResult, erro
 	}
 
 	engine.state.Round++
-	drawEffects := cards.FilterEffects(fishCard.Effects, cards.EffectContext{
-		Owner: cards.OwnerFish,
+	drawEffects := cards.FilterEffects(playerCard.Effects, cards.EffectContext{
+		Owner: cards.OwnerPlayer,
 		Phase: cards.PhaseDraw,
 	})
+	drawEffects = append(drawEffects, cards.FilterEffects(fishCard.Effects, cards.EffectContext{
+		Owner: cards.OwnerFish,
+		Phase: cards.PhaseDraw,
+	})...)
 	applyRoundScopedEffects(&engine.state, drawEffects)
 
 	roundOutcome := engine.roundEvaluator.Evaluate(playerMove, fishCard.Move)
 	engine.playerMoves.ConsumeMove(&engine.state, playerMove)
-	outcomeEffects := cards.FilterEffects(fishCard.Effects, cards.EffectContext{
-		Owner:   cards.OwnerFish,
+	outcomeEffects := cards.FilterEffects(playerCard.Effects, cards.EffectContext{
+		Owner:   cards.OwnerPlayer,
 		Phase:   cards.PhaseOutcome,
 		Outcome: roundOutcome,
 	})
+	outcomeEffects = append(outcomeEffects, cards.FilterEffects(fishCard.Effects, cards.EffectContext{
+		Owner:   cards.OwnerFish,
+		Phase:   cards.PhaseOutcome,
+		Outcome: roundOutcome,
+	})...)
 	applyRoundScopedEffects(&engine.state, outcomeEffects)
 	engine.progressionPolicy.Apply(&engine.state, match.ResolvedRound{
 		PlayerMove:     playerMove,
+		PlayerCard:     playerCard,
 		FishCard:       fishCard,
 		DrawEffects:    append([]cards.CardEffect(nil), drawEffects...),
 		OutcomeEffects: append([]cards.CardEffect(nil), outcomeEffects...),
@@ -134,6 +149,7 @@ func (engine *Engine) PlayRound(playerMove domain.Move) (match.RoundResult, erro
 	return match.RoundResult{
 		Round:      engine.state.Round,
 		PlayerMove: playerMove,
+		PlayerCard: playerCard,
 		FishMove:   fishCard.Move,
 		FishCard:   fishCard,
 		Outcome:    roundOutcome,

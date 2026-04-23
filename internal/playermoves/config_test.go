@@ -1,6 +1,7 @@
 package playermoves
 
 import (
+	"pesca/internal/cards"
 	"pesca/internal/domain"
 	"testing"
 
@@ -21,10 +22,10 @@ func TestNewUsageController(t *testing.T) {
 		{
 			title: "returns an error when recovery delay is negative",
 			config: Config{
-				InitialUsesPerMove: map[domain.Move]int{
-					domain.Blue:   3,
-					domain.Red:    3,
-					domain.Yellow: 3,
+				InitialDecks: map[domain.Move][]cards.PlayerCard{
+					domain.Blue:   {cards.NewPlayerCard(domain.Blue)},
+					domain.Red:    {cards.NewPlayerCard(domain.Red)},
+					domain.Yellow: {cards.NewPlayerCard(domain.Yellow)},
 				},
 				RecoveryDelayRounds: -1,
 			},
@@ -33,25 +34,37 @@ func TestNewUsageController(t *testing.T) {
 		{
 			title: "returns an error when a move is missing from the config",
 			config: Config{
-				InitialUsesPerMove: map[domain.Move]int{
-					domain.Blue: 3,
-					domain.Red:  3,
+				InitialDecks: map[domain.Move][]cards.PlayerCard{
+					domain.Blue: {cards.NewPlayerCard(domain.Blue)},
+					domain.Red:  {cards.NewPlayerCard(domain.Red)},
 				},
 				RecoveryDelayRounds: 1,
 			},
-			wantErr: "initial uses for move yellow are required",
+			wantErr: "initial deck for move yellow is required",
 		},
 		{
-			title: "returns an error when a move starts with negative uses",
+			title: "returns an error when a move starts with an empty deck",
 			config: Config{
-				InitialUsesPerMove: map[domain.Move]int{
-					domain.Blue:   3,
-					domain.Red:    -1,
-					domain.Yellow: 3,
+				InitialDecks: map[domain.Move][]cards.PlayerCard{
+					domain.Blue:   {cards.NewPlayerCard(domain.Blue)},
+					domain.Red:    {},
+					domain.Yellow: {cards.NewPlayerCard(domain.Yellow)},
 				},
 				RecoveryDelayRounds: 1,
 			},
-			wantErr: "initial uses for move red must be greater than or equal to 0",
+			wantErr: "initial deck for move red must contain at least one card",
+		},
+		{
+			title: "returns an error when a deck contains a card from another move",
+			config: Config{
+				InitialDecks: map[domain.Move][]cards.PlayerCard{
+					domain.Blue:   {cards.NewPlayerCard(domain.Red)},
+					domain.Red:    {cards.NewPlayerCard(domain.Red)},
+					domain.Yellow: {cards.NewPlayerCard(domain.Yellow)},
+				},
+				RecoveryDelayRounds: 1,
+			},
+			wantErr: "initial deck for move blue contains a card for move red",
 		},
 	}
 

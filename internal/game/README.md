@@ -16,7 +16,7 @@ Motor central del juego.
 
 - `RoundEvaluator`: decide el resultado de la ronda.
 - `FishDeck`: contrato del mazo que entrega cartas y expone su estado.
-- `PlayerMoveController`: valida y consume recursos de las acciones del jugador.
+- `PlayerMoveController`: valida la decision del jugador, expone su carta visible y consume la carta usada.
 - `MatchProgressionPolicy`: modifica el estado acumulado.
 - `MatchEndCondition`: determina si el encuentro termina.
 
