@@ -1,7 +1,10 @@
 # BL-XXX <titulo corto>
 
 ## Tipo
-Discovery | Delivery
+Discovery | Delivery | Calidad | Discovery + Delivery | Calidad + Delivery
+
+## Estado
+pending | planned | done | cancelled
 
 ## Pilar
 Core Loop | Combat | Fish | Items | Economy | Meta | Collection | Content | UX | Tech
@@ -28,6 +31,9 @@ Core Loop | Combat | Fish | Items | Economy | Meta | Collection | Content | UX |
 
 ## Dependencias
 - <BL relacionado o `ninguna`>
+
+## Plan relacionado
+- <`docs/features/...` o `ninguno`>
 
 ## Prioridad
 Alta | Media | Baja
