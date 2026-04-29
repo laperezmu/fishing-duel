@@ -4,7 +4,8 @@ Motor de juego en Go para un duelo de pesca por rondas. El proyecto ya no es sol
 
 ## Estado actual del juego
 
-- El jugador elige un preset de barajas propias y un preset de pez antes de empezar el encuentro.
+- El jugador elige un preset de barajas propias, un preset de pez y una situacion de agua antes de empezar el encuentro.
+- Cada pesca se abre con una lectura breve del agua y un minijuego de cast por timing que define la distancia inicial del duelo.
 - Cada ronda el jugador sigue eligiendo entre tres acciones base: `Tirar`, `Recoger` y `Soltar`.
 - Cada accion del jugador consume la carta superior visible de una mini-baraja por color.
 - El pez roba su siguiente carta desde una baraja configurable, con orden fijo o barajado segun el perfil.
@@ -28,7 +29,8 @@ Flujo actual del CLI:
 
 1. Elige un preset del jugador.
 2. Elige un preset del pez.
-3. Juega el duelo ronda a ronda desde la terminal.
+3. Elige una situacion de agua y resuelve el cast inicial.
+4. Juega el duelo ronda a ronda desde la terminal.
 
 Tambien puedes validar el proyecto con:
 
@@ -39,12 +41,14 @@ $(go env GOPATH)/bin/golangci-lint run
 
 ## Loop jugable actual
 
-1. Se inicializa el estado del encuentro, el rig del jugador, las barajas del jugador y la baraja del pez.
-2. El jugador ve sus tres acciones disponibles junto a la carta superior visible de cada color cuando aplica.
-3. El pez revela su carta activa para la ronda al robar del mazo, y el juego conserva un historial visible de lo ya descartado en el ciclo actual.
-4. El motor aplica efectos de `draw`, resuelve el outcome base del combate y luego aplica efectos condicionados por victoria, derrota o empate.
-5. La progresion modifica distancia y profundidad del pez, y puede disparar eventos derivados como `chapotea en la superficie`.
-6. El encuentro termina por captura, escape horizontal, escape por profundidad, escape por chapoteo o resolucion al agotarse la baraja del pez.
+1. Se elige una situacion de agua que aporta lectura visible y una base de apertura para el encuentro.
+2. El jugador resuelve un cast por timing que fija la distancia inicial del duelo.
+3. Se inicializa el estado del encuentro, la cana del jugador, las barajas del jugador y la baraja del pez.
+4. El jugador ve sus tres acciones disponibles junto a la carta superior visible de cada color cuando aplica.
+5. El pez revela su carta activa para la ronda al robar del mazo, y el juego conserva un historial visible de lo ya descartado en el ciclo actual.
+6. El motor aplica efectos de `draw`, resuelve el outcome base del combate y luego aplica efectos condicionados por victoria, derrota o empate.
+7. La progresion modifica distancia y profundidad del pez, y puede disparar eventos derivados como `chapotea en la superficie`.
+8. El encuentro termina por captura, escape horizontal, escape por profundidad, escape por chapoteo o resolucion al agotarse la baraja del pez.
 
 ## Presets actuales
 
@@ -91,7 +95,7 @@ Los perfiles del pez viven en `internal/content/fishprofiles/` y los del jugador
 
 - `internal/deck/`: mazo del pez, descarte, reciclado y politicas de retiro de cartas.
 - `internal/player/`: runtime del jugador, incluyendo recursos y barajas por color.
-- `internal/content/`: perfiles, presets y contenido configurable reusable para pez y jugador.
+- `internal/content/`: perfiles, presets y contenido configurable reusable para pez, jugador y contextos de agua.
 
 En terminos de arquitectura, el proyecto hoy funciona como un monolito modular pequeno: `cmd/` compone dependencias, `app` coordina el flujo, `presentation/cli` son adaptadores de borde y el dominio del duelo vive separado del contenido configurable.
 

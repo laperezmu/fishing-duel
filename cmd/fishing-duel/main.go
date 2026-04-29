@@ -9,6 +9,7 @@ import (
 	"pesca/internal/cli"
 	"pesca/internal/content/fishprofiles"
 	"pesca/internal/content/playerprofiles"
+	"pesca/internal/content/watercontexts"
 	"pesca/internal/encounter"
 	"pesca/internal/endings"
 	"pesca/internal/game"
@@ -44,8 +45,12 @@ func main() {
 	}
 
 	fishDeck := fishDeckPreset.BuildDeck(shuffler)
+	opening, err := app.ResolveEncounterOpening("Pesca: duelo contra el pez", encounter.DefaultConfig(), watercontexts.DefaultPresets(), ui)
+	if err != nil {
+		exitWithError("error resolviendo la apertura de pesca", err)
+	}
 
-	encounterState, err := encounter.NewState(encounter.DefaultConfig())
+	encounterState, err := encounter.NewState(opening.Config)
 	if err != nil {
 		exitWithError("error inicializando encuentro", err)
 	}

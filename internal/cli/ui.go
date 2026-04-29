@@ -7,22 +7,28 @@ import (
 	"pesca/internal/content/fishprofiles"
 	"pesca/internal/content/playerprofiles"
 	"pesca/internal/domain"
+	"pesca/internal/encounter"
 	"pesca/internal/presentation"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type UI struct {
-	scanner   *bufio.Scanner
-	out       io.Writer
-	intro     presentation.IntroView
-	lastRound *presentation.RoundView
+	scanner    *bufio.Scanner
+	out        io.Writer
+	intro      presentation.IntroView
+	lastRound  *presentation.RoundView
+	opening    *encounter.Opening
+	castDelay  time.Duration
+	castFrames []int
 }
 
 func NewUI(in io.Reader, out io.Writer) *UI {
 	return &UI{
-		scanner: bufio.NewScanner(in),
-		out:     out,
+		scanner:   bufio.NewScanner(in),
+		out:       out,
+		castDelay: 50 * time.Millisecond,
 	}
 }
 
@@ -118,7 +124,7 @@ func (ui *UI) ChooseFishDeckPreset(title string, presets []fishprofiles.FishDeck
 func (ui *UI) ChooseMove(status presentation.StatusView, options []presentation.MoveOption) (domain.Move, error) {
 	message := ""
 	for {
-		if _, err := io.WriteString(ui.out, renderPromptScreen(ui.intro.Title, status, options, ui.lastRound, message)); err != nil {
+		if _, err := io.WriteString(ui.out, renderPromptScreen(ui.intro.Title, status, options, ui.opening, ui.lastRound, message)); err != nil {
 			return 0, err
 		}
 		if _, err := fmt.Fprint(ui.out, "Elige 1, 2 o 3: "); err != nil {

@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"pesca/internal/content/fishprofiles"
 	"pesca/internal/content/playerprofiles"
+	"pesca/internal/content/watercontexts"
+	"pesca/internal/encounter"
 	"pesca/internal/presentation"
 	"strings"
 )
@@ -17,9 +19,12 @@ const (
 	encounterColumnSpan = encounterCellWidth + len(encounterSeparator)
 )
 
-func renderPromptScreen(title string, status presentation.StatusView, options []presentation.MoveOption, lastRound *presentation.RoundView, message string) string {
+func renderPromptScreen(title string, status presentation.StatusView, options []presentation.MoveOption, opening *encounter.Opening, lastRound *presentation.RoundView, message string) string {
 	var sections []string
 	sections = append(sections, renderHeader(title))
+	if opening != nil {
+		sections = append(sections, renderEncounterOpeningSection(*opening))
+	}
 	sections = append(sections, renderTrackSection(status))
 	sections = append(sections, renderStatsSection(status))
 	sections = append(sections, renderFishDiscardSection(status))
@@ -69,6 +74,18 @@ func renderPlayerDeckSelectionScreen(title string, presets []playerprofiles.Deck
 	return clearSequence + strings.Join(sections, "\n\n") + "\n\n"
 }
 
+func renderWaterContextSelectionScreen(title string, presets []watercontexts.Preset, message string) string {
+	sections := []string{
+		renderHeader(title),
+		renderWaterContextSelectionSection(presets),
+	}
+	if message != "" {
+		sections = append(sections, accent("Aviso")+"\n  "+message)
+	}
+
+	return clearSequence + strings.Join(sections, "\n\n") + "\n\n"
+}
+
 func renderFishDeckConfirmationScreen(title string, preset fishprofiles.FishDeckPreset, message string) string {
 	sections := []string{
 		renderHeader(title),
@@ -85,6 +102,18 @@ func renderPlayerDeckConfirmationScreen(title string, preset playerprofiles.Deck
 	sections := []string{
 		renderHeader(title),
 		renderPlayerDeckConfirmationSection(preset),
+	}
+	if message != "" {
+		sections = append(sections, accent("Aviso")+"\n  "+message)
+	}
+
+	return clearSequence + strings.Join(sections, "\n\n") + "\n\n"
+}
+
+func renderWaterContextConfirmationScreen(title string, preset watercontexts.Preset, message string) string {
+	sections := []string{
+		renderHeader(title),
+		renderWaterContextConfirmationSection(preset),
 	}
 	if message != "" {
 		sections = append(sections, accent("Aviso")+"\n  "+message)
@@ -133,6 +162,15 @@ func renderStatsSection(status presentation.StatusView) string {
 		accent("Estado del encuentro"),
 		fmt.Sprintf("  Ronda %d | Mazo %d | Descarte %d | Rebarajados %d", status.RoundNumber, status.ActiveCards, status.DiscardCards, status.RecycleCount),
 		fmt.Sprintf("  Tension del duelo | Jugador %d | Pez %d | Empates %d", status.PlayerWins, status.FishWins, status.Draws),
+	}, "\n")
+}
+
+func renderEncounterOpeningSection(opening encounter.Opening) string {
+	return strings.Join([]string{
+		accent("Apertura del lance"),
+		fmt.Sprintf("  Agua       : %s", opening.WaterContext.Name),
+		fmt.Sprintf("  Lance      : %s", opening.CastResult.Band.Label()),
+		fmt.Sprintf("  Inicio     : distancia %d | profundidad %d", opening.InitialDistance, opening.InitialDepth),
 	}, "\n")
 }
 
@@ -276,6 +314,24 @@ func renderFishDeckSelectionSection(presets []fishprofiles.FishDeckPreset) strin
 	return strings.Join(lines, "\n")
 }
 
+func renderWaterContextSelectionSection(presets []watercontexts.Preset) string {
+	lines := []string{
+		accent("Situacion de agua"),
+		"  Elige el tipo de agua que abrira el encuentro.",
+	}
+
+	for index, preset := range presets {
+		lines = append(lines,
+			fmt.Sprintf("  %d) %s", index+1, preset.Name),
+			fmt.Sprintf("     %s", preset.Description),
+		)
+	}
+
+	lines = append(lines, "  Escribe el numero de la situacion para seleccionarla.")
+
+	return strings.Join(lines, "\n")
+}
+
 func renderPlayerDeckSelectionSection(presets []playerprofiles.DeckPreset) string {
 	lines := []string{
 		accent("Preset del jugador"),
@@ -290,6 +346,20 @@ func renderPlayerDeckSelectionSection(presets []playerprofiles.DeckPreset) strin
 	}
 
 	lines = append(lines, "  Escribe el numero del preset para seleccionarlo.")
+
+	return strings.Join(lines, "\n")
+}
+
+func renderWaterContextConfirmationSection(preset watercontexts.Preset) string {
+	lines := []string{
+		accent("Confirmar situacion de agua"),
+		fmt.Sprintf("  Nombre      : %s", preset.Name),
+		fmt.Sprintf("  Resumen     : %s", preset.Description),
+		fmt.Sprintf("  Profundidad : %d", preset.InitialDepth),
+	}
+	for _, signal := range preset.Signals {
+		lines = append(lines, "  - "+signal)
+	}
 
 	return strings.Join(lines, "\n")
 }
@@ -332,6 +402,62 @@ func renderFishDeckOrder(preset fishprofiles.FishDeckPreset) string {
 	}
 
 	return "orden fijo"
+}
+
+func renderCastScreen(title string, context encounter.WaterContext, position int, totalSlots int, slotWidth int, message string) string {
+	sections := []string{
+		renderHeader(title),
+		renderCastSection(context, position, totalSlots, slotWidth),
+	}
+	if message != "" {
+		sections = append(sections, accent("Aviso")+"\n  "+message)
+	}
+
+	return clearSequence + strings.Join(sections, "\n\n") + "\n\n"
+}
+
+func renderCastSection(context encounter.WaterContext, position int, totalSlots int, slotWidth int) string {
+	bands := encounter.OrderedCastBands()
+	bandParts := make([]string, 0, len(bands))
+	for _, band := range bands {
+		bandParts = append(bandParts, band.Label())
+	}
+
+	lines := []string{
+		accent("Lectura del agua"),
+		fmt.Sprintf("  Agua       : %s", context.Name),
+		fmt.Sprintf("  Resumen    : %s", context.Description),
+	}
+	for _, signal := range context.VisibleSignals {
+		lines = append(lines, "  - "+signal)
+	}
+	lines = append(lines,
+		"",
+		accent("Cast"),
+		"  Pulsa Enter para detener la barra en la franja deseada.",
+		"  Bandas     : "+strings.Join(bandParts, " | "),
+		"  Barra      : "+renderCastBar(position, totalSlots, slotWidth),
+	)
+
+	return strings.Join(lines, "\n")
+}
+
+func renderCastBar(position int, totalSlots int, slotWidth int) string {
+	var builder strings.Builder
+	_, _ = builder.WriteString("[")
+	for slot := 0; slot < totalSlots; slot++ {
+		if slot > 0 && slot%slotWidth == 0 {
+			_, _ = builder.WriteString("|")
+		}
+		if slot <= position {
+			_, _ = builder.WriteString("=")
+			continue
+		}
+		_, _ = builder.WriteString(".")
+	}
+	_, _ = builder.WriteString("]")
+
+	return builder.String()
 }
 
 func renderEncounterAxis(maxDistance int) string {
