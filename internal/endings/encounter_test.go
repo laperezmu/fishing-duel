@@ -3,7 +3,8 @@ package endings
 import (
 	"pesca/internal/encounter"
 	"pesca/internal/match"
-	"pesca/internal/player/playerrig"
+	"pesca/internal/player/loadout"
+	"pesca/internal/player/rod"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -154,11 +155,13 @@ func newMatchState(t *testing.T, distance, depth int) match.State {
 	require.NoError(t, err)
 	encounterState.Distance = distance
 	encounterState.Depth = depth
-	playerRigState, err := playerrig.NewState(playerrig.DefaultConfig())
+	playerRodState, err := rod.NewState(rod.DefaultConfig())
+	require.NoError(t, err)
+	playerLoadout, err := loadout.NewState(playerRodState, nil)
 	require.NoError(t, err)
 
 	return match.State{
-		Encounter: encounterState,
-		PlayerRig: playerRigState,
+		Encounter:     encounterState,
+		PlayerLoadout: playerLoadout,
 	}
 }

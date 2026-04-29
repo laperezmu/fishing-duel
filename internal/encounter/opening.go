@@ -26,6 +26,11 @@ type CastResult struct {
 	Band CastBand
 }
 
+type OpeningLimits struct {
+	MaxInitialDistance int
+	MaxInitialDepth    int
+}
+
 type Opening struct {
 	WaterContext    WaterContext
 	CastResult      CastResult
@@ -101,8 +106,22 @@ func (context WaterContext) InitialDistanceForBand(band CastBand) (int, error) {
 	return initialDistance, nil
 }
 
-func ResolveOpening(baseConfig Config, context WaterContext, castResult CastResult) (Opening, error) {
+func (limits OpeningLimits) Validate() error {
+	if limits.MaxInitialDistance < 0 {
+		return fmt.Errorf("opening max initial distance must be greater than or equal to 0")
+	}
+	if limits.MaxInitialDepth < 0 {
+		return fmt.Errorf("opening max initial depth must be greater than or equal to 0")
+	}
+
+	return nil
+}
+
+func ResolveOpening(baseConfig Config, context WaterContext, castResult CastResult, limits OpeningLimits) (Opening, error) {
 	if err := context.Validate(); err != nil {
+		return Opening{}, err
+	}
+	if err := limits.Validate(); err != nil {
 		return Opening{}, err
 	}
 
@@ -110,10 +129,18 @@ func ResolveOpening(baseConfig Config, context WaterContext, castResult CastResu
 	if err != nil {
 		return Opening{}, err
 	}
+	if initialDistance > limits.MaxInitialDistance {
+		initialDistance = limits.MaxInitialDistance
+	}
+
+	initialDepth := context.BaseInitialDepth
+	if initialDepth > limits.MaxInitialDepth {
+		initialDepth = limits.MaxInitialDepth
+	}
 
 	resolvedConfig := baseConfig
 	resolvedConfig.InitialDistance = initialDistance
-	resolvedConfig.InitialDepth = context.BaseInitialDepth
+	resolvedConfig.InitialDepth = initialDepth
 	if err := resolvedConfig.Validate(); err != nil {
 		return Opening{}, err
 	}

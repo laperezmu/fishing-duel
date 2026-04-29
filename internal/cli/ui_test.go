@@ -9,8 +9,9 @@ import (
 	"pesca/internal/domain"
 	"pesca/internal/encounter"
 	"pesca/internal/match"
+	"pesca/internal/player/loadout"
 	"pesca/internal/player/playermoves"
-	"pesca/internal/player/playerrig"
+	"pesca/internal/player/rod"
 	"pesca/internal/presentation"
 	"strings"
 	"testing"
@@ -189,7 +190,7 @@ func TestResolveCastUsesOscillatingBarAndStoresOpeningSummary(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, encounter.CastBandVeryShort, castResult.Band)
 
-	opening, err := encounter.ResolveOpening(encounter.DefaultConfig(), waterContext, castResult)
+	opening, err := encounter.ResolveOpening(encounter.DefaultConfig(), waterContext, castResult, encounter.OpeningLimits{MaxInitialDistance: 5, MaxInitialDepth: 3})
 	require.NoError(t, err)
 	require.NoError(t, ui.ShowEncounterOpening("Pesca: duelo contra el pez", opening))
 
@@ -251,14 +252,23 @@ func samplePromptState(t *testing.T) match.State {
 				HiddenCards:  1,
 			}},
 		},
-		Encounter: encounterState,
-		PlayerRig: playerrig.State{MaxDistance: 5, MaxDepth: 4},
+		Encounter:     encounterState,
+		PlayerLoadout: mustSampleLoadout(t, rod.State{OpeningMaxDistance: 4, OpeningMaxDepth: 3, TrackMaxDistance: 5, TrackMaxDepth: 4}),
 		PlayerMoves: match.PlayerMoveResources{Moves: []match.PlayerMoveState{
 			{Move: domain.Blue, MaxUses: 3, RemainingUses: 3, ActiveCards: []cards.PlayerCard{cards.NewNamedPlayerCard("Anzuelo tenso", "Capturas desde un paso mas lejos este round.", domain.Blue, cards.CardEffect{Trigger: cards.TriggerOnDraw, CaptureDistanceBonus: 1}), cards.NewPlayerCard(domain.Blue), cards.NewPlayerCard(domain.Blue)}},
 			{Move: domain.Red, MaxUses: 3, RemainingUses: 3, ActiveCards: []cards.PlayerCard{cards.NewPlayerCard(domain.Red), cards.NewPlayerCard(domain.Red), cards.NewPlayerCard(domain.Red)}},
 			{Move: domain.Yellow, MaxUses: 3, RemainingUses: 3, ActiveCards: []cards.PlayerCard{cards.NewPlayerCard(domain.Yellow), cards.NewPlayerCard(domain.Yellow), cards.NewPlayerCard(domain.Yellow)}},
 		}},
 	}
+}
+
+func mustSampleLoadout(t *testing.T, playerRod rod.State) loadout.State {
+	t.Helper()
+
+	playerLoadout, err := loadout.NewState(playerRod, nil)
+	require.NoError(t, err)
+
+	return playerLoadout
 }
 
 func sampleFishDeckPresets() []fishprofiles.FishDeckPreset {

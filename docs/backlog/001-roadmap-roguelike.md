@@ -11,15 +11,15 @@ Este documento concentra el backlog activo del proyecto, con estado visible para
 
 ## Foto actual
 
-- `done`: `BL-005`, `BL-006`, `BL-018`, `BL-019`
-- `planned`: `BL-020`
+- `done`: `BL-005`, `BL-006`, `BL-018`, `BL-019`, `BL-020`
+- `planned`: `BL-021`
 - `pending`: resto del roadmap
-- Foco recomendado inmediato: cerrar la fundacion de la expedicion con `BL-001`, `BL-002` y `BL-011` antes de abrir mas delivery transversal.
+- Foco recomendado inmediato: cerrar la fundacion de la expedicion con `BL-001`, `BL-011` y `BL-002`; despues retomar la capa tactica con `BL-021` y `BL-022`.
 
 ## Foco sugerido actual
 
 - `BL-001`: fijar el loop completo de la expedicion y sus capas de persistencia.
-- `BL-020`: definir la apertura del encounter de pesca con lectura situacional y minijuego de cast.
+- `BL-011`: formalizar la economia de run y la frontera clara entre recursos de expedicion y progreso meta.
 - `BL-002`: traducir ese loop a un mapa de zonas y nodos con informacion parcial.
 
 ## Core Loop
@@ -115,25 +115,6 @@ Este documento concentra el backlog activo del proyecto, con estado visible para
 - **Dependencias**: `BL-001`, `BL-002`
 - **Prioridad**: Alta
 
-### BL-020 Disenar apertura del encounter de pesca y minijuego de cast
-- **Estado**: `planned`
-- **Tipo**: Discovery
-- **Objetivo**: definir la fase previa al combate de pesca como una apertura autocontenida del encounter, donde el jugador lea la situacion del agua, ejecute un cast por timing y abra una ventana horizontal real sin depender todavia del sistema final de nodos o mapa, dejando ademas preparado al encounter para recibir `InitialDistance` e `InitialDepth` como entradas resueltas.
-- **Resultado esperado**: flujo claro `leer situacion -> resolver cast -> abrir ventana horizontal`, vocabulario de aguas base y señales de lectura, bandas de distancia del cast, contrato minimo para inyectar contexto de agua desde presets o configuracion temporal, separacion entre informacion estetica visible y metadata interna de pool, y politica de fallo con impacto controlado sobre la apertura del encounter.
-- **Dependencias**: `BL-001`
-- **Plan relacionado**: `docs/features/016-apertura-encounter-pesca-y-cast.md`
-- **Direccion actual acordada**:
-  - La primera version no depende de que exista un sistema de nodos; el encounter de pesca puede recibir un contexto de agua directo desde configuracion o preset.
-  - La lectura de la situacion ocurre justo antes del cast, ya dentro de la apertura del encounter, y puede ser mas o menos informativa segun el contexto.
-  - El contexto de agua mezcla pistas esteticas visibles para orientar el lance y metadata interna de pool que no se expone todavia en interfaz.
-  - El cast es un minijuego de timing con una barra que carga y descarga en ciclo constante; el input finaliza la barra dentro de una seccion que se traduce a franja horizontal de distancia.
-  - El cast debe ser skillful y permitir acelerar la run al acceder antes a mejores subpools, pero no debe decidir por si solo el resultado de un duelo aislado.
-  - Un cast largo no es universalmente mejor; su valor depende de las aguas base activas y del subconjunto de pool que el contexto actual este ofreciendo.
-  - Aunque el scope activo solo modifica `InitialDistance`, el encounter debe quedar preparado para recibir tambien `InitialDepth` desde la apertura futura.
-  - Por defecto, un cast fallido no deberia vaciar el encuentro; cambia la calidad o alineacion del pez encontrado, no la existencia de una pesca.
-  - La integracion con nodos desconocidos del mapa se resuelve despues en `BL-002`, sin bloquear esta base tactica.
-- **Prioridad**: Alta
-
 ## Fish y Encounters
 
 ### BL-007 Expandir perfiles data-driven de pez
@@ -148,10 +129,11 @@ Este documento concentra el backlog activo del proyecto, con estado visible para
 - **Estado**: `pending`
 - **Tipo**: Discovery
 - **Objetivo**: decidir como la combinacion entre aguas base del nodo, franja horizontal del cast y sesgo vertical del setup del jugador selecciona subconjuntos de peces y define la aparicion de encuentros compatibles con esa ventana de lanzamiento.
-- **Resultado esperado**: modelo de pool base por nodo o zona, reglas de particion en subconjuntos por distancia y profundidad, metadata minima de aparicion en perfiles de pez y criterio para conectar cast, cana y habitats sin abrir todavia la capa de economia fotografica.
+- **Resultado esperado**: modelo de pool base por nodo o zona, reglas de particion en subconjuntos por distancia y profundidad, metadata minima de aparicion en perfiles de pez y criterio para conectar cast, `rod`, aditamentos y habitats sin abrir todavia la capa de economia fotografica.
 - **Dependencias**: `BL-003`, `BL-007`, `BL-020`, `BL-021`
 - **Direccion actual acordada**:
-  - Cada nodo de pesca parte de unas aguas base y luego se secciona en subconjuntos de pool segun la ventana horizontal del cast y la ventana vertical habilitada por la cana y sus aditamentos.
+  - Cada nodo de pesca parte de unas aguas base y luego se secciona en subconjuntos de pool segun la ventana horizontal del cast y la ventana vertical habilitada por la `rod` y sus aditamentos.
+  - La aparicion de peces debe resolverse a partir de la apertura ya cerrada del encounter (`InitialDistance`, `InitialDepth`) y no directamente desde los limites de escape del tablero.
   - La aparicion de peces debe seguir siendo compatible con zonas, elites, bosses y roles especiales de encounter.
   - El sistema debe permitir que a veces el jugador tenga lectura explicita al entrar al nodo y a veces no, sin exigir que el mapa revele antes la estructura del subpool.
   - La capa de economia o tags editoriales de fotografia queda fuera de este item y se aborda dentro de la extension data-driven del pez.
@@ -163,27 +145,32 @@ Este documento concentra el backlog activo del proyecto, con estado visible para
 - **Estado**: `pending`
 - **Tipo**: Discovery
 - **Objetivo**: clasificar las piezas de build que el jugador puede comprar, recibir o mejorar durante la expedicion sin solaparlas con los patrocinadores globales.
-- **Resultado esperado**: taxonomia inicial de acciones y objetos de tienda que cubra mejoras de la cana, aditamentos, reparacion del hilo, intervenciones sobre el mazo, consumibles y otros ajustes de servicio.
+- **Resultado esperado**: taxonomia inicial de acciones y objetos de tienda que cubra mejoras de la `rod`, aditamentos, reparacion del hilo, intervenciones sobre el mazo, consumibles y otros ajustes de servicio.
 - **Dependencias**: `BL-001`, `BL-011`
 - **Prioridad**: Alta
 
-### BL-021 Redefinir la cana y sus aditamentos como modelo de rig del jugador
-- **Estado**: `pending`
+### BL-021 Redefinir la cana como `rod` y sus aditamentos como base del setup del jugador
+- **Estado**: `planned`
 - **Tipo**: Discovery
-- **Objetivo**: consolidar el actual `rig` como el modelo de cana del jugador, separando sus atributos estructurales de los aditamentos que modifican la apertura vertical del encounter y el acceso a distintos habitats de pez.
-- **Resultado esperado**: modelo de cana con atributos base como `MaxDistance` y `MaxDepth`, taxonomia inicial de aditamentos, tradeoffs de setup y reglas claras para distinguir limites estructurales del equipo frente a modificadores de apertura o lectura del nodo.
+- **Objetivo**: reemplazar el vocabulario ambiguo de `rig` por un modelo explicito de `rod` para la cana base, separando sus limites estructurales de track frente a sus limites de apertura, y distinguiendo esa pieza base de los aditamentos que modifican la apertura vertical del encounter y el acceso a distintos habitats de pez.
+- **Resultado esperado**: modelo de `rod` con limites estructurales separados para apertura y track, taxonomia inicial de aditamentos, nomenclatura clara para distinguir `rod` frente a setup completo del jugador, y reglas de tradeoff para que el equipo no se lea como una pila de mejoras universales.
 - **Dependencias**: `BL-008`, `BL-020`
+- **Plan relacionado**: `docs/features/017-rod-y-limites-de-apertura-y-track.md`
 - **Direccion actual acordada**:
-  - `MaxDistance` y `MaxDepth` deben leerse como atributos de la cana del jugador y no como bonos abstractos del combat loop.
-  - Los aditamentos no reemplazan la cana; sesgan sobre todo la apertura vertical, la compatibilidad con ciertos habitats y la forma de acceder a subpools de peces.
-  - La cana conserva el rol de limite estructural del encuentro y no debe mutarse por cartas durante el duelo.
-  - Los setups deben tener costes y ventajas reales; por ejemplo, mas peso o mas profundidad accesible no deberian ser mejoras universales sin contrapartida.
+  - `rig` debe desaparecer como termino de dominio y pasar a `rod` cuando se hable de la cana base del jugador.
+  - `rod` debe referirse a la pieza base de equipo; el conjunto `rod + aditamentos` debe nombrarse como setup o loadout para no volver a mezclar capas.
+  - Los limites de apertura deben separarse de los limites de track: una cosa es hasta donde puede empezar la pesca tras el cast y otra hasta donde puede sostenerse el duelo antes del escape.
+  - La `rod` debe exponer al menos una pareja de limites de apertura y otra de track, en horizontal y vertical, en vez de reutilizar un unico `MaxDistance` o `MaxDepth` para ambas fases.
+  - Los limites de track siguen definiendo tablero, render y condiciones de escape; los limites de apertura solo validan hasta donde puede resolverse `InitialDistance` y `InitialDepth`.
+  - Los aditamentos no reemplazan la `rod`; sesgan sobre todo la apertura vertical, la compatibilidad con ciertos habitats y la forma de acceder a subpools de peces.
+  - La `rod` conserva el rol de limite estructural del encuentro y no debe mutarse por cartas durante el duelo.
+  - Los setups deben tener costes y ventajas reales; por ejemplo, mas profundidad de apertura o mas tolerancia de track no deberian ser mejoras universales sin contrapartida.
 - **Prioridad**: Alta
 
 ### BL-009 Disenar sistema de sinergias
 - **Estado**: `pending`
 - **Tipo**: Discovery
-- **Objetivo**: definir como interactuan cartas del jugador, mejoras de rig, hilo, patrocinadores, fotos reservadas y economia editorial sin generar combinaciones opacas o imposibles de leer.
+- **Objetivo**: definir como interactuan cartas del jugador, mejoras de `rod`, aditamentos, hilo, patrocinadores, fotos reservadas y economia editorial sin generar combinaciones opacas o imposibles de leer.
 - **Resultado esperado**: reglas de stacking, limites, superficies de activacion y familias de build que mantengan el juego expresivo y entendible.
 - **Dependencias**: `BL-005`, `BL-008`, `BL-011`
 - **Prioridad**: Media
@@ -269,6 +256,19 @@ Este documento concentra el backlog activo del proyecto, con estado visible para
 - **Plan relacionado**: `docs/features/015-visibilidad-descarte-del-pez.md`
 - **Prioridad**: Media
 
+### BL-020 Disenar apertura del encounter de pesca y minijuego de cast
+- **Estado**: `done`
+- **Tipo**: Discovery + Delivery
+- **Objetivo**: definir la fase previa al combate de pesca como una apertura autocontenida del encounter, donde el jugador lea la situacion del agua, ejecute un cast por timing y abra una ventana horizontal real sin depender todavia del sistema final de nodos o mapa, dejando ademas preparado al encounter para recibir `InitialDistance` e `InitialDepth` como entradas resueltas.
+- **Resultado esperado**: flujo claro `leer situacion -> resolver cast -> abrir ventana horizontal`, vocabulario de aguas base y senales de lectura, bandas de distancia del cast, contrato minimo para inyectar contexto de agua desde presets o configuracion temporal, separacion entre informacion estetica visible y metadata interna de pool, y politica de fallo con impacto controlado sobre la apertura del encounter.
+- **Dependencias**: `BL-001`
+- **Plan relacionado**: `docs/features/016-apertura-encounter-pesca-y-cast.md`
+- **Notas de cierre**:
+  - El encounter ya resuelve una apertura previa con contexto de agua, minijuego de cast y configuracion inicial derivada.
+  - El contrato queda listo para transportar `InitialDistance` e `InitialDepth`, aunque este slice solo altera la distancia inicial.
+  - La version integrada sigue desacoplada de nodos, `rod`/aditamentos y subpools, que pasan a revisarse en `BL-002`, `BL-021` y `BL-022`.
+- **Prioridad**: Alta
+
 ### BL-005 Disenar sistema extensible de efectos de cartas
 - **Estado**: `done`
 - **Tipo**: Delivery
@@ -299,19 +299,18 @@ Este documento concentra el backlog activo del proyecto, con estado visible para
 ## Orden sugerido del trabajo pendiente
 
 1. `BL-001`
-2. `BL-020`
+2. `BL-011`
 3. `BL-002`
-4. `BL-011`
-5. `BL-008`
-6. `BL-021`
-7. `BL-003`
-8. `BL-022`
-9. `BL-012`
-10. `BL-007`
-11. `BL-009`
-12. `BL-017`
-13. `BL-013`
-14. `BL-015`
-15. `BL-016`
-16. `BL-010`
-17. `BL-014`
+4. `BL-008`
+5. `BL-021`
+6. `BL-003`
+7. `BL-022`
+8. `BL-012`
+9. `BL-007`
+10. `BL-009`
+11. `BL-017`
+12. `BL-013`
+13. `BL-015`
+14. `BL-016`
+15. `BL-010`
+16. `BL-014`

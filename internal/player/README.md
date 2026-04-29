@@ -10,4 +10,5 @@ Agrupa runtime y capacidades operativas del jugador.
 ## Subareas iniciales
 
 - `internal/player/playermoves/`
-- `internal/player/playerrig/`
+- `internal/player/loadout/`
+- `internal/player/rod/`

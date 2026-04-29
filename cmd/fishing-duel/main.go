@@ -7,15 +7,16 @@ import (
 	"pesca/internal/app"
 	"pesca/internal/cards"
 	"pesca/internal/cli"
+	"pesca/internal/content/attachmentpresets"
 	"pesca/internal/content/fishprofiles"
 	"pesca/internal/content/playerprofiles"
+	"pesca/internal/content/rodpresets"
 	"pesca/internal/content/watercontexts"
 	"pesca/internal/encounter"
 	"pesca/internal/endings"
 	"pesca/internal/game"
 	"pesca/internal/match"
 	"pesca/internal/player/playermoves"
-	"pesca/internal/player/playerrig"
 	"pesca/internal/presentation"
 	"pesca/internal/progression"
 	"pesca/internal/rules"
@@ -39,13 +40,29 @@ func main() {
 	if err != nil {
 		exitWithError("error eligiendo preset del jugador", err)
 	}
+	rodPreset, err := ui.ChooseRodPreset("Pesca: duelo contra el pez", rodpresets.DefaultPresets())
+	if err != nil {
+		exitWithError("error eligiendo cana del jugador", err)
+	}
+	playerRod, err := rodPreset.BuildRod()
+	if err != nil {
+		exitWithError("error configurando cana del jugador", err)
+	}
+	attachmentPreset, err := ui.ChooseAttachmentPreset("Pesca: duelo contra el pez", playerRod, attachmentpresets.DefaultPresets())
+	if err != nil {
+		exitWithError("error eligiendo aditamentos del jugador", err)
+	}
+	playerLoadout, err := rodPreset.BuildLoadoutWithAttachments(attachmentPreset.BuildAttachments())
+	if err != nil {
+		exitWithError("error configurando loadout del jugador", err)
+	}
 	fishDeckPreset, err := ui.ChooseFishDeckPreset("Pesca: duelo contra el pez", fishprofiles.DefaultPresets())
 	if err != nil {
 		exitWithError("error eligiendo preset de baraja", err)
 	}
 
 	fishDeck := fishDeckPreset.BuildDeck(shuffler)
-	opening, err := app.ResolveEncounterOpening("Pesca: duelo contra el pez", encounter.DefaultConfig(), watercontexts.DefaultPresets(), ui)
+	opening, err := app.ResolveEncounterOpening("Pesca: duelo contra el pez", encounter.DefaultConfig(), playerLoadout, watercontexts.DefaultPresets(), ui)
 	if err != nil {
 		exitWithError("error resolviendo la apertura de pesca", err)
 	}
@@ -54,11 +71,6 @@ func main() {
 	if err != nil {
 		exitWithError("error inicializando encuentro", err)
 	}
-	playerRigState, err := playerrig.NewState(playerrig.DefaultConfig())
-	if err != nil {
-		exitWithError("error configurando herramientas del jugador", err)
-	}
-
 	playerMoveConfig := playerDeckPreset.BuildConfig(playerCardShuffler)
 	playerMoveController, err := playermoves.NewUsageController(playerMoveConfig)
 	if err != nil {
@@ -73,21 +85,25 @@ func main() {
 			return rng.Float64() < chance
 		})},
 		endings.EncounterEndCondition{},
-		match.State{Encounter: encounterState, PlayerRig: playerRigState},
+		match.State{Encounter: encounterState, PlayerLoadout: playerLoadout},
 	)
 	if err != nil {
 		exitWithError("error inicializando partida", err)
 	}
 
+	if err := runSession(engine, ui); err != nil {
+		exitWithError("error ejecutando partida", err)
+	}
+}
+
+func runSession(engine *game.Engine, ui *cli.UI) error {
 	presenter := presentation.NewPresenter(presentation.DefaultCatalog())
 	session, err := app.NewSession(engine, ui, presenter)
 	if err != nil {
-		exitWithError("error creando sesion", err)
+		return err
 	}
 
-	if err := session.Run(); err != nil {
-		exitWithError("error ejecutando partida", err)
-	}
+	return session.Run()
 }
 
 func exitWithError(message string, err error) {

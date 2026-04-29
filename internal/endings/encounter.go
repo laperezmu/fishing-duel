@@ -26,10 +26,10 @@ func (EncounterEndCondition) Apply(state *match.State) {
 	case state.Encounter.Distance <= captureDistance && state.Encounter.Depth <= surfaceDepth:
 		state.Encounter.Status = encounter.StatusCaptured
 		state.Encounter.EndReason = encounter.EndReasonTrackCapture
-	case state.Encounter.Distance > state.PlayerRig.MaxDistance:
+	case state.Encounter.Distance > state.PlayerLoadout.TrackMaxDistance():
 		state.Encounter.Status = encounter.StatusEscaped
 		state.Encounter.EndReason = encounter.EndReasonTrackEscape
-	case state.Encounter.Depth > state.PlayerRig.MaxDepth:
+	case state.Encounter.Depth > state.PlayerLoadout.TrackMaxDepth():
 		state.Encounter.Status = encounter.StatusEscaped
 		state.Encounter.EndReason = encounter.EndReasonDepthEscape
 	case state.Deck.Exhausted:
