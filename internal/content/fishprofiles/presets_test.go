@@ -13,7 +13,11 @@ func TestFishDeckPresetBuildDeckCopiesCardsAndUsesDeckConfig(t *testing.T) {
 	preset := FishDeckPreset{
 		Name: "Prueba",
 		FishCards: []cards.FishCard{
-			cards.NewNamedFishCard("Tiron de apertura", "Permite capturar desde un paso mas lejos este round.", domain.Red, cards.CardEffect{Trigger: cards.TriggerOnDraw, CaptureDistanceBonus: 1}),
+			func() cards.FishCard {
+				card := cards.NewNamedFishCard("Tiron de apertura", "Permite capturar desde un paso mas lejos este round.", domain.Red, cards.CardEffect{Trigger: cards.TriggerOnDraw, CaptureDistanceBonus: 1})
+				card.DiscardVisibility = cards.DiscardVisibilityMoveOnly
+				return card
+			}(),
 		},
 		CardsToRemove: 0,
 		Shuffle:       false,
@@ -28,6 +32,7 @@ func TestFishDeckPresetBuildDeckCopiesCardsAndUsesDeckConfig(t *testing.T) {
 	assert.Equal(t, "Tiron de apertura", drawnCard.Name)
 	assert.Equal(t, "Permite capturar desde un paso mas lejos este round.", drawnCard.Summary)
 	assert.Equal(t, domain.Red, drawnCard.Move)
+	assert.Equal(t, cards.DiscardVisibilityMoveOnly, drawnCard.DiscardVisibility)
 	require.Len(t, drawnCard.Effects, 1)
 	assert.Equal(t, 1, drawnCard.Effects[0].CaptureDistanceBonus)
 

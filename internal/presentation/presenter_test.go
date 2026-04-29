@@ -58,9 +58,25 @@ func TestPresenterStatus(t *testing.T) {
 	state := match.State{
 		Round: 2,
 		Deck: match.DeckState{
-			ActiveCards:  4,
-			DiscardCards: 5,
-			RecycleCount: 1,
+			ActiveCards:       4,
+			DiscardCards:      5,
+			RecycleCount:      1,
+			ShufflesOnRecycle: true,
+			CardsToRemove:     3,
+			CurrentCycle: match.FishDiscardCycleState{
+				Number:     2,
+				TotalCards: 3,
+				Entries: []match.FishDiscardEntryState{
+					{Visibility: cards.DiscardVisibilityFull, Move: domain.Blue, Name: "Oleaje abierto"},
+					{Visibility: cards.DiscardVisibilityMasked},
+				},
+			},
+			PreviousCycleStats: []match.FishDiscardCycleSummaryState{{
+				Number:       1,
+				TotalCards:   4,
+				VisibleCards: 3,
+				HiddenCards:  1,
+			}},
 		},
 		Encounter: encounter.State{
 			Config: encounter.Config{
@@ -102,6 +118,13 @@ func TestPresenterStatus(t *testing.T) {
 	assert.Equal(t, 2, status.PlayerWins)
 	assert.Equal(t, 1, status.FishWins)
 	assert.Equal(t, 3, status.Draws)
+	assert.True(t, status.FishDiscard.ShufflesOnRecycle)
+	assert.Equal(t, 3, status.FishDiscard.CardsToRemove)
+	assert.Equal(t, 3, status.FishDiscard.CurrentCycleTotalCards)
+	assert.Equal(t, "Oleaje abierto", status.FishDiscard.CurrentCycleEntries[0].Label)
+	assert.Equal(t, "?", status.FishDiscard.CurrentCycleEntries[1].Label)
+	require.Len(t, status.FishDiscard.PreviousCycles, 1)
+	assert.Equal(t, 1, status.FishDiscard.PreviousCycles[0].HiddenCards)
 	require.Len(t, status.MoveOptions, 3)
 	assert.Equal(t, 2, status.MoveOptions[0].RemainingUses)
 	assert.Equal(t, "Anzuelo tenso", status.MoveOptions[0].CardHint)

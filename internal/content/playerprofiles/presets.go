@@ -46,7 +46,7 @@ func DefaultPresets() []DeckPreset {
 				"Azul - Anzuelo tenso: al revelar la carta permite capturar desde un paso mas lejos ese round.",
 				"Rojo - Giro de superficie: al revelar la carta deja al pez contar como un nivel mas cerca de la superficie ese round.",
 				"Amarillo - Reserva final: al revelar la carta amplia el margen de captura cuando se agota la baraja ese round.",
-				"Objetivo: validar aperturas tacticas del jugador sin alterar la UX actual.",
+				"Objetivo: validar aperturas iniciales del jugador sin alterar la UX actual.",
 			},
 			Config: playermoves.Config{
 				InitialDecks: map[domain.Move][]cards.PlayerCard{

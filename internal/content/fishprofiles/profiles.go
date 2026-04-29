@@ -18,18 +18,26 @@ const (
 )
 
 type CardPattern struct {
-	Name    string
-	Summary string
-	Move    domain.Move
-	Effects []cards.CardEffect
+	Name              string
+	Summary           string
+	Move              domain.Move
+	Effects           []cards.CardEffect
+	DiscardVisibility cards.DiscardVisibility
 }
 
 func (pattern CardPattern) BuildCard() cards.FishCard {
+	var card cards.FishCard
 	if pattern.Name != "" || pattern.Summary != "" {
-		return cards.NewNamedFishCard(pattern.Name, pattern.Summary, pattern.Move, pattern.Effects...)
+		card = cards.NewNamedFishCard(pattern.Name, pattern.Summary, pattern.Move, pattern.Effects...)
+	} else {
+		card = cards.NewFishCard(pattern.Move, pattern.Effects...)
 	}
 
-	return cards.NewFishCard(pattern.Move, pattern.Effects...)
+	if pattern.DiscardVisibility != "" {
+		card.DiscardVisibility = pattern.DiscardVisibility
+	}
+
+	return card
 }
 
 type Profile struct {
@@ -66,9 +74,15 @@ func DefaultProfiles() []Profile {
 				"Reciclado: retira 3 cartas por ciclo.",
 			},
 			Cards: []CardPattern{
-				{Move: domain.Blue}, {Move: domain.Blue}, {Move: domain.Blue},
-				{Move: domain.Red}, {Move: domain.Red}, {Move: domain.Red},
-				{Move: domain.Yellow}, {Move: domain.Yellow}, {Move: domain.Yellow},
+				{Move: domain.Blue},
+				{Move: domain.Blue},
+				{Move: domain.Blue},
+				{Move: domain.Red},
+				{Move: domain.Red},
+				{Move: domain.Red},
+				{Move: domain.Yellow},
+				{Move: domain.Yellow},
+				{Move: domain.Yellow},
 			},
 			CardsToRemove: 3,
 			Shuffle:       true,
@@ -146,11 +160,12 @@ func DefaultProfiles() []Profile {
 				"Azul - Rebote de espuma: si pierde, el pez sube un nivel.",
 				"Rojo - Marea calma: en empate el pez cuenta como un nivel mas cerca de la superficie ese round.",
 				"Amarillo - Rebote de espuma: si pierde, el pez sube un nivel.",
+				"Lectura parcial: una Marea calma solo deja visible el movimiento en el historial del pez.",
 				"Orden: fijo para probar lecturas de superficie y cierre visual.",
 			},
 			Cards: []CardPattern{
 				{Name: "Rebote de espuma", Summary: "Si pierde, sube un nivel hacia la superficie.", Move: domain.Blue, Effects: []cards.CardEffect{{Trigger: cards.TriggerOnOwnerLose, DepthShift: -1}}},
-				{Name: "Marea calma", Summary: "En empate el pez cuenta como un nivel mas cerca de la superficie.", Move: domain.Red, Effects: []cards.CardEffect{{Trigger: cards.TriggerOnRoundDraw, SurfaceDepthBonus: 1}}},
+				{Name: "Marea calma", Summary: "En empate el pez cuenta como un nivel mas cerca de la superficie.", Move: domain.Red, Effects: []cards.CardEffect{{Trigger: cards.TriggerOnRoundDraw, SurfaceDepthBonus: 1}}, DiscardVisibility: cards.DiscardVisibilityMoveOnly},
 				{Name: "Rebote de espuma", Summary: "Si pierde, sube un nivel hacia la superficie.", Move: domain.Yellow, Effects: []cards.CardEffect{{Trigger: cards.TriggerOnOwnerLose, DepthShift: -1}}},
 				{Name: "Marea calma", Summary: "En empate el pez cuenta como un nivel mas cerca de la superficie.", Move: domain.Red, Effects: []cards.CardEffect{{Trigger: cards.TriggerOnRoundDraw, SurfaceDepthBonus: 1}}},
 			},
@@ -161,7 +176,7 @@ func DefaultProfiles() []Profile {
 			ID:          "deck-exhaustion",
 			ArchetypeID: ArchetypeDeckExhaustion,
 			Name:        "Agotamiento de mazo",
-			Description: "Perfil que concentra su plan en el cierre por agotamiento y en ventanas cortas de resolucion.",
+			Description: "Perfil que concentra su plan en el cierre por agotamiento y en ventanas cortas de cierre.",
 			Details: []string{
 				"Arquetipo: deck_exhaustion.",
 				"Rojo - Ultima ventana: al revelarse amplia la captura por agotamiento ese round.",

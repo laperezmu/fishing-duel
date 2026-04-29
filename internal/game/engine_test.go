@@ -96,6 +96,14 @@ func TestNewEngine(t *testing.T) {
 		assert.Equal(t, 2, state.Deck.DiscardCards)
 		assert.Equal(t, 1, state.Deck.RecycleCount)
 		assert.True(t, state.Deck.Exhausted)
+		assert.True(t, state.Deck.ShufflesOnRecycle)
+		assert.Equal(t, 3, state.Deck.CardsToRemove)
+		assert.Equal(t, 2, state.Deck.CurrentCycle.Number)
+		assert.Equal(t, 2, state.Deck.CurrentCycle.TotalCards)
+		require.Len(t, state.Deck.CurrentCycle.Entries, 2)
+		assert.Equal(t, cards.DiscardVisibilityFull, state.Deck.CurrentCycle.Entries[0].Visibility)
+		require.Len(t, state.Deck.PreviousCycleStats, 1)
+		assert.Equal(t, 1, state.Deck.PreviousCycleStats[0].Number)
 		assert.Equal(t, samplePlayerRigState(), state.PlayerRig)
 		assert.Equal(t, samplePlayerMoveResources(), state.PlayerMoves)
 		fixture.assertExpectations(t)
@@ -274,6 +282,9 @@ func TestEnginePlayRound(t *testing.T) {
 		playerMoveController := &mockPlayerMoveController{}
 		roundEvaluator := &mockRoundEvaluator{}
 		fishDeck := &mockFishDeck{}
+		fishDeck.visibilitySnapshots = []deck.VisibilitySnapshot{{
+			CurrentCycle: deck.VisibleDiscardCycle{Number: 1},
+		}}
 		playerCard := cards.NewPlayerCard(domain.Blue)
 
 		initializeCall := playerMoveController.On("Initialize", mock.AnythingOfType("*match.State")).Run(func(arguments mock.Arguments) {
@@ -360,6 +371,26 @@ func newEngineFixture(t *testing.T, initialState match.State) engineFixture {
 	}
 
 	fishDeck := &mockFishDeck{}
+	fishDeck.visibilitySnapshots = []deck.VisibilitySnapshot{{
+		CurrentCycle: deck.VisibleDiscardCycle{
+			Number:     2,
+			TotalCards: 2,
+			Entries: []deck.VisibleDiscardEntry{
+				{Visibility: cards.DiscardVisibilityFull, Move: domain.Blue, Name: "Oleaje abierto"},
+				{Visibility: cards.DiscardVisibilityMoveOnly, Move: domain.Red},
+			},
+		},
+		PreviousCycles: []deck.VisibleDiscardCycleSummary{{
+			Number:       1,
+			TotalCards:   4,
+			VisibleCards: 3,
+			HiddenCards:  1,
+		}},
+		RecycleCount:      1,
+		ShufflesOnRecycle: true,
+		CardsToRemove:     3,
+		Exhausted:         true,
+	}}
 	playerMoveController := &mockPlayerMoveController{}
 	roundEvaluator := &mockRoundEvaluator{}
 	progressionPolicy := &mockProgressionPolicy{}
@@ -424,6 +455,8 @@ func samplePlayerRigState() playerrig.State {
 
 type mockFishDeck struct {
 	mock.Mock
+	visibilitySnapshots     []deck.VisibilitySnapshot
+	visibilitySnapshotCalls int
 }
 
 func (mockDeck *mockFishDeck) Draw() (cards.FishCard, error) {
@@ -449,6 +482,20 @@ func (mockDeck *mockFishDeck) RecycleCount() int {
 
 func (mockDeck *mockFishDeck) Exhausted() bool {
 	return mockDeck.Called().Bool(0)
+}
+
+func (mockDeck *mockFishDeck) VisibilitySnapshot() deck.VisibilitySnapshot {
+	if len(mockDeck.visibilitySnapshots) == 0 {
+		return deck.VisibilitySnapshot{}
+	}
+
+	index := mockDeck.visibilitySnapshotCalls
+	if index >= len(mockDeck.visibilitySnapshots) {
+		index = len(mockDeck.visibilitySnapshots) - 1
+	}
+	mockDeck.visibilitySnapshotCalls++
+
+	return mockDeck.visibilitySnapshots[index]
 }
 
 type mockPlayerMoveController struct {

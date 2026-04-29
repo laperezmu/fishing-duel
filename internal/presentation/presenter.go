@@ -93,6 +93,7 @@ func (p Presenter) Status(state match.State) StatusView {
 		PlayerWins:                state.Stats.PlayerWins,
 		FishWins:                  state.Stats.FishWins,
 		Draws:                     state.Stats.Draws,
+		FishDiscard:               p.fishDiscardView(state),
 		MoveOptions:               p.moveOptionsForState(state),
 	}
 }
@@ -248,6 +249,56 @@ func (p Presenter) playerCardHint(moveState match.PlayerMoveState) string {
 	}
 
 	return strings.Join(parts, " | ")
+}
+
+func (p Presenter) fishDiscardView(state match.State) FishDiscardView {
+	currentCycleEntries := make([]FishDiscardEntryView, 0, len(state.Deck.CurrentCycle.Entries))
+	for _, entry := range state.Deck.CurrentCycle.Entries {
+		currentCycleEntries = append(currentCycleEntries, FishDiscardEntryView{
+			Label: p.fishDiscardEntryLabel(entry),
+		})
+	}
+
+	previousCycles := make([]FishDiscardCycleSummaryView, 0, len(state.Deck.PreviousCycleStats))
+	for _, previousCycle := range state.Deck.PreviousCycleStats {
+		previousCycles = append(previousCycles, FishDiscardCycleSummaryView{
+			CycleNumber:  previousCycle.Number,
+			TotalCards:   previousCycle.TotalCards,
+			VisibleCards: previousCycle.VisibleCards,
+			HiddenCards:  previousCycle.HiddenCards,
+		})
+	}
+
+	return FishDiscardView{
+		CurrentCycleNumber:     state.Deck.CurrentCycle.Number,
+		CurrentCycleTotalCards: state.Deck.CurrentCycle.TotalCards,
+		CurrentCycleEntries:    currentCycleEntries,
+		PreviousCycles:         previousCycles,
+		ShufflesOnRecycle:      state.Deck.ShufflesOnRecycle,
+		CardsToRemove:          state.Deck.CardsToRemove,
+		RecycleCount:           state.Deck.RecycleCount,
+	}
+}
+
+func (p Presenter) fishDiscardEntryLabel(entry match.FishDiscardEntryState) string {
+	switch entry.Visibility {
+	case cards.DiscardVisibilityMasked:
+		return "?"
+	case cards.DiscardVisibilityMoveOnly:
+		return p.fishMoveLabel(entry.Move)
+	case cards.DiscardVisibilityHidden:
+		return ""
+	case cards.DiscardVisibilityFull, "":
+		if entry.Name != "" {
+			return entry.Name
+		}
+		return p.fishMoveLabel(entry.Move)
+	default:
+		if entry.Name != "" {
+			return entry.Name
+		}
+		return p.fishMoveLabel(entry.Move)
+	}
 }
 
 func triggerLabel(trigger cards.Trigger) string {

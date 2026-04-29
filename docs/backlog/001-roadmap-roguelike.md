@@ -12,7 +12,7 @@ Este documento concentra el backlog activo del proyecto, con estado visible para
 ## Foto actual
 
 - `done`: `BL-005`, `BL-006`, `BL-018`
-- `planned`: ninguno
+- `planned`: `BL-019`
 - `pending`: resto del roadmap
 - Foco recomendado inmediato: cerrar la fundacion de la expedicion con `BL-001`, `BL-002` y `BL-011` antes de abrir mas delivery transversal.
 
@@ -214,11 +214,12 @@ Este documento concentra el backlog activo del proyecto, con estado visible para
 - **Prioridad**: Media
 
 ### BL-019 Hacer visible el descarte del pez y modular la lectura del historial
-- **Estado**: `pending`
+- **Estado**: `planned`
 - **Tipo**: Discovery + Delivery
 - **Objetivo**: convertir el descarte del pez en una herramienta estrategica legible durante el encounter, manteniendo espacio para peces, cartas o eventos que oculten parcial o temporalmente esa informacion.
 - **Resultado esperado**: estado de runtime, presentacion y UX que permitan ver el descarte visible del pez por ciclo, entender cuando el mazo recicla o se baraja y soportar excepciones de visibilidad por carta, arquetipo o evento.
 - **Dependencias**: `BL-005`, `BL-006`, `BL-017`
+- **Plan relacionado**: `docs/features/015-visibilidad-descarte-del-pez.md`
 - **Direccion actual acordada**:
   - La regla general del combate pasa a ser que el jugador puede consultar el historial de descarte visible del pez durante el encuentro.
   - La lectura prioritaria debe centrarse en el ciclo actual del mazo; los ciclos anteriores pueden quedar resumidos, atenuados o separados si eso mejora claridad.

@@ -22,6 +22,7 @@ func renderPromptScreen(title string, status presentation.StatusView, options []
 	sections = append(sections, renderHeader(title))
 	sections = append(sections, renderTrackSection(status))
 	sections = append(sections, renderStatsSection(status))
+	sections = append(sections, renderFishDiscardSection(status))
 	if lastRound != nil {
 		sections = append(sections, renderLastRoundSection(*lastRound))
 	}
@@ -135,6 +136,62 @@ func renderStatsSection(status presentation.StatusView) string {
 	}, "\n")
 }
 
+func renderFishDiscardSection(status presentation.StatusView) string {
+	currentCycle := renderCurrentFishDiscardCycle(status.FishDiscard)
+	recycleMode := renderFishRecycleMode(status.FishDiscard)
+	previousCycles := renderPreviousFishDiscardCycles(status.FishDiscard)
+
+	return strings.Join([]string{
+		accent("Historial del pez"),
+		"  Ciclo activo : " + currentCycle,
+		fmt.Sprintf("  Reciclado   : %s | retira %d carta%s | %d ciclo%s cerrado%s", recycleMode, status.FishDiscard.CardsToRemove, pluralSuffix(status.FishDiscard.CardsToRemove), status.FishDiscard.RecycleCount, pluralSuffix(status.FishDiscard.RecycleCount), pluralSuffix(status.FishDiscard.RecycleCount)),
+		"  Ciclos cerrados: " + previousCycles,
+	}, "\n")
+}
+
+func renderCurrentFishDiscardCycle(view presentation.FishDiscardView) string {
+	if view.CurrentCycleTotalCards == 0 {
+		return fmt.Sprintf("C%d sin cartas usadas todavia", maxInt(view.CurrentCycleNumber, 1))
+	}
+
+	parts := make([]string, 0, len(view.CurrentCycleEntries)+1)
+	for _, entry := range view.CurrentCycleEntries {
+		parts = append(parts, entry.Label)
+	}
+
+	hiddenCards := view.CurrentCycleTotalCards - len(view.CurrentCycleEntries)
+	if hiddenCards > 0 {
+		parts = append(parts, fmt.Sprintf("%d oculta%s", hiddenCards, pluralSuffix(hiddenCards)))
+	}
+
+	if len(parts) == 0 {
+		return fmt.Sprintf("C%d %d carta%s oculta%s", maxInt(view.CurrentCycleNumber, 1), hiddenCards, pluralSuffix(hiddenCards), pluralSuffix(hiddenCards))
+	}
+
+	return fmt.Sprintf("C%d %s", maxInt(view.CurrentCycleNumber, 1), strings.Join(parts, " | "))
+}
+
+func renderFishRecycleMode(view presentation.FishDiscardView) string {
+	if view.ShufflesOnRecycle {
+		return "rebaraja"
+	}
+
+	return "mantiene orden"
+}
+
+func renderPreviousFishDiscardCycles(view presentation.FishDiscardView) string {
+	if len(view.PreviousCycles) == 0 {
+		return "ninguno"
+	}
+
+	parts := make([]string, 0, len(view.PreviousCycles))
+	for _, cycle := range view.PreviousCycles {
+		parts = append(parts, renderFishDiscardCycleSummary(cycle))
+	}
+
+	return strings.Join(parts, " | ")
+}
+
 func renderLastRoundSection(view presentation.RoundView) string {
 	lines := []string{
 		accent("Ultimo lance"),
@@ -179,6 +236,15 @@ func renderMoveOption(option presentation.MoveOption) string {
 	}
 
 	return fmt.Sprintf("%d) %s %s", option.Index, moveLabel, dim("[sin usos]"))
+}
+
+func renderFishDiscardCycleSummary(cycle presentation.FishDiscardCycleSummaryView) string {
+	parts := []string{fmt.Sprintf("C%d %d usada%s", cycle.CycleNumber, cycle.TotalCards, pluralSuffix(cycle.TotalCards))}
+	if cycle.HiddenCards > 0 {
+		parts = append(parts, fmt.Sprintf("%d oculta%s", cycle.HiddenCards, pluralSuffix(cycle.HiddenCards)))
+	}
+
+	return strings.Join(parts, ", ")
 }
 
 func renderGameOverSection(summary presentation.SummaryView) string {
@@ -233,7 +299,7 @@ func renderFishDeckConfirmationSection(preset fishprofiles.FishDeckPreset) strin
 		accent("Confirmar preset"),
 		fmt.Sprintf("  Nombre      : %s", preset.Name),
 		fmt.Sprintf("  Arquetipo   : %s", preset.ArchetypeID),
-		fmt.Sprintf("  Descripcion : %s", preset.Description),
+		fmt.Sprintf("  Resumen     : %s", preset.Description),
 		fmt.Sprintf("  Cartas      : %d", len(preset.FishCards)),
 		fmt.Sprintf("  Orden       : %s", renderFishDeckOrder(preset)),
 		fmt.Sprintf("  Reciclado   : retira %d cartas por ciclo", preset.CardsToRemove),
@@ -249,7 +315,7 @@ func renderPlayerDeckConfirmationSection(preset playerprofiles.DeckPreset) strin
 	lines := []string{
 		accent("Confirmar preset"),
 		fmt.Sprintf("  Nombre      : %s", preset.Name),
-		fmt.Sprintf("  Descripcion : %s", preset.Description),
+		fmt.Sprintf("  Resumen     : %s", preset.Description),
 		fmt.Sprintf("  Barajas     : %d colores", len(preset.Config.InitialDecks)),
 		fmt.Sprintf("  Recupera    : %d ronda(s)", preset.Config.RecoveryDelayRounds),
 	}
@@ -373,4 +439,20 @@ func centerEncounterText(label string, width int) string {
 
 func renderEncounterToken(label string) string {
 	return fmt.Sprintf("%-*s", encounterCellWidth, label)
+}
+
+func pluralSuffix(count int) string {
+	if count == 1 {
+		return ""
+	}
+
+	return "s"
+}
+
+func maxInt(value, minimum int) int {
+	if value < minimum {
+		return minimum
+	}
+
+	return value
 }
