@@ -24,6 +24,35 @@ func TestNewState(t *testing.T) {
 				EndReason: EndReasonNone,
 			},
 		},
+		{
+			title: "allows an encounter to start close to shore",
+			config: Config{
+				InitialDistance:           1,
+				InitialDepth:              0,
+				SurfaceDepth:              0,
+				CaptureDistance:           0,
+				ExhaustionCaptureDistance: 2,
+				PlayerWinStep:             1,
+				FishWinStep:               1,
+				SplashEscapeChance:        0.5,
+			},
+			wantState: State{
+				Config: Config{
+					InitialDistance:           1,
+					InitialDepth:              0,
+					SurfaceDepth:              0,
+					CaptureDistance:           0,
+					ExhaustionCaptureDistance: 2,
+					PlayerWinStep:             1,
+					FishWinStep:               1,
+					SplashEscapeChance:        0.5,
+				},
+				Distance:  1,
+				Depth:     0,
+				Status:    StatusOngoing,
+				EndReason: EndReasonNone,
+			},
+		},
 	}
 
 	for _, test := range validCases {
@@ -41,9 +70,9 @@ func TestNewState(t *testing.T) {
 		wantErrText string
 	}{
 		{
-			title: "returns an error when initial distance is two or lower",
+			title: "returns an error when initial distance is negative",
 			config: Config{
-				InitialDistance:           2,
+				InitialDistance:           -1,
 				InitialDepth:              1,
 				SurfaceDepth:              0,
 				CaptureDistance:           0,
@@ -52,7 +81,7 @@ func TestNewState(t *testing.T) {
 				FishWinStep:               1,
 				SplashEscapeChance:        0.5,
 			},
-			wantErrText: "initial distance must be greater than 2",
+			wantErrText: "initial distance must be greater than or equal to 0",
 		},
 		{
 			title: "returns an error when initial depth is above the surface",

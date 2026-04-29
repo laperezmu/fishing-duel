@@ -59,8 +59,8 @@ func DefaultConfig() Config {
 }
 
 func (c Config) Validate() error {
-	if c.InitialDistance <= 2 {
-		return fmt.Errorf("initial distance must be greater than 2")
+	if c.InitialDistance < 0 {
+		return fmt.Errorf("initial distance must be greater than or equal to 0")
 	}
 	if c.InitialDepth < c.SurfaceDepth {
 		return fmt.Errorf("initial depth must be greater than or equal to surface depth")

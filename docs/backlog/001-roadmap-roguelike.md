@@ -11,16 +11,16 @@ Este documento concentra el backlog activo del proyecto, con estado visible para
 
 ## Foto actual
 
-- `done`: `BL-005`, `BL-006`, `BL-018`
-- `planned`: `BL-019`
+- `done`: `BL-005`, `BL-006`, `BL-018`, `BL-019`
+- `planned`: `BL-020`
 - `pending`: resto del roadmap
 - Foco recomendado inmediato: cerrar la fundacion de la expedicion con `BL-001`, `BL-002` y `BL-011` antes de abrir mas delivery transversal.
 
 ## Foco sugerido actual
 
 - `BL-001`: fijar el loop completo de la expedicion y sus capas de persistencia.
+- `BL-020`: definir la apertura del encounter de pesca con lectura situacional y minijuego de cast.
 - `BL-002`: traducir ese loop a un mapa de zonas y nodos con informacion parcial.
-- `BL-011`: cerrar la economia editorial, la reserva de fotos y la frontera entre run y meta.
 
 ## Core Loop
 
@@ -57,7 +57,7 @@ Este documento concentra el backlog activo del proyecto, con estado visible para
   - El jugador puede reservar un numero pequeno de fotos para esperar sinergias de patrocinador o eventos que las paguen mejor mas adelante.
   - Las fotos reservadas no generan interes fijo; su revalorizacion depende de patrocinadores y eventos editoriales concretos.
   - Al cerrar una zona, toda foto reservada se liquida automaticamente antes de avanzar.
-  - El dinero resultante se gasta en deckbuilding fino, reparaciones y mejoras del rig.
+  - El dinero resultante se gasta en deckbuilding fino, reparaciones y mejoras de la cana y sus aditamentos.
 - **Reglas del hilo**:
   - El hilo representa la supervivencia global de la expedicion.
   - Su desgaste se arrastra durante toda la run y no se restaura automaticamente al cambiar de zona.
@@ -66,7 +66,7 @@ Este documento concentra el backlog activo del proyecto, con estado visible para
 - **Taxonomia inicial de patrocinadores**:
   - `Revista de Trofeos`: premia capturas raras, elites, bosses y fotos de portada.
   - `Marca Tecnica`: mejora consistencia tactica, precision, thresholds y control del duelo.
-  - `Taller Profesional`: favorece reparacion, mantenimiento, aguante del hilo y mejoras del rig.
+  - `Taller Profesional`: favorece reparacion, mantenimiento, aguante del hilo y mejoras de la cana.
   - `Patrocinio Offshore`: premia pesca profunda, mar abierto, encuentros duros y riesgo alto.
   - `Editorial de Aventura`: favorece reserva de fotos, eventos especiales y rutas arriesgadas.
   - `Canal Popular`: premia volumen, fotos frecuentes y rentabilidad estable de la expedicion.
@@ -115,15 +115,47 @@ Este documento concentra el backlog activo del proyecto, con estado visible para
 - **Dependencias**: `BL-001`, `BL-002`
 - **Prioridad**: Alta
 
+### BL-020 Disenar apertura del encounter de pesca y minijuego de cast
+- **Estado**: `planned`
+- **Tipo**: Discovery
+- **Objetivo**: definir la fase previa al combate de pesca como una apertura autocontenida del encounter, donde el jugador lea la situacion del agua, ejecute un cast por timing y abra una ventana horizontal real sin depender todavia del sistema final de nodos o mapa, dejando ademas preparado al encounter para recibir `InitialDistance` e `InitialDepth` como entradas resueltas.
+- **Resultado esperado**: flujo claro `leer situacion -> resolver cast -> abrir ventana horizontal`, vocabulario de aguas base y señales de lectura, bandas de distancia del cast, contrato minimo para inyectar contexto de agua desde presets o configuracion temporal, separacion entre informacion estetica visible y metadata interna de pool, y politica de fallo con impacto controlado sobre la apertura del encounter.
+- **Dependencias**: `BL-001`
+- **Plan relacionado**: `docs/features/016-apertura-encounter-pesca-y-cast.md`
+- **Direccion actual acordada**:
+  - La primera version no depende de que exista un sistema de nodos; el encounter de pesca puede recibir un contexto de agua directo desde configuracion o preset.
+  - La lectura de la situacion ocurre justo antes del cast, ya dentro de la apertura del encounter, y puede ser mas o menos informativa segun el contexto.
+  - El contexto de agua mezcla pistas esteticas visibles para orientar el lance y metadata interna de pool que no se expone todavia en interfaz.
+  - El cast es un minijuego de timing con una barra que carga y descarga en ciclo constante; el input finaliza la barra dentro de una seccion que se traduce a franja horizontal de distancia.
+  - El cast debe ser skillful y permitir acelerar la run al acceder antes a mejores subpools, pero no debe decidir por si solo el resultado de un duelo aislado.
+  - Un cast largo no es universalmente mejor; su valor depende de las aguas base activas y del subconjunto de pool que el contexto actual este ofreciendo.
+  - Aunque el scope activo solo modifica `InitialDistance`, el encounter debe quedar preparado para recibir tambien `InitialDepth` desde la apertura futura.
+  - Por defecto, un cast fallido no deberia vaciar el encuentro; cambia la calidad o alineacion del pez encontrado, no la existencia de una pesca.
+  - La integracion con nodos desconocidos del mapa se resuelve despues en `BL-002`, sin bloquear esta base tactica.
+- **Prioridad**: Alta
+
 ## Fish y Encounters
 
 ### BL-007 Expandir perfiles data-driven de pez
 - **Estado**: `pending`
 - **Tipo**: Delivery
-- **Objetivo**: extender la primera base configurable de arquetipos hacia perfiles de pez que soporten encuentros normales, elites, bosses de zona y legendarios finales dentro de la expedicion.
-- **Resultado esperado**: estructura ampliable para mazo, efectos, metadata de descubrimiento, tags editoriales de foto y condiciones de aparicion por zona o rol de encounter.
+- **Objetivo**: extender la primera base configurable de arquetipos hacia perfiles de pez que soporten encuentros normales, elites, bosses de zona y legendarios finales dentro de la expedicion, concentrando tambien la metadata editorial o fotografica propia de cada especie o encuentro.
+- **Resultado esperado**: estructura ampliable para mazo, efectos, metadata de descubrimiento, tags editoriales de foto y condiciones de aparicion por zona o rol de encounter, dejando claro que la capa fotografica vive en el contenido data-driven del pez y no en la resolucion generica del cast.
 - **Dependencias**: `BL-006`, `BL-003`
 - **Prioridad**: Media
+
+### BL-022 Definir aparicion de peces por aguas base y ventana de lanzamiento
+- **Estado**: `pending`
+- **Tipo**: Discovery
+- **Objetivo**: decidir como la combinacion entre aguas base del nodo, franja horizontal del cast y sesgo vertical del setup del jugador selecciona subconjuntos de peces y define la aparicion de encuentros compatibles con esa ventana de lanzamiento.
+- **Resultado esperado**: modelo de pool base por nodo o zona, reglas de particion en subconjuntos por distancia y profundidad, metadata minima de aparicion en perfiles de pez y criterio para conectar cast, cana y habitats sin abrir todavia la capa de economia fotografica.
+- **Dependencias**: `BL-003`, `BL-007`, `BL-020`, `BL-021`
+- **Direccion actual acordada**:
+  - Cada nodo de pesca parte de unas aguas base y luego se secciona en subconjuntos de pool segun la ventana horizontal del cast y la ventana vertical habilitada por la cana y sus aditamentos.
+  - La aparicion de peces debe seguir siendo compatible con zonas, elites, bosses y roles especiales de encounter.
+  - El sistema debe permitir que a veces el jugador tenga lectura explicita al entrar al nodo y a veces no, sin exigir que el mapa revele antes la estructura del subpool.
+  - La capa de economia o tags editoriales de fotografia queda fuera de este item y se aborda dentro de la extension data-driven del pez.
+- **Prioridad**: Alta
 
 ## Items y Build
 
@@ -131,8 +163,21 @@ Este documento concentra el backlog activo del proyecto, con estado visible para
 - **Estado**: `pending`
 - **Tipo**: Discovery
 - **Objetivo**: clasificar las piezas de build que el jugador puede comprar, recibir o mejorar durante la expedicion sin solaparlas con los patrocinadores globales.
-- **Resultado esperado**: taxonomia inicial de acciones y objetos de tienda que cubra mejoras del rig, reparacion del hilo, intervenciones sobre el mazo, consumibles y otros ajustes de servicio.
+- **Resultado esperado**: taxonomia inicial de acciones y objetos de tienda que cubra mejoras de la cana, aditamentos, reparacion del hilo, intervenciones sobre el mazo, consumibles y otros ajustes de servicio.
 - **Dependencias**: `BL-001`, `BL-011`
+- **Prioridad**: Alta
+
+### BL-021 Redefinir la cana y sus aditamentos como modelo de rig del jugador
+- **Estado**: `pending`
+- **Tipo**: Discovery
+- **Objetivo**: consolidar el actual `rig` como el modelo de cana del jugador, separando sus atributos estructurales de los aditamentos que modifican la apertura vertical del encounter y el acceso a distintos habitats de pez.
+- **Resultado esperado**: modelo de cana con atributos base como `MaxDistance` y `MaxDepth`, taxonomia inicial de aditamentos, tradeoffs de setup y reglas claras para distinguir limites estructurales del equipo frente a modificadores de apertura o lectura del nodo.
+- **Dependencias**: `BL-008`, `BL-020`
+- **Direccion actual acordada**:
+  - `MaxDistance` y `MaxDepth` deben leerse como atributos de la cana del jugador y no como bonos abstractos del combat loop.
+  - Los aditamentos no reemplazan la cana; sesgan sobre todo la apertura vertical, la compatibilidad con ciertos habitats y la forma de acceder a subpools de peces.
+  - La cana conserva el rol de limite estructural del encuentro y no debe mutarse por cartas durante el duelo.
+  - Los setups deben tener costes y ventajas reales; por ejemplo, mas peso o mas profundidad accesible no deberian ser mejoras universales sin contrapartida.
 - **Prioridad**: Alta
 
 ### BL-009 Disenar sistema de sinergias
@@ -213,23 +258,16 @@ Este documento concentra el backlog activo del proyecto, con estado visible para
 - **Dependencias**: `BL-001`, `BL-008`, `BL-011`
 - **Prioridad**: Media
 
+## Completados
+
 ### BL-019 Hacer visible el descarte del pez y modular la lectura del historial
-- **Estado**: `planned`
+- **Estado**: `done`
 - **Tipo**: Discovery + Delivery
 - **Objetivo**: convertir el descarte del pez en una herramienta estrategica legible durante el encounter, manteniendo espacio para peces, cartas o eventos que oculten parcial o temporalmente esa informacion.
 - **Resultado esperado**: estado de runtime, presentacion y UX que permitan ver el descarte visible del pez por ciclo, entender cuando el mazo recicla o se baraja y soportar excepciones de visibilidad por carta, arquetipo o evento.
 - **Dependencias**: `BL-005`, `BL-006`, `BL-017`
 - **Plan relacionado**: `docs/features/015-visibilidad-descarte-del-pez.md`
-- **Direccion actual acordada**:
-  - La regla general del combate pasa a ser que el jugador puede consultar el historial de descarte visible del pez durante el encuentro.
-  - La lectura prioritaria debe centrarse en el ciclo actual del mazo; los ciclos anteriores pueden quedar resumidos, atenuados o separados si eso mejora claridad.
-  - El reciclado del mazo debe comunicarse de forma explicita, incluyendo cuando el pez rebaraja y cuando parte del descarte ya no puede volver por `CardsToRemove`.
-  - Algunas cartas, arquetipos o efectos concretos pueden ocultar una entrada individual del historial, mostrar solo el movimiento o volver opaco parte del descarte, pero no conviene que la excepcion por defecto oculte todo el panel.
-  - La informacion visible del descarte debe nacer en el runtime del mazo y llegar a `match`, `presentation` y `cli` como un snapshot legible, en lugar de reconstruirse ad hoc en la UI.
-  - La feature debe dejar preparada una superficie clara para futuras mecanicas de intel del pez, niebla informativa, bosses con fases opacas y desbloqueos de bestiario entre runs.
 - **Prioridad**: Media
-
-## Completados
 
 ### BL-005 Disenar sistema extensible de efectos de cartas
 - **Estado**: `done`
@@ -261,17 +299,19 @@ Este documento concentra el backlog activo del proyecto, con estado visible para
 ## Orden sugerido del trabajo pendiente
 
 1. `BL-001`
-2. `BL-002`
-3. `BL-011`
-4. `BL-003`
+2. `BL-020`
+3. `BL-002`
+4. `BL-011`
 5. `BL-008`
-6. `BL-012`
-7. `BL-007`
-8. `BL-009`
-9. `BL-019`
-10. `BL-017`
-11. `BL-013`
-12. `BL-015`
-13. `BL-016`
-14. `BL-010`
-15. `BL-014`
+6. `BL-021`
+7. `BL-003`
+8. `BL-022`
+9. `BL-012`
+10. `BL-007`
+11. `BL-009`
+12. `BL-017`
+13. `BL-013`
+14. `BL-015`
+15. `BL-016`
+16. `BL-010`
+17. `BL-014`

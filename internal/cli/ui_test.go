@@ -5,6 +5,7 @@ import (
 	"pesca/internal/cards"
 	"pesca/internal/content/fishprofiles"
 	"pesca/internal/content/playerprofiles"
+	"pesca/internal/content/watercontexts"
 	"pesca/internal/domain"
 	"pesca/internal/encounter"
 	"pesca/internal/match"
@@ -163,6 +164,51 @@ func TestChooseFishDeckPresetRejectsInvalidInput(t *testing.T) {
 	assert.Contains(t, out.String(), "respuesta no valida, usa s o n")
 }
 
+func TestChooseWaterContext(t *testing.T) {
+	var out bytes.Buffer
+	ui := NewUI(strings.NewReader("2\ns\n"), &out)
+
+	preset, err := ui.ChooseWaterContext("Pesca: duelo contra el pez", sampleWaterContextPresets())
+
+	require.NoError(t, err)
+	assert.Equal(t, "Canal abierto", preset.Name)
+	assert.Contains(t, out.String(), "Situacion de agua")
+	assert.Contains(t, out.String(), "Confirmar situacion de agua")
+	assert.NotContains(t, out.String(), "offshore")
+	assert.Contains(t, out.String(), clearSequence)
+}
+
+func TestResolveCastUsesOscillatingBarAndStoresOpeningSummary(t *testing.T) {
+	var out bytes.Buffer
+	ui := NewUI(strings.NewReader("\n1\n"), &out)
+	ui.castDelay = 0
+	ui.castFrames = []int{0}
+	waterContext := sampleWaterContextPresets()[0].BuildContext()
+
+	castResult, err := ui.ResolveCast("Pesca: duelo contra el pez", waterContext)
+	require.NoError(t, err)
+	assert.Equal(t, encounter.CastBandVeryShort, castResult.Band)
+
+	opening, err := encounter.ResolveOpening(encounter.DefaultConfig(), waterContext, castResult)
+	require.NoError(t, err)
+	require.NoError(t, ui.ShowEncounterOpening("Pesca: duelo contra el pez", opening))
+
+	presenter := presentation.NewPresenter(presentation.DefaultCatalog())
+	require.NoError(t, ui.ShowIntro(presenter.Intro()))
+	status := presenter.Status(samplePromptState(t))
+	_, err = ui.ChooseMove(status, status.MoveOptions)
+	require.NoError(t, err)
+
+	printed := out.String()
+	assert.Contains(t, printed, "Lectura del agua")
+	assert.Contains(t, printed, "Pulsa Enter para detener la barra")
+	assert.Contains(t, printed, "Barra      : [")
+	assert.Contains(t, printed, "Apertura del lance")
+	assert.Contains(t, printed, "Agua       : Ensenada cercana")
+	assert.Contains(t, printed, "Lance      : muy corto")
+	assert.Contains(t, printed, "Inicio     : distancia 0 | profundidad 1")
+}
+
 func TestPresetSelectionScreensHideCardDetailsFromTheList(t *testing.T) {
 	playerSelection := renderPlayerDeckSelectionSection(samplePlayerDeckPresets())
 	fishSelection := renderFishDeckSelectionSection(sampleFishDeckPresets())
@@ -240,6 +286,10 @@ func sampleFishDeckPresets() []fishprofiles.FishDeckPreset {
 			Shuffle:       false,
 		},
 	}
+}
+
+func sampleWaterContextPresets() []watercontexts.Preset {
+	return watercontexts.DefaultPresets()
 }
 
 func samplePlayerDeckPresets() []playerprofiles.DeckPreset {
