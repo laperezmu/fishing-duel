@@ -12,9 +12,10 @@ import (
 func TestProfileBuildCards(t *testing.T) {
 	profile := Profile{
 		Cards: []CardPattern{{
-			Name:    "Tiron de apertura",
-			Summary: "Permite capturar desde un paso mas lejos este round.",
-			Move:    domain.Red,
+			Name:              "Tiron de apertura",
+			Summary:           "Permite capturar desde un paso mas lejos este round.",
+			Move:              domain.Red,
+			DiscardVisibility: cards.DiscardVisibilityMoveOnly,
 			Effects: []cards.CardEffect{{
 				Trigger:              cards.TriggerOnDraw,
 				CaptureDistanceBonus: 1,
@@ -27,6 +28,7 @@ func TestProfileBuildCards(t *testing.T) {
 	require.Len(t, builtCards, 1)
 	assert.Equal(t, "Tiron de apertura", builtCards[0].Name)
 	assert.Equal(t, domain.Red, builtCards[0].Move)
+	assert.Equal(t, cards.DiscardVisibilityMoveOnly, builtCards[0].DiscardVisibility)
 	assert.Equal(t, 1, builtCards[0].Effects[0].CaptureDistanceBonus)
 }
 
@@ -44,4 +46,5 @@ func TestDefaultProfiles(t *testing.T) {
 	assert.NotEmpty(t, profiles[1].Details)
 	require.Len(t, profiles[1].Cards, 4)
 	assert.Equal(t, "Tiron de apertura", profiles[1].Cards[0].Name)
+	assert.Equal(t, cards.DiscardVisibilityMoveOnly, profiles[4].Cards[1].DiscardVisibility)
 }

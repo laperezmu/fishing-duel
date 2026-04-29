@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"pesca/internal/cards"
+	"pesca/internal/deck"
 	"pesca/internal/domain"
 	"pesca/internal/match"
 )
@@ -29,6 +30,7 @@ type FishDeck interface {
 	DiscardCount() int
 	RecycleCount() int
 	Exhausted() bool
+	VisibilitySnapshot() deck.VisibilitySnapshot
 }
 
 type PlayerMoveController interface {
@@ -158,12 +160,49 @@ func (engine *Engine) PlayRound(playerMove domain.Move) (match.RoundResult, erro
 }
 
 func (engine *Engine) refreshState() {
+	visibilitySnapshot := engine.fishDeck.VisibilitySnapshot()
 	engine.state.Deck.ActiveCards = engine.fishDeck.ActiveCount()
 	engine.state.Deck.DiscardCards = engine.fishDeck.DiscardCount()
 	engine.state.Deck.RecycleCount = engine.fishDeck.RecycleCount()
 	engine.state.Deck.Exhausted = engine.fishDeck.Exhausted()
+	engine.state.Deck.ShufflesOnRecycle = visibilitySnapshot.ShufflesOnRecycle
+	engine.state.Deck.CardsToRemove = visibilitySnapshot.CardsToRemove
+	engine.state.Deck.CurrentCycle = mapVisibleDiscardCycleState(visibilitySnapshot.CurrentCycle)
+	engine.state.Deck.PreviousCycleStats = mapVisibleDiscardCycleSummaryStates(visibilitySnapshot.PreviousCycles)
 }
 
 func (engine *Engine) resetRoundState() {
 	engine.state.RoundState = match.RoundState{}
+}
+
+func mapVisibleDiscardCycleState(cycle deck.VisibleDiscardCycle) match.FishDiscardCycleState {
+	entries := make([]match.FishDiscardEntryState, 0, len(cycle.Entries))
+	for _, entry := range cycle.Entries {
+		entries = append(entries, match.FishDiscardEntryState{
+			Visibility: entry.Visibility,
+			Move:       entry.Move,
+			Name:       entry.Name,
+			Summary:    entry.Summary,
+		})
+	}
+
+	return match.FishDiscardCycleState{
+		Number:     cycle.Number,
+		TotalCards: cycle.TotalCards,
+		Entries:    entries,
+	}
+}
+
+func mapVisibleDiscardCycleSummaryStates(summaries []deck.VisibleDiscardCycleSummary) []match.FishDiscardCycleSummaryState {
+	mappedSummaries := make([]match.FishDiscardCycleSummaryState, 0, len(summaries))
+	for _, summary := range summaries {
+		mappedSummaries = append(mappedSummaries, match.FishDiscardCycleSummaryState{
+			Number:       summary.Number,
+			TotalCards:   summary.TotalCards,
+			VisibleCards: summary.VisibleCards,
+			HiddenCards:  summary.HiddenCards,
+		})
+	}
+
+	return mappedSummaries
 }

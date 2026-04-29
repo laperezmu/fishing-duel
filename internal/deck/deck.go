@@ -10,12 +10,49 @@ var ErrNoCardsAvailable = errors.New("no cards available")
 
 type Shuffler func([]cards.FishCard)
 
+type VisibleDiscardEntry struct {
+	Visibility cards.DiscardVisibility
+	Move       domain.Move
+	Name       string
+	Summary    string
+}
+
+type VisibleDiscardCycle struct {
+	Number     int
+	TotalCards int
+	Entries    []VisibleDiscardEntry
+}
+
+type VisibleDiscardCycleSummary struct {
+	Number       int
+	TotalCards   int
+	VisibleCards int
+	HiddenCards  int
+}
+
+type VisibilitySnapshot struct {
+	CurrentCycle      VisibleDiscardCycle
+	PreviousCycles    []VisibleDiscardCycleSummary
+	RecycleCount      int
+	ShufflesOnRecycle bool
+	CardsToRemove     int
+	Exhausted         bool
+}
+
 type RecyclePolicy interface {
 	Recycle(discardedCards []cards.FishCard, shuffler Shuffler) []cards.FishCard
 }
 
 type RemoveCardsRecyclePolicy struct {
 	CardsToRemove int
+}
+
+func (policy RemoveCardsRecyclePolicy) CardsRemovedPerCycle() int {
+	if policy.CardsToRemove < 0 {
+		return 0
+	}
+
+	return policy.CardsToRemove
 }
 
 func (policy RemoveCardsRecyclePolicy) Recycle(discardedCards []cards.FishCard, shuffler Shuffler) []cards.FishCard {
@@ -38,6 +75,7 @@ func (policy RemoveCardsRecyclePolicy) Recycle(discardedCards []cards.FishCard, 
 type Deck struct {
 	activeCards    []cards.FishCard
 	discardedCards []cards.FishCard
+	previousCycles []VisibleDiscardCycleSummary
 	shuffler       Shuffler
 	recyclePolicy  RecyclePolicy
 	recycleCount   int
@@ -109,6 +147,19 @@ func (deck *Deck) Exhausted() bool {
 	return deck.exhausted
 }
 
+func (deck *Deck) VisibilitySnapshot() VisibilitySnapshot {
+	currentCycleNumber := deck.recycleCount + 1
+
+	return VisibilitySnapshot{
+		CurrentCycle:      buildVisibleDiscardCycle(currentCycleNumber, deck.discardedCards),
+		PreviousCycles:    append([]VisibleDiscardCycleSummary(nil), deck.previousCycles...),
+		RecycleCount:      deck.recycleCount,
+		ShufflesOnRecycle: deck.shuffler != nil,
+		CardsToRemove:     cardsRemovedPerCycle(deck.recyclePolicy),
+		Exhausted:         deck.exhausted,
+	}
+}
+
 func (deck *Deck) ensureCardsAvailable() error {
 	if len(deck.activeCards) > 0 {
 		return nil
@@ -132,8 +183,79 @@ func (deck *Deck) recycleDiscardPileIfNeeded() {
 		return
 	}
 
+	deck.previousCycles = append(deck.previousCycles, buildVisibleDiscardCycleSummary(deck.recycleCount+1, deck.discardedCards))
 	deck.activeCards = deck.recyclePolicy.Recycle(deck.discardedCards, deck.shuffler)
 	deck.discardedCards = nil
 	deck.recycleCount++
 	deck.exhausted = len(deck.activeCards) == 0
+}
+
+type cardsRemovedPerCycleReporter interface {
+	CardsRemovedPerCycle() int
+}
+
+func cardsRemovedPerCycle(policy RecyclePolicy) int {
+	reporter, ok := policy.(cardsRemovedPerCycleReporter)
+	if !ok {
+		return 0
+	}
+
+	return reporter.CardsRemovedPerCycle()
+}
+
+func buildVisibleDiscardCycle(number int, discardedCards []cards.FishCard) VisibleDiscardCycle {
+	entries := make([]VisibleDiscardEntry, 0, len(discardedCards))
+	for _, discardedCard := range discardedCards {
+		entry, visible := buildVisibleDiscardEntry(discardedCard)
+		if !visible {
+			continue
+		}
+
+		entries = append(entries, entry)
+	}
+
+	return VisibleDiscardCycle{
+		Number:     number,
+		TotalCards: len(discardedCards),
+		Entries:    entries,
+	}
+}
+
+func buildVisibleDiscardCycleSummary(number int, discardedCards []cards.FishCard) VisibleDiscardCycleSummary {
+	visibleCards := 0
+	for _, discardedCard := range discardedCards {
+		if discardedCard.EffectiveDiscardVisibility() == cards.DiscardVisibilityHidden {
+			continue
+		}
+
+		visibleCards++
+	}
+
+	totalCards := len(discardedCards)
+	return VisibleDiscardCycleSummary{
+		Number:       number,
+		TotalCards:   totalCards,
+		VisibleCards: visibleCards,
+		HiddenCards:  totalCards - visibleCards,
+	}
+}
+
+func buildVisibleDiscardEntry(card cards.FishCard) (VisibleDiscardEntry, bool) {
+	visibility := card.EffectiveDiscardVisibility()
+	if visibility == cards.DiscardVisibilityHidden {
+		return VisibleDiscardEntry{}, false
+	}
+
+	entry := VisibleDiscardEntry{Visibility: visibility}
+	if visibility == cards.DiscardVisibilityMasked {
+		return entry, true
+	}
+
+	entry.Move = card.Move
+	if visibility == cards.DiscardVisibilityFull {
+		entry.Name = card.Name
+		entry.Summary = card.Summary
+	}
+
+	return entry, true
 }

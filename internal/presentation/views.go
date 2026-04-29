@@ -21,6 +21,27 @@ type IntroView struct {
 	Options []MoveOption
 }
 
+type FishDiscardEntryView struct {
+	Label string
+}
+
+type FishDiscardCycleSummaryView struct {
+	CycleNumber  int
+	TotalCards   int
+	VisibleCards int
+	HiddenCards  int
+}
+
+type FishDiscardView struct {
+	CurrentCycleNumber     int
+	CurrentCycleTotalCards int
+	CurrentCycleEntries    []FishDiscardEntryView
+	PreviousCycles         []FishDiscardCycleSummaryView
+	ShufflesOnRecycle      bool
+	CardsToRemove          int
+	RecycleCount           int
+}
+
 type StatusView struct {
 	RoundNumber               int
 	FishDistance              int
@@ -36,6 +57,7 @@ type StatusView struct {
 	PlayerWins                int
 	FishWins                  int
 	Draws                     int
+	FishDiscard               FishDiscardView
 	MoveOptions               []MoveOption
 }
 

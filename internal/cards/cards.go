@@ -41,27 +41,25 @@ type CardEffect struct {
 	SurfaceDepthBonus              int
 }
 
+type DiscardVisibility string
+
+const (
+	DiscardVisibilityFull     DiscardVisibility = "full"
+	DiscardVisibilityMoveOnly DiscardVisibility = "move_only"
+	DiscardVisibilityMasked   DiscardVisibility = "masked"
+	DiscardVisibilityHidden   DiscardVisibility = "hidden"
+)
+
 func (effect CardEffect) Applies(context EffectContext) bool {
 	switch effect.Trigger {
 	case TriggerOnDraw:
 		return context.Phase == PhaseDraw
 	case TriggerOnOwnerWin:
-		if context.Phase != PhaseOutcome {
-			return false
-		}
-		return context.Owner == OwnerFish && context.Outcome == domain.FishWin ||
-			context.Owner == OwnerPlayer && context.Outcome == domain.PlayerWin
+		return effect.appliesOnOwnerWin(context)
 	case TriggerOnOwnerLose:
-		if context.Phase != PhaseOutcome {
-			return false
-		}
-		return context.Owner == OwnerFish && context.Outcome == domain.PlayerWin ||
-			context.Owner == OwnerPlayer && context.Outcome == domain.FishWin
+		return effect.appliesOnOwnerLose(context)
 	case TriggerOnRoundDraw:
-		if context.Phase != PhaseOutcome {
-			return false
-		}
-		return context.Outcome == domain.Draw
+		return effect.appliesOnRoundDraw(context)
 	default:
 		return false
 	}
@@ -81,10 +79,11 @@ func FilterEffects(effects []CardEffect, context EffectContext) []CardEffect {
 }
 
 type FishCard struct {
-	Name    string
-	Summary string
-	Move    domain.Move
-	Effects []CardEffect
+	Name              string
+	Summary           string
+	Move              domain.Move
+	Effects           []CardEffect
+	DiscardVisibility DiscardVisibility
 }
 
 type PlayerCard struct {
@@ -96,8 +95,9 @@ type PlayerCard struct {
 
 func NewFishCard(move domain.Move, effects ...CardEffect) FishCard {
 	return FishCard{
-		Move:    move,
-		Effects: append([]CardEffect(nil), effects...),
+		Move:              move,
+		Effects:           append([]CardEffect(nil), effects...),
+		DiscardVisibility: DiscardVisibilityFull,
 	}
 }
 
@@ -126,6 +126,7 @@ func CloneFishCard(card FishCard) FishCard {
 	clonedCard := NewFishCard(card.Move, card.Effects...)
 	clonedCard.Name = card.Name
 	clonedCard.Summary = card.Summary
+	clonedCard.DiscardVisibility = card.effectiveDiscardVisibility()
 	return clonedCard
 }
 
@@ -134,4 +135,44 @@ func ClonePlayerCard(card PlayerCard) PlayerCard {
 	clonedCard.Name = card.Name
 	clonedCard.Summary = card.Summary
 	return clonedCard
+}
+
+func (effect CardEffect) appliesOnOwnerWin(context EffectContext) bool {
+	if context.Phase != PhaseOutcome {
+		return false
+	}
+
+	if context.Owner == OwnerFish {
+		return context.Outcome == domain.FishWin
+	}
+
+	return context.Owner == OwnerPlayer && context.Outcome == domain.PlayerWin
+}
+
+func (effect CardEffect) appliesOnOwnerLose(context EffectContext) bool {
+	if context.Phase != PhaseOutcome {
+		return false
+	}
+
+	if context.Owner == OwnerFish {
+		return context.Outcome == domain.PlayerWin
+	}
+
+	return context.Owner == OwnerPlayer && context.Outcome == domain.FishWin
+}
+
+func (effect CardEffect) appliesOnRoundDraw(context EffectContext) bool {
+	return context.Phase == PhaseOutcome && context.Outcome == domain.Draw
+}
+
+func (card FishCard) effectiveDiscardVisibility() DiscardVisibility {
+	if card.DiscardVisibility == "" {
+		return DiscardVisibilityFull
+	}
+
+	return card.DiscardVisibility
+}
+
+func (card FishCard) EffectiveDiscardVisibility() DiscardVisibility {
+	return card.effectiveDiscardVisibility()
 }

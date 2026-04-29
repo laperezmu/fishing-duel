@@ -8,6 +8,7 @@ Motor de juego en Go para un duelo de pesca por rondas. El proyecto ya no es sol
 - Cada ronda el jugador sigue eligiendo entre tres acciones base: `Tirar`, `Recoger` y `Soltar`.
 - Cada accion del jugador consume la carta superior visible de una mini-baraja por color.
 - El pez roba su siguiente carta desde una baraja configurable, con orden fijo o barajado segun el perfil.
+- El duelo muestra el historial visible de descarte del pez para ayudar a leer patrones, con espacio para cartas o perfiles que oculten parte de esa informacion.
 - El motor resuelve efectos `on_draw` y efectos post-outcome antes de aplicar progresion y chequeos finales.
 - El encuentro usa dos ejes de presion: `distancia` y `profundidad`, mas cierres por captura, escape y agotamiento de mazo.
 
@@ -40,7 +41,7 @@ $(go env GOPATH)/bin/golangci-lint run
 
 1. Se inicializa el estado del encuentro, el rig del jugador, las barajas del jugador y la baraja del pez.
 2. El jugador ve sus tres acciones disponibles junto a la carta superior visible de cada color cuando aplica.
-3. El pez revela su carta activa para la ronda al robar del mazo.
+3. El pez revela su carta activa para la ronda al robar del mazo, y el juego conserva un historial visible de lo ya descartado en el ciclo actual.
 4. El motor aplica efectos de `draw`, resuelve el outcome base del combate y luego aplica efectos condicionados por victoria, derrota o empate.
 5. La progresion modifica distancia y profundidad del pez, y puede disparar eventos derivados como `chapotea en la superficie`.
 6. El encuentro termina por captura, escape horizontal, escape por profundidad, escape por chapoteo o resolucion al agotarse la baraja del pez.

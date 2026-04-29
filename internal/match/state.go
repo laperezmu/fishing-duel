@@ -8,10 +8,34 @@ import (
 )
 
 type DeckState struct {
-	ActiveCards  int
-	DiscardCards int
-	RecycleCount int
-	Exhausted    bool
+	ActiveCards        int
+	DiscardCards       int
+	RecycleCount       int
+	Exhausted          bool
+	ShufflesOnRecycle  bool
+	CardsToRemove      int
+	CurrentCycle       FishDiscardCycleState
+	PreviousCycleStats []FishDiscardCycleSummaryState
+}
+
+type FishDiscardEntryState struct {
+	Visibility cards.DiscardVisibility
+	Move       domain.Move
+	Name       string
+	Summary    string
+}
+
+type FishDiscardCycleState struct {
+	Number     int
+	TotalCards int
+	Entries    []FishDiscardEntryState
+}
+
+type FishDiscardCycleSummaryState struct {
+	Number       int
+	TotalCards   int
+	VisibleCards int
+	HiddenCards  int
 }
 
 type Stats struct {

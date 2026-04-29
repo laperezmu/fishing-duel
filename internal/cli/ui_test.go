@@ -49,6 +49,10 @@ func TestShowIntroIncludesColoredOptions(t *testing.T) {
 	assert.Contains(t, printed, "~~~~")
 	assert.Contains(t, printed, "Profundidad actual: 1")
 	assert.Contains(t, printed, "Baraja agotada: captura con distancia <= 2 y profundidad <= 1")
+	assert.Contains(t, printed, "Historial del pez")
+	assert.Contains(t, printed, "Ciclo activo : C2 Oleaje abierto | ? | 1 oculta")
+	assert.Contains(t, printed, "Reciclado   : rebaraja | retira 3 cartas | 1 ciclo cerrado")
+	assert.Contains(t, printed, "Ciclos cerrados: C1 4 usadas, 1 oculta")
 }
 
 func TestChooseMoveShowsLastRoundSummary(t *testing.T) {
@@ -88,6 +92,7 @@ func TestChooseMoveShowsLastRoundSummary(t *testing.T) {
 	assert.Contains(t, printed, "Distancia : 2")
 	assert.Contains(t, printed, "Profundidad : 1")
 	assert.Contains(t, printed, "Evento    : chapotea: permanece sujeto")
+	assert.Contains(t, printed, "Historial del pez")
 }
 
 func TestChooseMoveRejectsUnavailableMoveUntilPlayerSelectsAvailableOption(t *testing.T) {
@@ -155,7 +160,7 @@ func TestChooseFishDeckPresetRejectsInvalidInput(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, "Apertura", preset.Name)
 	assert.Contains(t, out.String(), "opcion no valida, usa un numero entre 1 y 2")
-	assert.Contains(t, out.String(), "confirmacion no valida, usa s o n")
+	assert.Contains(t, out.String(), "respuesta no valida, usa s o n")
 }
 
 func TestPresetSelectionScreensHideCardDetailsFromTheList(t *testing.T) {
@@ -180,7 +185,25 @@ func samplePromptState(t *testing.T) match.State {
 
 	return match.State{
 		Deck: match.DeckState{
-			ActiveCards: 9,
+			ActiveCards:       9,
+			DiscardCards:      3,
+			RecycleCount:      1,
+			ShufflesOnRecycle: true,
+			CardsToRemove:     3,
+			CurrentCycle: match.FishDiscardCycleState{
+				Number:     2,
+				TotalCards: 3,
+				Entries: []match.FishDiscardEntryState{
+					{Visibility: cards.DiscardVisibilityFull, Move: domain.Blue, Name: "Oleaje abierto"},
+					{Visibility: cards.DiscardVisibilityMasked},
+				},
+			},
+			PreviousCycleStats: []match.FishDiscardCycleSummaryState{{
+				Number:       1,
+				TotalCards:   4,
+				VisibleCards: 3,
+				HiddenCards:  1,
+			}},
 		},
 		Encounter: encounterState,
 		PlayerRig: playerrig.State{MaxDistance: 5, MaxDepth: 4},

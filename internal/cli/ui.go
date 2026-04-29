@@ -250,7 +250,7 @@ func parseConfirmation(input string) (bool, error) {
 	case "n", "no":
 		return false, nil
 	default:
-		return false, fmt.Errorf("confirmacion no valida, usa s o n")
+		return false, fmt.Errorf("respuesta no valida, usa s o n")
 	}
 }
 
