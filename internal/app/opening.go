@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"pesca/internal/content/watercontexts"
 	"pesca/internal/encounter"
+	"pesca/internal/player/loadout"
 )
 
 type OpeningUI interface {
@@ -12,9 +13,12 @@ type OpeningUI interface {
 	ShowEncounterOpening(title string, opening encounter.Opening) error
 }
 
-func ResolveEncounterOpening(title string, baseConfig encounter.Config, presets []watercontexts.Preset, ui OpeningUI) (encounter.Opening, error) {
+func ResolveEncounterOpening(title string, baseConfig encounter.Config, playerLoadout loadout.State, presets []watercontexts.Preset, ui OpeningUI) (encounter.Opening, error) {
 	if ui == nil {
 		return encounter.Opening{}, fmt.Errorf("opening ui is required")
+	}
+	if err := playerLoadout.Validate(); err != nil {
+		return encounter.Opening{}, fmt.Errorf("player loadout: %w", err)
 	}
 	if len(presets) == 0 {
 		return encounter.Opening{}, fmt.Errorf("at least one water context preset is required")
@@ -31,7 +35,7 @@ func ResolveEncounterOpening(title string, baseConfig encounter.Config, presets 
 		return encounter.Opening{}, fmt.Errorf("resolve cast: %w", err)
 	}
 
-	opening, err := encounter.ResolveOpening(baseConfig, waterContext, castResult)
+	opening, err := encounter.ResolveOpening(baseConfig, waterContext, castResult, playerLoadout.OpeningLimits())
 	if err != nil {
 		return encounter.Opening{}, fmt.Errorf("resolve encounter opening: %w", err)
 	}

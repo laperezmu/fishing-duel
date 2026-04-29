@@ -8,8 +8,9 @@ import (
 	"pesca/internal/endings"
 	"pesca/internal/game"
 	"pesca/internal/match"
+	"pesca/internal/player/loadout"
 	"pesca/internal/player/playermoves"
-	"pesca/internal/player/playerrig"
+	"pesca/internal/player/rod"
 	"pesca/internal/progression"
 	"testing"
 
@@ -88,7 +89,7 @@ func TestNewEngine(t *testing.T) {
 	}
 
 	t.Run("initializes player moves prepares the deck and refreshes the initial state", func(t *testing.T) {
-		fixture := newEngineFixture(t, match.State{PlayerRig: samplePlayerRigState()})
+		fixture := newEngineFixture(t, match.State{PlayerLoadout: samplePlayerLoadoutState(t)})
 
 		state := fixture.engine.State()
 
@@ -104,7 +105,7 @@ func TestNewEngine(t *testing.T) {
 		assert.Equal(t, cards.DiscardVisibilityFull, state.Deck.CurrentCycle.Entries[0].Visibility)
 		require.Len(t, state.Deck.PreviousCycleStats, 1)
 		assert.Equal(t, 1, state.Deck.PreviousCycleStats[0].Number)
-		assert.Equal(t, samplePlayerRigState(), state.PlayerRig)
+		assert.Equal(t, samplePlayerLoadoutState(t), state.PlayerLoadout)
 		assert.Equal(t, samplePlayerMoveResources(), state.PlayerMoves)
 		fixture.assertExpectations(t)
 	})
@@ -112,7 +113,7 @@ func TestNewEngine(t *testing.T) {
 
 func TestEnginePlayRound(t *testing.T) {
 	t.Run("returns an error when the game is already finished", func(t *testing.T) {
-		fixture := newEngineFixture(t, match.State{Finished: true, PlayerRig: samplePlayerRigState()})
+		fixture := newEngineFixture(t, match.State{Finished: true, PlayerLoadout: samplePlayerLoadoutState(t)})
 
 		result, err := fixture.engine.PlayRound(domain.Blue)
 
@@ -122,7 +123,7 @@ func TestEnginePlayRound(t *testing.T) {
 	})
 
 	t.Run("returns a validation error when the player move controller rejects the move", func(t *testing.T) {
-		fixture := newEngineFixture(t, match.State{PlayerRig: samplePlayerRigState()})
+		fixture := newEngineFixture(t, match.State{PlayerLoadout: samplePlayerLoadoutState(t)})
 		prepareRoundCall := fixture.playerMoveController.On("PrepareRound", mock.AnythingOfType("*match.State")).Once()
 		validateMoveCall := fixture.playerMoveController.On("ValidateMove", mock.Anything, domain.Blue).Return(playermoves.ErrMoveUnavailable).Once()
 		mock.InOrder(prepareRoundCall, validateMoveCall)
@@ -135,7 +136,7 @@ func TestEnginePlayRound(t *testing.T) {
 	})
 
 	t.Run("returns the deck error when drawing a fish move fails and the match remains open", func(t *testing.T) {
-		fixture := newEngineFixture(t, match.State{PlayerRig: samplePlayerRigState()})
+		fixture := newEngineFixture(t, match.State{PlayerLoadout: samplePlayerLoadoutState(t)})
 		prepareRoundCall := fixture.playerMoveController.On("PrepareRound", mock.AnythingOfType("*match.State")).Once()
 		validateMoveCall := fixture.playerMoveController.On("ValidateMove", mock.Anything, domain.Blue).Return(nil).Once()
 		peekCardCall := fixture.playerMoveController.On("PeekMoveCard", mock.Anything, domain.Blue).Return(cards.NewPlayerCard(domain.Blue), nil).Once()
@@ -156,7 +157,7 @@ func TestEnginePlayRound(t *testing.T) {
 	})
 
 	t.Run("returns game finished when draw fails and the end condition closes the match", func(t *testing.T) {
-		fixture := newEngineFixture(t, match.State{PlayerRig: samplePlayerRigState()})
+		fixture := newEngineFixture(t, match.State{PlayerLoadout: samplePlayerLoadoutState(t)})
 		prepareRoundCall := fixture.playerMoveController.On("PrepareRound", mock.AnythingOfType("*match.State")).Once()
 		validateMoveCall := fixture.playerMoveController.On("ValidateMove", mock.Anything, domain.Blue).Return(nil).Once()
 		peekCardCall := fixture.playerMoveController.On("PeekMoveCard", mock.Anything, domain.Blue).Return(cards.NewPlayerCard(domain.Blue), nil).Once()
@@ -180,7 +181,7 @@ func TestEnginePlayRound(t *testing.T) {
 	})
 
 	t.Run("orchestrates the round using the injected deck and player move controller", func(t *testing.T) {
-		fixture := newEngineFixture(t, match.State{PlayerRig: samplePlayerRigState()})
+		fixture := newEngineFixture(t, match.State{PlayerLoadout: samplePlayerLoadoutState(t)})
 		playerCard := cards.NewPlayerCard(domain.Blue, cards.CardEffect{Trigger: cards.TriggerOnDraw, SurfaceDepthBonus: 1})
 		prepareBeforeValidationCall := fixture.playerMoveController.On("PrepareRound", mock.AnythingOfType("*match.State")).Run(func(arguments mock.Arguments) {
 			state := arguments.Get(0).(*match.State)
@@ -338,7 +339,7 @@ func TestEnginePlayRound(t *testing.T) {
 			roundEvaluator,
 			progression.TrackPolicy{},
 			endings.EncounterEndCondition{},
-			match.State{Encounter: encounterState, PlayerRig: samplePlayerRigState()},
+			match.State{Encounter: encounterState, PlayerLoadout: samplePlayerLoadoutState(t)},
 		)
 		require.NoError(t, err)
 
@@ -366,8 +367,8 @@ type engineFixture struct {
 
 func newEngineFixture(t *testing.T, initialState match.State) engineFixture {
 	t.Helper()
-	if initialState.PlayerRig.MaxDistance == 0 {
-		initialState.PlayerRig = samplePlayerRigState()
+	if initialState.PlayerLoadout.TrackMaxDistance() == 0 {
+		initialState.PlayerLoadout = samplePlayerLoadoutState(t)
 	}
 
 	fishDeck := &mockFishDeck{}
@@ -446,11 +447,22 @@ func samplePlayerMoveResources() match.PlayerMoveResources {
 	}}
 }
 
-func samplePlayerRigState() playerrig.State {
-	return playerrig.State{
-		MaxDistance: 5,
-		MaxDepth:    3,
+func samplePlayerRodState() rod.State {
+	return rod.State{
+		OpeningMaxDistance: 5,
+		OpeningMaxDepth:    3,
+		TrackMaxDistance:   5,
+		TrackMaxDepth:      3,
 	}
+}
+
+func samplePlayerLoadoutState(t *testing.T) loadout.State {
+	t.Helper()
+
+	playerLoadout, err := loadout.NewState(samplePlayerRodState(), nil)
+	require.NoError(t, err)
+
+	return playerLoadout
 }
 
 type mockFishDeck struct {

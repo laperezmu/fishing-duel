@@ -2,10 +2,13 @@ package cli
 
 import (
 	"fmt"
+	"pesca/internal/content/attachmentpresets"
 	"pesca/internal/content/fishprofiles"
 	"pesca/internal/content/playerprofiles"
+	"pesca/internal/content/rodpresets"
 	"pesca/internal/content/watercontexts"
 	"pesca/internal/encounter"
+	"pesca/internal/player/loadout"
 	"pesca/internal/presentation"
 	"strings"
 )
@@ -74,6 +77,30 @@ func renderPlayerDeckSelectionScreen(title string, presets []playerprofiles.Deck
 	return clearSequence + strings.Join(sections, "\n\n") + "\n\n"
 }
 
+func renderRodSelectionScreen(title string, presets []rodpresets.Preset, message string) string {
+	sections := []string{
+		renderHeader(title),
+		renderRodSelectionSection(presets),
+	}
+	if message != "" {
+		sections = append(sections, accent("Aviso")+"\n  "+message)
+	}
+
+	return clearSequence + strings.Join(sections, "\n\n") + "\n\n"
+}
+
+func renderAttachmentSelectionScreen(title string, presets []attachmentpresets.Preset, message string) string {
+	sections := []string{
+		renderHeader(title),
+		renderAttachmentSelectionSection(presets),
+	}
+	if message != "" {
+		sections = append(sections, accent("Aviso")+"\n  "+message)
+	}
+
+	return clearSequence + strings.Join(sections, "\n\n") + "\n\n"
+}
+
 func renderWaterContextSelectionScreen(title string, presets []watercontexts.Preset, message string) string {
 	sections := []string{
 		renderHeader(title),
@@ -102,6 +129,30 @@ func renderPlayerDeckConfirmationScreen(title string, preset playerprofiles.Deck
 	sections := []string{
 		renderHeader(title),
 		renderPlayerDeckConfirmationSection(preset),
+	}
+	if message != "" {
+		sections = append(sections, accent("Aviso")+"\n  "+message)
+	}
+
+	return clearSequence + strings.Join(sections, "\n\n") + "\n\n"
+}
+
+func renderRodConfirmationScreen(title string, preset rodpresets.Preset, message string) string {
+	sections := []string{
+		renderHeader(title),
+		renderRodConfirmationSection(preset),
+	}
+	if message != "" {
+		sections = append(sections, accent("Aviso")+"\n  "+message)
+	}
+
+	return clearSequence + strings.Join(sections, "\n\n") + "\n\n"
+}
+
+func renderAttachmentConfirmationScreen(title string, preset attachmentpresets.Preset, preview loadout.State, message string) string {
+	sections := []string{
+		renderHeader(title),
+		renderAttachmentConfirmationSection(preset, preview),
 	}
 	if message != "" {
 		sections = append(sections, accent("Aviso")+"\n  "+message)
@@ -332,6 +383,42 @@ func renderWaterContextSelectionSection(presets []watercontexts.Preset) string {
 	return strings.Join(lines, "\n")
 }
 
+func renderRodSelectionSection(presets []rodpresets.Preset) string {
+	lines := []string{
+		accent("Preset de cana"),
+		"  Elige la rod base que definira tus limites de apertura y track.",
+	}
+
+	for index, preset := range presets {
+		lines = append(lines,
+			fmt.Sprintf("  %d) %s", index+1, preset.Name),
+			fmt.Sprintf("     %s", preset.Description),
+		)
+	}
+
+	lines = append(lines, "  Escribe el numero del preset para seleccionarlo.")
+
+	return strings.Join(lines, "\n")
+}
+
+func renderAttachmentSelectionSection(presets []attachmentpresets.Preset) string {
+	lines := []string{
+		accent("Preset de aditamentos"),
+		"  Elige los aditamentos que completaran el loadout sobre tu rod.",
+	}
+
+	for index, preset := range presets {
+		lines = append(lines,
+			fmt.Sprintf("  %d) %s", index+1, preset.Name),
+			fmt.Sprintf("     %s", preset.Description),
+		)
+	}
+
+	lines = append(lines, "  Escribe el numero del preset para seleccionarlo.")
+
+	return strings.Join(lines, "\n")
+}
+
 func renderPlayerDeckSelectionSection(presets []playerprofiles.DeckPreset) string {
 	lines := []string{
 		accent("Preset del jugador"),
@@ -391,6 +478,43 @@ func renderPlayerDeckConfirmationSection(preset playerprofiles.DeckPreset) strin
 	}
 	for _, detail := range preset.Details {
 		lines = append(lines, "  - "+detail)
+	}
+
+	return strings.Join(lines, "\n")
+}
+
+func renderRodConfirmationSection(preset rodpresets.Preset) string {
+	lines := []string{
+		accent("Confirmar cana"),
+		fmt.Sprintf("  Nombre          : %s", preset.Name),
+		fmt.Sprintf("  Resumen         : %s", preset.Description),
+		fmt.Sprintf("  Apertura        : dist %d | prof %d", preset.Config.OpeningMaxDistance, preset.Config.OpeningMaxDepth),
+		fmt.Sprintf("  Track           : dist %d | prof %d", preset.Config.TrackMaxDistance, preset.Config.TrackMaxDepth),
+	}
+	for _, detail := range preset.Details {
+		lines = append(lines, "  - "+detail)
+	}
+
+	return strings.Join(lines, "\n")
+}
+
+func renderAttachmentConfirmationSection(preset attachmentpresets.Preset, preview loadout.State) string {
+	effectiveRod, _ := preview.EffectiveRod()
+	lines := []string{
+		accent("Confirmar aditamentos"),
+		fmt.Sprintf("  Nombre          : %s", preset.Name),
+		fmt.Sprintf("  Resumen         : %s", preset.Description),
+		fmt.Sprintf("  Resultado final : apertura dist %d | prof %d", effectiveRod.OpeningMaxDistance, effectiveRod.OpeningMaxDepth),
+		fmt.Sprintf("  Track final     : dist %d | prof %d", effectiveRod.TrackMaxDistance, effectiveRod.TrackMaxDepth),
+	}
+	if len(preset.Attachments) == 0 {
+		lines = append(lines, "  - Sin aditamentos equipados.")
+	}
+	for _, detail := range preset.Details {
+		lines = append(lines, "  - "+detail)
+	}
+	for _, attachment := range preset.Attachments {
+		lines = append(lines, "  * "+attachment.Name+": "+attachment.Description)
 	}
 
 	return strings.Join(lines, "\n")

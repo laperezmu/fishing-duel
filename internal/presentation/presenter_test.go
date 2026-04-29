@@ -5,7 +5,8 @@ import (
 	"pesca/internal/domain"
 	"pesca/internal/encounter"
 	"pesca/internal/match"
-	"pesca/internal/player/playerrig"
+	"pesca/internal/player/loadout"
+	"pesca/internal/player/rod"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -89,7 +90,7 @@ func TestPresenterStatus(t *testing.T) {
 			Distance: 3,
 			Depth:    2,
 		},
-		PlayerRig: playerrig.State{MaxDistance: 5, MaxDepth: 4},
+		PlayerLoadout: mustLoadout(t, rod.State{OpeningMaxDistance: 4, OpeningMaxDepth: 3, TrackMaxDistance: 5, TrackMaxDepth: 4}),
 		Stats: match.Stats{
 			PlayerWins: 2,
 			FishWins:   1,
@@ -192,6 +193,15 @@ func newCustomCatalog() Catalog {
 			encounter.EndReasonSplashEscape: "escape por chapoteo",
 		},
 	}
+}
+
+func mustLoadout(t *testing.T, playerRod rod.State) loadout.State {
+	t.Helper()
+
+	playerLoadout, err := loadout.NewState(playerRod, nil)
+	require.NoError(t, err)
+
+	return playerLoadout
 }
 
 func newCapturedEncounterState(t *testing.T) encounter.State {

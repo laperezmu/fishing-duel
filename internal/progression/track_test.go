@@ -5,7 +5,8 @@ import (
 	"pesca/internal/domain"
 	"pesca/internal/encounter"
 	"pesca/internal/match"
-	"pesca/internal/player/playerrig"
+	"pesca/internal/player/loadout"
+	"pesca/internal/player/rod"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -210,11 +211,13 @@ func newMatchState(t *testing.T) match.State {
 
 	encounterState, err := encounter.NewState(encounter.DefaultConfig())
 	require.NoError(t, err)
-	playerRigState, err := playerrig.NewState(playerrig.DefaultConfig())
+	playerRodState, err := rod.NewState(rod.DefaultConfig())
+	require.NoError(t, err)
+	playerLoadout, err := loadout.NewState(playerRodState, nil)
 	require.NoError(t, err)
 
 	return match.State{
-		Encounter: encounterState,
-		PlayerRig: playerRigState,
+		Encounter:     encounterState,
+		PlayerLoadout: playerLoadout,
 	}
 }

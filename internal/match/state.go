@@ -4,7 +4,7 @@ import (
 	"pesca/internal/cards"
 	"pesca/internal/domain"
 	"pesca/internal/encounter"
-	"pesca/internal/player/playerrig"
+	"pesca/internal/player/loadout"
 )
 
 type DeckState struct {
@@ -68,14 +68,14 @@ type RoundState struct {
 }
 
 type State struct {
-	Round       int
-	RoundState  RoundState
-	Deck        DeckState
-	Encounter   encounter.State
-	PlayerRig   playerrig.State
-	PlayerMoves PlayerMoveResources
-	Stats       Stats
-	Finished    bool
+	Round         int
+	RoundState    RoundState
+	Deck          DeckState
+	Encounter     encounter.State
+	PlayerLoadout loadout.State
+	PlayerMoves   PlayerMoveResources
+	Stats         Stats
+	Finished      bool
 }
 
 type ResolvedRound struct {

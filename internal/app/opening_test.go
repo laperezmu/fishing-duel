@@ -5,6 +5,8 @@ import (
 	"pesca/internal/app"
 	"pesca/internal/content/watercontexts"
 	"pesca/internal/encounter"
+	"pesca/internal/player/loadout"
+	"pesca/internal/player/rod"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -14,6 +16,7 @@ import (
 
 func TestResolveEncounterOpening(t *testing.T) {
 	baseConfig := encounter.DefaultConfig()
+	playerLoadout := sampleLoadout(t)
 	preset := watercontexts.DefaultPresets()[0]
 	resolvedContext := preset.BuildContext()
 	castResult := encounter.CastResult{Band: encounter.CastBandShort}
@@ -25,7 +28,7 @@ func TestResolveEncounterOpening(t *testing.T) {
 		return opening.InitialDistance == 1 && opening.InitialDepth == preset.InitialDepth && opening.CastResult.Band == encounter.CastBandShort
 	})).Return(nil).Once()
 
-	opening, err := app.ResolveEncounterOpening("Pesca", baseConfig, []watercontexts.Preset{preset}, ui)
+	opening, err := app.ResolveEncounterOpening("Pesca", baseConfig, playerLoadout, []watercontexts.Preset{preset}, ui)
 
 	require.NoError(t, err)
 	assert.Equal(t, 1, opening.InitialDistance)
@@ -35,18 +38,28 @@ func TestResolveEncounterOpening(t *testing.T) {
 
 func TestResolveEncounterOpeningWrapsErrors(t *testing.T) {
 	t.Run("returns an error when ui is missing", func(t *testing.T) {
-		_, err := app.ResolveEncounterOpening("Pesca", encounter.DefaultConfig(), watercontexts.DefaultPresets(), nil)
+		playerLoadout := sampleLoadout(t)
+
+		_, err := app.ResolveEncounterOpening("Pesca", encounter.DefaultConfig(), playerLoadout, watercontexts.DefaultPresets(), nil)
 
 		require.Error(t, err)
 		assert.EqualError(t, err, "opening ui is required")
 	})
 
+	t.Run("returns an error when player loadout is invalid", func(t *testing.T) {
+		_, err := app.ResolveEncounterOpening("Pesca", encounter.DefaultConfig(), loadout.State{Rod: rod.State{TrackMaxDistance: 0, TrackMaxDepth: 3}}, watercontexts.DefaultPresets(), &mockOpeningUI{})
+
+		require.Error(t, err)
+		assert.EqualError(t, err, "player loadout: rod: track max distance must be greater than 0")
+	})
+
 	t.Run("wraps selection errors", func(t *testing.T) {
 		preset := watercontexts.DefaultPresets()[0]
+		playerLoadout := sampleLoadout(t)
 		ui := &mockOpeningUI{}
 		ui.On("ChooseWaterContext", "Pesca", []watercontexts.Preset{preset}).Return(watercontexts.Preset{}, errors.New("selection failed")).Once()
 
-		_, err := app.ResolveEncounterOpening("Pesca", encounter.DefaultConfig(), []watercontexts.Preset{preset}, ui)
+		_, err := app.ResolveEncounterOpening("Pesca", encounter.DefaultConfig(), playerLoadout, []watercontexts.Preset{preset}, ui)
 
 		require.Error(t, err)
 		assert.EqualError(t, err, "choose water context: selection failed")
@@ -70,4 +83,15 @@ func (ui *mockOpeningUI) ResolveCast(title string, context encounter.WaterContex
 
 func (ui *mockOpeningUI) ShowEncounterOpening(title string, opening encounter.Opening) error {
 	return ui.Called(title, opening).Error(0)
+}
+
+func sampleLoadout(t *testing.T) loadout.State {
+	t.Helper()
+
+	playerRod, err := rod.NewState(rod.DefaultConfig())
+	require.NoError(t, err)
+	playerLoadout, err := loadout.NewState(playerRod, nil)
+	require.NoError(t, err)
+
+	return playerLoadout
 }

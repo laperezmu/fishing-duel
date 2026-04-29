@@ -4,10 +4,14 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"pesca/internal/content/attachmentpresets"
 	"pesca/internal/content/fishprofiles"
 	"pesca/internal/content/playerprofiles"
+	"pesca/internal/content/rodpresets"
 	"pesca/internal/domain"
 	"pesca/internal/encounter"
+	"pesca/internal/player/loadout"
+	"pesca/internal/player/rod"
 	"pesca/internal/presentation"
 	"strconv"
 	"strings"
@@ -121,6 +125,90 @@ func (ui *UI) ChooseFishDeckPreset(title string, presets []fishprofiles.FishDeck
 	}
 }
 
+func (ui *UI) ChooseRodPreset(title string, presets []rodpresets.Preset) (rodpresets.Preset, error) {
+	if len(presets) == 0 {
+		return rodpresets.Preset{}, fmt.Errorf("no hay presets de cana disponibles")
+	}
+
+	message := ""
+	for {
+		if _, err := io.WriteString(ui.out, renderRodSelectionScreen(title, presets, message)); err != nil {
+			return rodpresets.Preset{}, err
+		}
+		if _, err := fmt.Fprint(ui.out, "Elige una cana del jugador: "); err != nil {
+			return rodpresets.Preset{}, err
+		}
+		if !ui.scanner.Scan() {
+			if err := ui.scanner.Err(); err != nil {
+				return rodpresets.Preset{}, err
+			}
+			return rodpresets.Preset{}, fmt.Errorf("entrada finalizada")
+		}
+
+		selectedIndex, err := parsePresetChoice(ui.scanner.Text(), len(presets))
+		if err != nil {
+			message = err.Error()
+			continue
+		}
+
+		selectedPreset := presets[selectedIndex]
+		confirmed, err := ui.confirmRodPreset(title, selectedPreset)
+		if err != nil {
+			return rodpresets.Preset{}, err
+		}
+		if confirmed {
+			if _, err := io.WriteString(ui.out, clearSequence); err != nil {
+				return rodpresets.Preset{}, err
+			}
+			return selectedPreset, nil
+		}
+
+		message = "seleccion cancelada, elige otra cana"
+	}
+}
+
+func (ui *UI) ChooseAttachmentPreset(title string, baseRod rod.State, presets []attachmentpresets.Preset) (attachmentpresets.Preset, error) {
+	if len(presets) == 0 {
+		return attachmentpresets.Preset{}, fmt.Errorf("no hay presets de aditamentos disponibles")
+	}
+
+	message := ""
+	for {
+		if _, err := io.WriteString(ui.out, renderAttachmentSelectionScreen(title, presets, message)); err != nil {
+			return attachmentpresets.Preset{}, err
+		}
+		if _, err := fmt.Fprint(ui.out, "Elige un preset de aditamentos: "); err != nil {
+			return attachmentpresets.Preset{}, err
+		}
+		if !ui.scanner.Scan() {
+			if err := ui.scanner.Err(); err != nil {
+				return attachmentpresets.Preset{}, err
+			}
+			return attachmentpresets.Preset{}, fmt.Errorf("entrada finalizada")
+		}
+
+		selectedIndex, err := parsePresetChoice(ui.scanner.Text(), len(presets))
+		if err != nil {
+			message = err.Error()
+			continue
+		}
+
+		selectedPreset := presets[selectedIndex]
+		confirmed, err := ui.confirmAttachmentPreset(title, baseRod, selectedPreset)
+		if err != nil {
+			return attachmentpresets.Preset{}, err
+		}
+		if confirmed {
+			if _, err := io.WriteString(ui.out, clearSequence); err != nil {
+				return attachmentpresets.Preset{}, err
+			}
+			return selectedPreset, nil
+		}
+
+		message = "seleccion cancelada, elige otros aditamentos"
+	}
+}
+
 func (ui *UI) ChooseMove(status presentation.StatusView, options []presentation.MoveOption) (domain.Move, error) {
 	message := ""
 	for {
@@ -193,6 +281,60 @@ func (ui *UI) confirmFishDeckPreset(title string, preset fishprofiles.FishDeckPr
 			return false, err
 		}
 		if _, err := fmt.Fprint(ui.out, "Confirmar preset del pez? [s/n]: "); err != nil {
+			return false, err
+		}
+		if !ui.scanner.Scan() {
+			if err := ui.scanner.Err(); err != nil {
+				return false, err
+			}
+			return false, fmt.Errorf("entrada finalizada")
+		}
+
+		confirmed, err := parseConfirmation(ui.scanner.Text())
+		if err == nil {
+			return confirmed, nil
+		}
+
+		message = err.Error()
+	}
+}
+
+func (ui *UI) confirmRodPreset(title string, preset rodpresets.Preset) (bool, error) {
+	message := ""
+	for {
+		if _, err := io.WriteString(ui.out, renderRodConfirmationScreen(title, preset, message)); err != nil {
+			return false, err
+		}
+		if _, err := fmt.Fprint(ui.out, "Confirmar cana? [s/n]: "); err != nil {
+			return false, err
+		}
+		if !ui.scanner.Scan() {
+			if err := ui.scanner.Err(); err != nil {
+				return false, err
+			}
+			return false, fmt.Errorf("entrada finalizada")
+		}
+
+		confirmed, err := parseConfirmation(ui.scanner.Text())
+		if err == nil {
+			return confirmed, nil
+		}
+
+		message = err.Error()
+	}
+}
+
+func (ui *UI) confirmAttachmentPreset(title string, baseRod rod.State, preset attachmentpresets.Preset) (bool, error) {
+	message := ""
+	for {
+		previewLoadout, err := loadout.NewState(baseRod, preset.BuildAttachments())
+		if err != nil {
+			return false, err
+		}
+		if _, err := io.WriteString(ui.out, renderAttachmentConfirmationScreen(title, preset, previewLoadout, message)); err != nil {
+			return false, err
+		}
+		if _, err := fmt.Fprint(ui.out, "Confirmar aditamentos? [s/n]: "); err != nil {
 			return false, err
 		}
 		if !ui.scanner.Scan() {
