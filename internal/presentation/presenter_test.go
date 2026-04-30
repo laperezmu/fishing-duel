@@ -101,7 +101,7 @@ func TestPresenterStatus(t *testing.T) {
 		Lifecycle: match.LifecycleState{Stats: match.Stats{PlayerWins: 2, FishWins: 1, Draws: 3}},
 	}
 
-	status := presenter.Status(state)
+	status := presenter.Status(match.NewStatusSnapshot(state))
 
 	assert.Equal(t, 3, status.RoundNumber)
 	assert.Equal(t, 3, status.FishDistance)
@@ -136,12 +136,12 @@ func TestPresenterRound(t *testing.T) {
 	presenter := NewPresenter(newCustomCatalog())
 	encounterState := newCapturedEncounterState(t)
 	encounterState.LastEvent = encounter.Event{Kind: encounter.EventKindSplash, Escaped: false}
-	round := presenter.Round(match.RoundResult{
+	round := presenter.Round(match.NewRoundSnapshot(match.RoundResult{
 		PlayerMove: domain.Blue,
 		FishMove:   domain.Red,
 		Outcome:    domain.PlayerWin,
 		State:      match.State{Encounter: encounterState},
-	})
+	}))
 
 	assert.Equal(t, "Lanzar", round.PlayerLabel)
 	assert.Equal(t, "Afianzar", round.FishLabel)
@@ -152,7 +152,7 @@ func TestPresenterRound(t *testing.T) {
 
 func TestPresenterSummary(t *testing.T) {
 	presenter := NewPresenter(newCustomCatalog())
-	summary := presenter.Summary(match.State{Encounter: newCapturedEncounterState(t)})
+	summary := presenter.Summary(match.NewSummarySnapshot(match.State{Encounter: newCapturedEncounterState(t)}))
 
 	assert.Equal(t, encounter.StatusCaptured, summary.EncounterStatus)
 	assert.Equal(t, 1, summary.FishDepth)

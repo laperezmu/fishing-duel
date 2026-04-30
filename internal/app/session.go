@@ -16,9 +16,9 @@ type UI interface {
 
 type Presenter interface {
 	Intro() presentation.IntroView
-	Status(match.State) presentation.StatusView
-	Round(match.RoundResult) presentation.RoundView
-	Summary(match.State) presentation.SummaryView
+	Status(match.StatusSnapshot) presentation.StatusView
+	Round(match.RoundSnapshot) presentation.RoundView
+	Summary(match.SummarySnapshot) presentation.SummaryView
 }
 
 type Engine interface {
@@ -59,7 +59,7 @@ func (s *Session) Run() error {
 	}
 
 	for !s.engine.State().Lifecycle.Finished {
-		status := s.presenter.Status(s.engine.State())
+		status := s.presenter.Status(match.NewStatusSnapshot(s.engine.State()))
 		move, err := s.ui.ChooseMove(status, status.MoveOptions)
 		if err != nil {
 			return fmt.Errorf("choose move: %w", err)
@@ -70,12 +70,12 @@ func (s *Session) Run() error {
 			return fmt.Errorf("play round: %w", err)
 		}
 
-		if err := s.ui.ShowRound(s.presenter.Round(result)); err != nil {
+		if err := s.ui.ShowRound(s.presenter.Round(match.NewRoundSnapshot(result))); err != nil {
 			return fmt.Errorf("show round: %w", err)
 		}
 	}
 
-	if err := s.ui.ShowGameOver(s.presenter.Summary(s.engine.State())); err != nil {
+	if err := s.ui.ShowGameOver(s.presenter.Summary(match.NewSummarySnapshot(s.engine.State()))); err != nil {
 		return fmt.Errorf("show game over: %w", err)
 	}
 

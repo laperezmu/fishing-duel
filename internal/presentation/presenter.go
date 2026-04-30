@@ -77,51 +77,51 @@ func (p Presenter) Intro() IntroView {
 	}
 }
 
-func (p Presenter) Status(state match.State) StatusView {
+func (p Presenter) Status(snapshot match.StatusSnapshot) StatusView {
 	return StatusView{
-		RoundNumber:               state.Round.Number + 1,
-		FishDistance:              state.Encounter.Distance,
-		FishDepth:                 state.Encounter.Depth,
-		SurfaceDepth:              state.Encounter.Config.SurfaceDepth,
-		MaxDistance:               state.Player.Loadout.TrackMaxDistance(),
-		MaxDepth:                  state.Player.Loadout.TrackMaxDepth(),
-		CaptureDistance:           state.Encounter.Config.CaptureDistance,
-		ExhaustionCaptureDistance: state.Encounter.Config.ExhaustionCaptureDistance,
-		ActiveCards:               state.Deck.ActiveCards,
-		DiscardCards:              state.Deck.DiscardCards,
-		RecycleCount:              state.Deck.RecycleCount,
-		PlayerWins:                state.Lifecycle.Stats.PlayerWins,
-		FishWins:                  state.Lifecycle.Stats.FishWins,
-		Draws:                     state.Lifecycle.Stats.Draws,
-		FishDiscard:               p.fishDiscardView(state),
-		MoveOptions:               p.moveOptionsForState(state),
+		RoundNumber:               snapshot.RoundNumber,
+		FishDistance:              snapshot.Track.Distance,
+		FishDepth:                 snapshot.Track.Depth,
+		SurfaceDepth:              snapshot.Track.SurfaceDepth,
+		MaxDistance:               snapshot.Track.MaxDistance,
+		MaxDepth:                  snapshot.Track.MaxDepth,
+		CaptureDistance:           snapshot.Track.CaptureDistance,
+		ExhaustionCaptureDistance: snapshot.Track.ExhaustionCaptureDistance,
+		ActiveCards:               snapshot.FishDiscard.ActiveCards,
+		DiscardCards:              snapshot.FishDiscard.DiscardCards,
+		RecycleCount:              snapshot.FishDiscard.RecycleCount,
+		PlayerWins:                snapshot.Stats.PlayerWins,
+		FishWins:                  snapshot.Stats.FishWins,
+		Draws:                     snapshot.Stats.Draws,
+		FishDiscard:               p.fishDiscardView(snapshot.FishDiscard),
+		MoveOptions:               p.moveOptionsForSnapshot(snapshot.Player),
 	}
 }
 
-func (p Presenter) Round(result match.RoundResult) RoundView {
+func (p Presenter) Round(snapshot match.RoundSnapshot) RoundView {
 	return RoundView{
-		Status:       p.Status(result.State),
-		PlayerMove:   result.PlayerMove,
-		FishMove:     result.FishMove,
-		PlayerLabel:  p.playerMoveLabel(result.PlayerMove),
-		FishLabel:    p.fishMoveLabel(result.FishMove),
-		Outcome:      result.Outcome,
-		OutcomeLabel: p.roundOutcomeLabel(result.Outcome),
-		EventLabel:   p.eventLabel(result.State.Encounter.LastEvent),
+		Status:       p.Status(snapshot.Status),
+		PlayerMove:   snapshot.PlayerMove,
+		FishMove:     snapshot.FishMove,
+		PlayerLabel:  p.playerMoveLabel(snapshot.PlayerMove),
+		FishLabel:    p.fishMoveLabel(snapshot.FishMove),
+		Outcome:      snapshot.Outcome,
+		OutcomeLabel: p.roundOutcomeLabel(snapshot.Outcome),
+		EventLabel:   p.eventLabel(snapshot.Encounter.LastEvent),
 	}
 }
 
-func (p Presenter) Summary(state match.State) SummaryView {
+func (p Presenter) Summary(snapshot match.SummarySnapshot) SummaryView {
 	return SummaryView{
-		TotalRounds:     state.Round.Number,
-		FishDistance:    state.Encounter.Distance,
-		FishDepth:       state.Encounter.Depth,
-		EncounterStatus: state.Encounter.Status,
-		OutcomeLabel:    p.encounterOutcomeLabel(state.Encounter.Status),
-		EndReasonLabel:  p.endReasonLabel(state.Encounter.EndReason),
-		PlayerWins:      state.Lifecycle.Stats.PlayerWins,
-		FishWins:        state.Lifecycle.Stats.FishWins,
-		Draws:           state.Lifecycle.Stats.Draws,
+		TotalRounds:     snapshot.TotalRounds,
+		FishDistance:    snapshot.Encounter.Distance,
+		FishDepth:       snapshot.Encounter.Depth,
+		EncounterStatus: snapshot.Encounter.Status,
+		OutcomeLabel:    p.encounterOutcomeLabel(snapshot.Encounter.Status),
+		EndReasonLabel:  p.endReasonLabel(snapshot.Encounter.EndReason),
+		PlayerWins:      snapshot.Stats.PlayerWins,
+		FishWins:        snapshot.Stats.FishWins,
+		Draws:           snapshot.Stats.Draws,
 	}
 }
 
@@ -155,10 +155,10 @@ func (p Presenter) moveOptions() []MoveOption {
 	}
 }
 
-func (p Presenter) moveOptionsForState(state match.State) []MoveOption {
+func (p Presenter) moveOptionsForSnapshot(player match.PlayerOptionsSnapshot) []MoveOption {
 	moveOptions := p.moveOptions()
 	for optionIndex := range moveOptions {
-		for _, moveState := range state.Player.Moves.Moves {
+		for _, moveState := range player.Moves {
 			if moveState.Move != moveOptions[optionIndex].Move {
 				continue
 			}
@@ -210,12 +210,12 @@ func (p Presenter) endReasonLabel(reason encounter.EndReason) string {
 	return string(reason)
 }
 
-func (p Presenter) playerCardHint(moveState match.PlayerMoveState) string {
-	if len(moveState.ActiveCards) == 0 {
+func (p Presenter) playerCardHint(moveState match.MoveResourceSnapshot) string {
+	if !moveState.HasTopCard {
 		return ""
 	}
 
-	topCard := moveState.ActiveCards[0]
+	topCard := moveState.TopCard
 	if topCard.Name != "" {
 		return topCard.Name
 	}
@@ -251,16 +251,16 @@ func (p Presenter) playerCardHint(moveState match.PlayerMoveState) string {
 	return strings.Join(parts, " | ")
 }
 
-func (p Presenter) fishDiscardView(state match.State) FishDiscardView {
-	currentCycleEntries := make([]FishDiscardEntryView, 0, len(state.Deck.CurrentCycle.Entries))
-	for _, entry := range state.Deck.CurrentCycle.Entries {
+func (p Presenter) fishDiscardView(discard match.FishDiscardSnapshot) FishDiscardView {
+	currentCycleEntries := make([]FishDiscardEntryView, 0, len(discard.CurrentCycle.Entries))
+	for _, entry := range discard.CurrentCycle.Entries {
 		currentCycleEntries = append(currentCycleEntries, FishDiscardEntryView{
 			Label: p.fishDiscardEntryLabel(entry),
 		})
 	}
 
-	previousCycles := make([]FishDiscardCycleSummaryView, 0, len(state.Deck.PreviousCycleStats))
-	for _, previousCycle := range state.Deck.PreviousCycleStats {
+	previousCycles := make([]FishDiscardCycleSummaryView, 0, len(discard.PreviousCycleStats))
+	for _, previousCycle := range discard.PreviousCycleStats {
 		previousCycles = append(previousCycles, FishDiscardCycleSummaryView{
 			CycleNumber:  previousCycle.Number,
 			TotalCards:   previousCycle.TotalCards,
@@ -270,13 +270,13 @@ func (p Presenter) fishDiscardView(state match.State) FishDiscardView {
 	}
 
 	return FishDiscardView{
-		CurrentCycleNumber:     state.Deck.CurrentCycle.Number,
-		CurrentCycleTotalCards: state.Deck.CurrentCycle.TotalCards,
+		CurrentCycleNumber:     discard.CurrentCycle.Number,
+		CurrentCycleTotalCards: discard.CurrentCycle.TotalCards,
 		CurrentCycleEntries:    currentCycleEntries,
 		PreviousCycles:         previousCycles,
-		ShufflesOnRecycle:      state.Deck.ShufflesOnRecycle,
-		CardsToRemove:          state.Deck.CardsToRemove,
-		RecycleCount:           state.Deck.RecycleCount,
+		ShufflesOnRecycle:      discard.ShufflesOnRecycle,
+		CardsToRemove:          discard.CardsToRemove,
+		RecycleCount:           discard.RecycleCount,
 	}
 }
 

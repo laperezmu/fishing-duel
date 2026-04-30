@@ -13,8 +13,8 @@ type TrackPolicy struct {
 
 func (policy TrackPolicy) Apply(state *match.State, round match.ResolvedRound) {
 	delta := encounter.Delta{}
-	captureDistance := state.Encounter.Config.CaptureDistance + state.Round.Thresholds.CaptureDistanceBonus
-	surfaceDepth := state.Encounter.Config.SurfaceDepth + state.Round.Thresholds.SurfaceDepthBonus
+	captureDistance := encounter.EffectiveCaptureDistance(state.Encounter.Config, state.Round.Thresholds)
+	surfaceDepth := encounter.EffectiveSurfaceDepth(state.Encounter.Config, state.Round.Thresholds)
 
 	switch round.Outcome {
 	case domain.PlayerWin:
