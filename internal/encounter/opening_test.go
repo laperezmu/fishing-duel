@@ -1,6 +1,7 @@
 package encounter
 
 import (
+	"pesca/internal/content/waterpools"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -15,7 +16,7 @@ func TestResolveOpening(t *testing.T) {
 		Name:             "Ensenada cercana",
 		Description:      "Actividad cerca de la orilla.",
 		VisibleSignals:   []string{"Espuma corta."},
-		PoolTag:          "shoreline",
+		PoolTag:          waterpools.Shoreline,
 		BaseInitialDepth: 1,
 		BandInitialDistance: map[CastBand]int{
 			CastBandVeryShort: 3,
@@ -44,7 +45,7 @@ func TestResolveOpeningAllowsCloseCastBands(t *testing.T) {
 		Name:             "Bolsillo cercano",
 		Description:      "Actividad pegada a la orilla.",
 		VisibleSignals:   []string{"Ondas cortas junto a la costa."},
-		PoolTag:          "pocket",
+		PoolTag:          waterpools.Shoreline,
 		BaseInitialDepth: 0,
 		BandInitialDistance: map[CastBand]int{
 			CastBandVeryShort: 0,
@@ -70,7 +71,7 @@ func TestResolveOpeningClampsInitialValuesToOpeningLimits(t *testing.T) {
 		Name:             "Canal profundo",
 		Description:      "Actividad lejos y mas abajo.",
 		VisibleSignals:   []string{"Remolinos largos."},
-		PoolTag:          "offshore",
+		PoolTag:          waterpools.Offshore,
 		BaseInitialDepth: 4,
 		BandInitialDistance: map[CastBand]int{
 			CastBandVeryShort: 2,
@@ -95,6 +96,7 @@ func TestWaterContextValidate(t *testing.T) {
 		waterContext := WaterContext{
 			ID:               "broken",
 			Name:             "Incompleto",
+			PoolTag:          waterpools.Shoreline,
 			BaseInitialDepth: 1,
 			BandInitialDistance: map[CastBand]int{
 				CastBandVeryShort: 3,
@@ -111,6 +113,7 @@ func TestWaterContextValidate(t *testing.T) {
 		waterContext := WaterContext{
 			ID:               "closest-cells",
 			Name:             "Celdas cercanas",
+			PoolTag:          waterpools.Shoreline,
 			BaseInitialDepth: 0,
 			BandInitialDistance: map[CastBand]int{
 				CastBandVeryShort: 0,

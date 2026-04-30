@@ -11,10 +11,10 @@ Este documento concentra el backlog activo del proyecto, con estado visible para
 
 ## Foto actual
 
-- `done`: `BL-005`, `BL-006`, `BL-018`, `BL-019`, `BL-020`
-- `planned`: `BL-021`
+- `done`: `BL-005`, `BL-006`, `BL-018`, `BL-019`, `BL-020`, `BL-021`
+- `planned`: `BL-022`
 - `pending`: resto del roadmap
-- Foco recomendado inmediato: cerrar la fundacion de la expedicion con `BL-001`, `BL-011` y `BL-002`; despues retomar la capa tactica con `BL-021` y `BL-022`.
+- Foco recomendado inmediato: cerrar la fundacion de la expedicion con `BL-001`, `BL-011` y `BL-002`; si seguimos en la capa tactica, el siguiente bloque natural es `BL-022`.
 
 ## Foco sugerido actual
 
@@ -126,11 +126,12 @@ Este documento concentra el backlog activo del proyecto, con estado visible para
 - **Prioridad**: Media
 
 ### BL-022 Definir aparicion de peces por aguas base y ventana de lanzamiento
-- **Estado**: `pending`
+- **Estado**: `planned`
 - **Tipo**: Discovery
 - **Objetivo**: decidir como la combinacion entre aguas base del nodo, franja horizontal del cast y sesgo vertical del setup del jugador selecciona subconjuntos de peces y define la aparicion de encuentros compatibles con esa ventana de lanzamiento.
 - **Resultado esperado**: modelo de pool base por nodo o zona, reglas de particion en subconjuntos por distancia y profundidad, metadata minima de aparicion en perfiles de pez y criterio para conectar cast, `rod`, aditamentos y habitats sin abrir todavia la capa de economia fotografica.
 - **Dependencias**: `BL-003`, `BL-007`, `BL-020`, `BL-021`
+- **Plan relacionado**: `docs/features/018-aparicion-de-peces-por-aguas-y-ventana-de-lanzamiento.md`
 - **Direccion actual acordada**:
   - Cada nodo de pesca parte de unas aguas base y luego se secciona en subconjuntos de pool segun la ventana horizontal del cast y la ventana vertical habilitada por la `rod` y sus aditamentos.
   - La aparicion de peces debe resolverse a partir de la apertura ya cerrada del encounter (`InitialDistance`, `InitialDepth`) y no directamente desde los limites de escape del tablero.
@@ -150,12 +151,17 @@ Este documento concentra el backlog activo del proyecto, con estado visible para
 - **Prioridad**: Alta
 
 ### BL-021 Redefinir la cana como `rod` y sus aditamentos como base del setup del jugador
-- **Estado**: `planned`
+- **Estado**: `done`
 - **Tipo**: Discovery
 - **Objetivo**: reemplazar el vocabulario ambiguo de `rig` por un modelo explicito de `rod` para la cana base, separando sus limites estructurales de track frente a sus limites de apertura, y distinguiendo esa pieza base de los aditamentos que modifican la apertura vertical del encounter y el acceso a distintos habitats de pez.
 - **Resultado esperado**: modelo de `rod` con limites estructurales separados para apertura y track, taxonomia inicial de aditamentos, nomenclatura clara para distinguir `rod` frente a setup completo del jugador, y reglas de tradeoff para que el equipo no se lea como una pila de mejoras universales.
 - **Dependencias**: `BL-008`, `BL-020`
 - **Plan relacionado**: `docs/features/017-rod-y-limites-de-apertura-y-track.md`
+- **Notas de cierre**:
+  - El vocabulario de `rig` ya fue sustituido por `rod` y el estado runtime usa `loadout` como composicion de `rod` y aditamentos.
+  - La apertura del encounter ya valida `InitialDistance` e `InitialDepth` contra limites efectivos de apertura, mientras el tablero y los escapes usan limites de track.
+  - El CLI ya permite elegir presets de `rod` y presets de aditamentos antes de abrir el encounter.
+  - Los aditamentos ya modifican limites de apertura y track, y transportan `HabitatTags` listos para alimentar `BL-022`.
 - **Direccion actual acordada**:
   - `rig` debe desaparecer como termino de dominio y pasar a `rod` cuando se hable de la cana base del jugador.
   - `rod` debe referirse a la pieza base de equipo; el conjunto `rod + aditamentos` debe nombrarse como setup o loadout para no volver a mezclar capas.
@@ -245,6 +251,48 @@ Este documento concentra el backlog activo del proyecto, con estado visible para
 - **Dependencias**: `BL-001`, `BL-008`, `BL-011`
 - **Prioridad**: Media
 
+### BL-023 Desacoplar flujos de interfaz y preparar arquitectura UI-agnostic
+- **Estado**: `pending`
+- **Tipo**: Discovery + Delivery
+- **Objetivo**: refactorizar los flujos de setup, opening, presentacion y sesion para que la aplicacion deje de depender estructuralmente del CLI como unica forma de presentar e interactuar con el juego, dejando a `internal/cli/` como un adaptador de borde y preparando una futura UI grafica para consumir los mismos casos de uso.
+- **Resultado esperado**: arquitectura donde el combate, el setup previo al encounter y la apertura del lance se expresen como casos de uso UI-agnostic; presenter y view models mas semanticos para setup/opening/combate; controlador reusable del cast fuera del CLI; y `cmd/` reducido a composicion de dependencias, de modo que una GUI futura no tenga que duplicar wiring ni parsear strings finales para reconstruir la experiencia.
+- **Dependencias**: `BL-018`, `BL-020`, `BL-021`
+- **Contexto actual detectado**:
+  - El loop de combate ya tiene una separacion sana entre motor, `app`, `presentation` y `cli`, especialmente en `internal/app/session.go`, donde la sesion consume interfaces de `Engine`, `UI` y `Presenter`.
+  - El mayor acoplamiento actual vive en el setup previo a la partida y en la apertura del encounter: `cmd/fishing-duel/main.go` orquesta seleccion de deck, `rod`, aditamentos, pez y opening contra la UI concreta.
+  - La logica del cast por timing esta incrustada en el adaptador CLI (`internal/cli/opening.go`), usando `scanner`, `time.Sleep` y redibujos de pantalla completos; eso no traslada bien a una UI grafica basada en eventos o ticks.
+  - Parte de la presentacion del opening y de los presets aun se renderiza directamente desde tipos de dominio o contenido (`encounter.Opening`, presets de `rod`, aditamentos y agua) en vez de pasar por view models estables.
+  - Los view models actuales de `presentation` ayudan para el combate, pero todavia cargan bastante texto final o labels compactados, lo que obligaria a una GUI a reutilizar strings ya formateados en vez de consumir datos estructurados.
+  - El adaptador CLI mantiene estado visual propio (`intro`, `lastRound`, `opening`) y asume un flujo de repintado full-screen, senal de que parte de la UX aun vive dentro del borde de terminal.
+- **Direccion actual acordada**:
+  - El objetivo no es implementar una GUI todavia, sino dejar la arquitectura lista para que `CLI` y futura `GUI` cuelguen de los mismos flujos de aplicacion.
+  - `cmd/` debe quedar como composition root y no como lugar donde vive la orquestacion de setup, seleccion de presets o minijuegos previos al combate.
+  - El flujo previo a la sesion debe subir a `internal/app/` o a un subpaquete estable de casos de uso, para que elegir deck, `rod`, aditamentos, pez, contexto de agua y opening no dependa del adaptador concreto.
+  - La logica temporal del cast debe extraerse a un controlador o estado reusable fuera de `internal/cli/`, de modo que cada interfaz solo decida como dibujarlo y capturar input.
+  - `internal/presentation/` debe ampliarse para cubrir setup y opening, y a la vez volverse menos text-first en puntos clave: la GUI futura debe poder consumir datos semanticos y no solo labels finales.
+  - El adaptador CLI debe tender a renderizar exclusivamente views o modelos de pantalla, evitando conocer de primera mano demasiado contenido configurable o runtime del dominio.
+  - La migracion debe preservar la CLI actual como primer adaptador y mantener el juego jugable durante todo el refactor.
+- **Propuesta de refactor por fases**:
+  - `Fase 1`: extraer el flujo de setup desde `cmd/fishing-duel/` a una capa de aplicacion (`internal/app/setup/` o equivalente) con interfaces UI-neutrales para elecciones y confirmaciones.
+  - `Fase 2`: mover la apertura del encounter a un flujo de aplicacion mas completo, donde la seleccion de agua, preview de loadout y resumen de apertura no dependan del renderer CLI.
+  - `Fase 3`: sacar el cast timing de `internal/cli/opening.go` a un controlador reusable, con estado/ticks/resultado legibles por cualquier frontend.
+  - `Fase 4`: ampliar `internal/presentation/` con view models de setup, opening, loadout y cast, reduciendo el paso directo de presets o structs de dominio al render.
+  - `Fase 5`: adelgazar `internal/cli/` para que quede como adaptador de input/output de terminal, no como lugar donde vive la UX global de la app.
+  - `Fase 6`: dejar preparado un segundo entrypoint futuro (`cmd/...`) para GUI sin duplicar el wiring de juego.
+- **Criterios de cierre**:
+  - el bootstrap ya no depende de metodos tipados contra `*cli.UI`
+  - existe un flujo de setup/opening reusable desde `app` y consumible por mas de un adaptador
+  - la logica del cast ya no vive en el paquete CLI
+  - setup y opening tienen view models propios en `presentation`
+  - la CLI sigue funcionando como adaptador despues del refactor
+  - queda listo el camino para crear una GUI sin reescribir combate, setup ni opening
+- **Riesgos o decisiones abiertas**:
+  - si se intenta resolver a la vez la arquitectura UI-agnostic y una GUI completa, el scope puede crecer demasiado.
+  - habra que decidir cuanto de `presentation` sigue siendo textual y cuanto pasa a ser estructurado sin romper la legibilidad actual de la CLI.
+  - el cast puede necesitar un pequeño modelo de estado orientado a ticks o eventos antes de encajar bien en una GUI.
+  - algunos flujos de seleccion hoy basados en presets concretos pueden necesitar un contrato mas abstracto para no arrastrar contenido directo hasta el borde.
+- **Prioridad**: Media
+
 ## Completados
 
 ### BL-019 Hacer visible el descarte del pez y modular la lectura del historial
@@ -302,13 +350,13 @@ Este documento concentra el backlog activo del proyecto, con estado visible para
 2. `BL-011`
 3. `BL-002`
 4. `BL-008`
-5. `BL-021`
-6. `BL-003`
-7. `BL-022`
-8. `BL-012`
-9. `BL-007`
-10. `BL-009`
-11. `BL-017`
+5. `BL-003`
+6. `BL-022`
+7. `BL-012`
+8. `BL-007`
+9. `BL-009`
+10. `BL-017`
+11. `BL-023`
 12. `BL-013`
 13. `BL-015`
 14. `BL-016`

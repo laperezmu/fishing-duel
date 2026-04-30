@@ -2,6 +2,7 @@ package loadout
 
 import (
 	"fmt"
+	"pesca/internal/content/habitats"
 	"pesca/internal/encounter"
 	"pesca/internal/player/rod"
 )
@@ -14,7 +15,7 @@ type Attachment struct {
 	OpeningDepthModifier    int
 	TrackDistanceModifier   int
 	TrackDepthModifier      int
-	HabitatTags             []string
+	HabitatTags             []habitats.Tag
 }
 
 type State struct {
@@ -26,7 +27,7 @@ func NewState(playerRod rod.State, attachments []Attachment) (State, error) {
 	clonedAttachments := make([]Attachment, 0, len(attachments))
 	for _, attachment := range attachments {
 		clonedAttachment := attachment
-		clonedAttachment.HabitatTags = append([]string(nil), attachment.HabitatTags...)
+		clonedAttachment.HabitatTags = append([]habitats.Tag(nil), attachment.HabitatTags...)
 		clonedAttachments = append(clonedAttachments, clonedAttachment)
 	}
 
@@ -59,8 +60,8 @@ func (state State) Validate() error {
 		}
 		seenAttachmentIDs[attachment.ID] = struct{}{}
 		for _, habitatTag := range attachment.HabitatTags {
-			if habitatTag == "" {
-				return fmt.Errorf("attachment habitat tags must not be empty")
+			if err := habitatTag.Validate(); err != nil {
+				return err
 			}
 		}
 	}
@@ -120,9 +121,9 @@ func (state State) TrackMaxDepth() int {
 	return effectiveRod.TrackMaxDepth
 }
 
-func (state State) HabitatTags() []string {
-	tags := make([]string, 0, len(state.Attachments))
-	seenTags := make(map[string]struct{}, len(state.Attachments))
+func (state State) HabitatTags() []habitats.Tag {
+	tags := make([]habitats.Tag, 0, len(state.Attachments))
+	seenTags := make(map[habitats.Tag]struct{}, len(state.Attachments))
 	for _, attachment := range state.Attachments {
 		for _, habitatTag := range attachment.HabitatTags {
 			if _, exists := seenTags[habitatTag]; exists {

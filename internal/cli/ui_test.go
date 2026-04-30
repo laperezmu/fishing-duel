@@ -4,8 +4,10 @@ import (
 	"bytes"
 	"pesca/internal/cards"
 	"pesca/internal/content/fishprofiles"
+	"pesca/internal/content/habitats"
 	"pesca/internal/content/playerprofiles"
 	"pesca/internal/content/watercontexts"
+	"pesca/internal/content/waterpools"
 	"pesca/internal/domain"
 	"pesca/internal/encounter"
 	"pesca/internal/match"
@@ -193,6 +195,11 @@ func TestResolveCastUsesOscillatingBarAndStoresOpeningSummary(t *testing.T) {
 	opening, err := encounter.ResolveOpening(encounter.DefaultConfig(), waterContext, castResult, encounter.OpeningLimits{MaxInitialDistance: 5, MaxInitialDepth: 3})
 	require.NoError(t, err)
 	require.NoError(t, ui.ShowEncounterOpening("Pesca: duelo contra el pez", opening))
+	require.NoError(t, ui.ShowFishSpawn("Pesca: duelo contra el pez", fishprofiles.Spawn{
+		Profile:        fishprofiles.DefaultProfiles()[0],
+		Context:        fishprofiles.SpawnContext{WaterPoolTag: waterpools.Shoreline, InitialDistance: 0, InitialDepth: 1, HabitatTags: []habitats.Tag{habitats.Surface}},
+		CandidateCount: 1,
+	}))
 
 	presenter := presentation.NewPresenter(presentation.DefaultCatalog())
 	require.NoError(t, ui.ShowIntro(presenter.Intro()))
@@ -208,6 +215,10 @@ func TestResolveCastUsesOscillatingBarAndStoresOpeningSummary(t *testing.T) {
 	assert.Contains(t, printed, "Agua       : Ensenada cercana")
 	assert.Contains(t, printed, "Lance      : muy corto")
 	assert.Contains(t, printed, "Inicio     : distancia 0 | profundidad 1")
+	assert.Contains(t, printed, "Pez en el agua")
+	assert.Contains(t, printed, "Perfil     : Clasico")
+	assert.Contains(t, printed, "Agua base  : Costa cercana")
+	assert.Contains(t, printed, "Habitats   : Superficie")
 }
 
 func TestPresetSelectionScreensHideCardDetailsFromTheList(t *testing.T) {
@@ -222,6 +233,8 @@ func TestPresetSelectionScreensHideCardDetailsFromTheList(t *testing.T) {
 
 	assert.Contains(t, playerConfirmation, "Azul - Anzuelo tenso")
 	assert.Contains(t, fishConfirmation, "Rojo - Tiron de apertura")
+	assert.Contains(t, fishConfirmation, "Arquetipo   : Tempo de apertura")
+	assert.NotContains(t, fishConfirmation, string(sampleFishDeckPresets()[1].ArchetypeID))
 }
 
 func samplePromptState(t *testing.T) match.State {

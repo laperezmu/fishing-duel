@@ -1,20 +1,11 @@
 package fishprofiles
 
 import (
+	"fmt"
 	"pesca/internal/cards"
+	"pesca/internal/content/habitats"
+	"pesca/internal/content/waterpools"
 	"pesca/internal/domain"
-)
-
-type ArchetypeID string
-
-const (
-	ArchetypeBaselineCycle      ArchetypeID = "baseline_cycle"
-	ArchetypeHorizontalPressure ArchetypeID = "horizontal_pressure"
-	ArchetypeVerticalEscape     ArchetypeID = "vertical_escape"
-	ArchetypeSurfaceControl     ArchetypeID = "surface_control"
-	ArchetypeDrawTempo          ArchetypeID = "draw_tempo"
-	ArchetypeDeckExhaustion     ArchetypeID = "deck_exhaustion"
-	ArchetypeHybridPressure     ArchetypeID = "hybrid_pressure"
 )
 
 type CardPattern struct {
@@ -46,9 +37,40 @@ type Profile struct {
 	Name          string
 	Description   string
 	Details       []string
+	Appearance    Appearance
 	Cards         []CardPattern
 	CardsToRemove int
 	Shuffle       bool
+}
+
+func (profile Profile) Validate() error {
+	if profile.ID == "" {
+		return fmt.Errorf("profile id is required")
+	}
+	if profile.Name == "" {
+		return fmt.Errorf("profile name is required")
+	}
+	if err := profile.ArchetypeID.Validate(); err != nil {
+		return err
+	}
+	if err := profile.Appearance.Validate(); err != nil {
+		return fmt.Errorf("appearance: %w", err)
+	}
+
+	return nil
+}
+
+func (profile Profile) BuildPreset() FishDeckPreset {
+	return FishDeckPreset{
+		ID:            profile.ID,
+		ArchetypeID:   profile.ArchetypeID,
+		Name:          profile.Name,
+		Description:   profile.Description,
+		Details:       append([]string(nil), profile.Details...),
+		FishCards:     profile.BuildCards(),
+		CardsToRemove: profile.CardsToRemove,
+		Shuffle:       profile.Shuffle,
+	}
 }
 
 func (profile Profile) BuildCards() []cards.FishCard {
@@ -67,6 +89,13 @@ func DefaultProfiles() []Profile {
 			ArchetypeID: ArchetypeBaselineCycle,
 			Name:        "Clasico",
 			Description: "Baraja base de referencia sin efectos, util para comparar cambios de sistema.",
+			Appearance: Appearance{
+				WaterPoolTags:      []waterpools.ID{waterpools.Shoreline, waterpools.MixedCurrent},
+				MinInitialDistance: 0,
+				MaxInitialDistance: 2,
+				MinInitialDepth:    0,
+				MaxInitialDepth:    2,
+			},
 			Details: []string{
 				"Arquetipo: ciclo base sin presion especializada.",
 				"Nueve cartas lisas sin efectos: tres rojas, tres azules y tres amarillas.",
@@ -92,6 +121,13 @@ func DefaultProfiles() []Profile {
 			ArchetypeID: ArchetypeDrawTempo,
 			Name:        "Apertura con anzuelo",
 			Description: "Perfil de tempo que concentra su presion al revelar cartas de apertura.",
+			Appearance: Appearance{
+				WaterPoolTags:      []waterpools.ID{waterpools.Shoreline, waterpools.Offshore},
+				MinInitialDistance: 1,
+				MaxInitialDistance: 5,
+				MinInitialDepth:    0,
+				MaxInitialDepth:    2,
+			},
 			Details: []string{
 				"Arquetipo: draw_tempo.",
 				"Rojo - Tiron de apertura: al revelarse permite capturar desde un paso mas lejos ese round.",
@@ -113,6 +149,14 @@ func DefaultProfiles() []Profile {
 			ArchetypeID: ArchetypeHorizontalPressure,
 			Name:        "Presion horizontal",
 			Description: "Perfil que prioriza empujar el encuentro hacia mar abierto cuando obtiene ventaja.",
+			Appearance: Appearance{
+				WaterPoolTags:       []waterpools.ID{waterpools.Offshore},
+				MinInitialDistance:  3,
+				MaxInitialDistance:  5,
+				MinInitialDepth:     0,
+				MaxInitialDepth:     2,
+				RequiredHabitatTags: []habitats.Tag{habitats.OpenWater},
+			},
 			Details: []string{
 				"Arquetipo: horizontal_pressure.",
 				"Azul - Oleaje abierto: si gana, empuja un paso hacia mar abierto.",
@@ -134,6 +178,14 @@ func DefaultProfiles() []Profile {
 			ArchetypeID: ArchetypeVerticalEscape,
 			Name:        "Presion vertical",
 			Description: "Perfil orientado a hundirse al ganar y a respirar al perder.",
+			Appearance: Appearance{
+				WaterPoolTags:       []waterpools.ID{waterpools.Offshore, waterpools.MixedCurrent},
+				MinInitialDistance:  2,
+				MaxInitialDistance:  5,
+				MinInitialDepth:     2,
+				MaxInitialDepth:     4,
+				RequiredHabitatTags: []habitats.Tag{habitats.Bottom, habitats.Channel},
+			},
 			Details: []string{
 				"Arquetipo: vertical_escape.",
 				"Azul - Tiron al fondo: si gana, el pez baja un nivel mas profundo.",
@@ -155,6 +207,14 @@ func DefaultProfiles() []Profile {
 			ArchetypeID: ArchetypeSurfaceControl,
 			Name:        "Control de superficie",
 			Description: "Perfil que gira en torno a mantener el pez cerca de la capa superficial y forzar eventos legibles.",
+			Appearance: Appearance{
+				WaterPoolTags:       []waterpools.ID{waterpools.Shoreline, waterpools.MixedCurrent},
+				MinInitialDistance:  0,
+				MaxInitialDistance:  3,
+				MinInitialDepth:     0,
+				MaxInitialDepth:     1,
+				RequiredHabitatTags: []habitats.Tag{habitats.Surface},
+			},
 			Details: []string{
 				"Arquetipo: surface_control.",
 				"Azul - Rebote de espuma: si pierde, el pez sube un nivel.",
@@ -177,6 +237,14 @@ func DefaultProfiles() []Profile {
 			ArchetypeID: ArchetypeDeckExhaustion,
 			Name:        "Agotamiento de mazo",
 			Description: "Perfil que concentra su plan en el cierre por agotamiento y en ventanas cortas de cierre.",
+			Appearance: Appearance{
+				WaterPoolTags:       []waterpools.ID{waterpools.Shoreline, waterpools.MixedCurrent},
+				MinInitialDistance:  0,
+				MaxInitialDistance:  2,
+				MinInitialDepth:     0,
+				MaxInitialDepth:     2,
+				RequiredHabitatTags: []habitats.Tag{habitats.Weed, habitats.Rock},
+			},
 			Details: []string{
 				"Arquetipo: deck_exhaustion.",
 				"Rojo - Ultima ventana: al revelarse amplia la captura por agotamiento ese round.",
@@ -198,6 +266,13 @@ func DefaultProfiles() []Profile {
 			ArchetypeID: ArchetypeHybridPressure,
 			Name:        "Corriente mixta",
 			Description: "Perfil mixto que combina ventajas al revelarse con respuestas segun el resultado.",
+			Appearance: Appearance{
+				WaterPoolTags:      []waterpools.ID{waterpools.MixedCurrent},
+				MinInitialDistance: 1,
+				MaxInitialDistance: 4,
+				MinInitialDepth:    1,
+				MaxInitialDepth:    3,
+			},
 			Details: []string{
 				"Arquetipo: hybrid_pressure.",
 				"Rojo - Corriente cerrada: al revelarse amplia la captura y, si pierde, sube un nivel hacia la superficie.",

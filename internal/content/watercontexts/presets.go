@@ -1,13 +1,16 @@
 package watercontexts
 
-import "pesca/internal/encounter"
+import (
+	"pesca/internal/content/waterpools"
+	"pesca/internal/encounter"
+)
 
 type Preset struct {
 	ID           string
 	Name         string
 	Description  string
 	Signals      []string
-	PoolTag      string
+	PoolTag      waterpools.ID
 	Distances    map[encounter.CastBand]int
 	InitialDepth int
 }
@@ -39,7 +42,7 @@ func DefaultPresets() []Preset {
 				"Espuma corta pegada a la costa.",
 				"Destellos y remolinos en la primera mitad del agua.",
 			},
-			PoolTag:      "shoreline",
+			PoolTag:      waterpools.Shoreline,
 			Distances:    consecutiveDistances(0),
 			InitialDepth: 1,
 		},
@@ -51,7 +54,7 @@ func DefaultPresets() []Preset {
 				"La corriente principal tira mar adentro.",
 				"Las ondas vivas aparecen lejos de la orilla.",
 			},
-			PoolTag:      "offshore",
+			PoolTag:      waterpools.Offshore,
 			Distances:    consecutiveDistances(1),
 			InitialDepth: 1,
 		},
@@ -63,7 +66,7 @@ func DefaultPresets() []Preset {
 				"La espuma cruza en diagonales y corta el agua en dos.",
 				"Hay actividad intermitente a media distancia.",
 			},
-			PoolTag:      "mixed-current",
+			PoolTag:      waterpools.MixedCurrent,
 			Distances:    consecutiveDistances(0),
 			InitialDepth: 1,
 		},
