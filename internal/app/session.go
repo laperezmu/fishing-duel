@@ -58,7 +58,7 @@ func (s *Session) Run() error {
 		return fmt.Errorf("show intro: %w", err)
 	}
 
-	for !s.engine.State().Finished {
+	for !s.engine.State().Lifecycle.Finished {
 		status := s.presenter.Status(s.engine.State())
 		move, err := s.ui.ChooseMove(status, status.MoveOptions)
 		if err != nil {

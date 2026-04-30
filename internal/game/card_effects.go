@@ -7,8 +7,8 @@ import (
 
 func applyRoundScopedEffects(state *match.State, effects []cards.CardEffect) {
 	for _, effect := range effects {
-		state.RoundState.Thresholds.CaptureDistanceBonus += effect.CaptureDistanceBonus
-		state.RoundState.Thresholds.ExhaustionCaptureDistanceBonus += effect.ExhaustionCaptureDistanceBonus
-		state.RoundState.Thresholds.SurfaceDepthBonus += effect.SurfaceDepthBonus
+		state.Round.Thresholds.CaptureDistanceBonus += effect.CaptureDistanceBonus
+		state.Round.Thresholds.ExhaustionCaptureDistanceBonus += effect.ExhaustionCaptureDistanceBonus
+		state.Round.Thresholds.SurfaceDepthBonus += effect.SurfaceDepthBonus
 	}
 }

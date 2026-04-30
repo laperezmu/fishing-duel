@@ -79,20 +79,20 @@ func (p Presenter) Intro() IntroView {
 
 func (p Presenter) Status(state match.State) StatusView {
 	return StatusView{
-		RoundNumber:               state.Round + 1,
+		RoundNumber:               state.Round.Number + 1,
 		FishDistance:              state.Encounter.Distance,
 		FishDepth:                 state.Encounter.Depth,
 		SurfaceDepth:              state.Encounter.Config.SurfaceDepth,
-		MaxDistance:               state.PlayerLoadout.TrackMaxDistance(),
-		MaxDepth:                  state.PlayerLoadout.TrackMaxDepth(),
+		MaxDistance:               state.Player.Loadout.TrackMaxDistance(),
+		MaxDepth:                  state.Player.Loadout.TrackMaxDepth(),
 		CaptureDistance:           state.Encounter.Config.CaptureDistance,
 		ExhaustionCaptureDistance: state.Encounter.Config.ExhaustionCaptureDistance,
 		ActiveCards:               state.Deck.ActiveCards,
 		DiscardCards:              state.Deck.DiscardCards,
 		RecycleCount:              state.Deck.RecycleCount,
-		PlayerWins:                state.Stats.PlayerWins,
-		FishWins:                  state.Stats.FishWins,
-		Draws:                     state.Stats.Draws,
+		PlayerWins:                state.Lifecycle.Stats.PlayerWins,
+		FishWins:                  state.Lifecycle.Stats.FishWins,
+		Draws:                     state.Lifecycle.Stats.Draws,
 		FishDiscard:               p.fishDiscardView(state),
 		MoveOptions:               p.moveOptionsForState(state),
 	}
@@ -113,15 +113,15 @@ func (p Presenter) Round(result match.RoundResult) RoundView {
 
 func (p Presenter) Summary(state match.State) SummaryView {
 	return SummaryView{
-		TotalRounds:     state.Round,
+		TotalRounds:     state.Round.Number,
 		FishDistance:    state.Encounter.Distance,
 		FishDepth:       state.Encounter.Depth,
 		EncounterStatus: state.Encounter.Status,
 		OutcomeLabel:    p.encounterOutcomeLabel(state.Encounter.Status),
 		EndReasonLabel:  p.endReasonLabel(state.Encounter.EndReason),
-		PlayerWins:      state.Stats.PlayerWins,
-		FishWins:        state.Stats.FishWins,
-		Draws:           state.Stats.Draws,
+		PlayerWins:      state.Lifecycle.Stats.PlayerWins,
+		FishWins:        state.Lifecycle.Stats.FishWins,
+		Draws:           state.Lifecycle.Stats.Draws,
 	}
 }
 
@@ -158,7 +158,7 @@ func (p Presenter) moveOptions() []MoveOption {
 func (p Presenter) moveOptionsForState(state match.State) []MoveOption {
 	moveOptions := p.moveOptions()
 	for optionIndex := range moveOptions {
-		for _, moveState := range state.PlayerMoves.Moves {
+		for _, moveState := range state.Player.Moves.Moves {
 			if moveState.Move != moveOptions[optionIndex].Move {
 				continue
 			}

@@ -11,16 +11,18 @@ Este documento concentra el backlog activo del proyecto, con estado visible para
 
 ## Foto actual
 
-- `done`: `BL-005`, `BL-006`, `BL-018`, `BL-019`, `BL-020`, `BL-021`
-- `planned`: `BL-022`
+- `done`: `BL-005`, `BL-006`, `BL-018`, `BL-019`, `BL-020`, `BL-021`, `BL-022`
+- `planned`: `BL-029`
 - `pending`: resto del roadmap
-- Foco recomendado inmediato: cerrar la fundacion de la expedicion con `BL-001`, `BL-011` y `BL-002`; si seguimos en la capa tactica, el siguiente bloque natural es `BL-022`.
+- Foco recomendado inmediato: sanear la deuda tecnica critica antes de abrir mas superficie de producto, empezando por `BL-023`, `BL-029`, `BL-030`, `BL-031` y `BL-032`.
 
 ## Foco sugerido actual
 
-- `BL-001`: fijar el loop completo de la expedicion y sus capas de persistencia.
-- `BL-011`: formalizar la economia de run y la frontera clara entre recursos de expedicion y progreso meta.
-- `BL-002`: traducir ese loop a un mapa de zonas y nodos con informacion parcial.
+- `BL-023`: desacoplar setup, opening y presentacion para dejar el CLI como adaptador y bajar riesgo de crecimiento.
+- `BL-029`: cortar el crecimiento de `match.State` antes de introducir runtime de run.
+- `BL-030`: consolidar fronteras del runtime de combate sobre una base de estado mas sana.
+- `BL-031`: centralizar politicas, defaults y heuristicas tacticas para reducir magic numbers y drift.
+- `BL-032`: endurecer el pipeline tecnico para que el refactor se sostenga con menos friccion.
 
 ## Core Loop
 
@@ -126,12 +128,16 @@ Este documento concentra el backlog activo del proyecto, con estado visible para
 - **Prioridad**: Media
 
 ### BL-022 Definir aparicion de peces por aguas base y ventana de lanzamiento
-- **Estado**: `planned`
+- **Estado**: `done`
 - **Tipo**: Discovery
 - **Objetivo**: decidir como la combinacion entre aguas base del nodo, franja horizontal del cast y sesgo vertical del setup del jugador selecciona subconjuntos de peces y define la aparicion de encuentros compatibles con esa ventana de lanzamiento.
 - **Resultado esperado**: modelo de pool base por nodo o zona, reglas de particion en subconjuntos por distancia y profundidad, metadata minima de aparicion en perfiles de pez y criterio para conectar cast, `rod`, aditamentos y habitats sin abrir todavia la capa de economia fotografica.
 - **Dependencias**: `BL-003`, `BL-007`, `BL-020`, `BL-021`
 - **Plan relacionado**: `docs/features/018-aparicion-de-peces-por-aguas-y-ventana-de-lanzamiento.md`
+- **Notas de cierre**:
+  - La eleccion manual del preset de pez ya no es el flujo principal; el juego resuelve `agua -> apertura -> spawn -> mazo del pez`.
+  - Los perfiles de pez ya exponen metadata minima de aparicion por pool de agua, distancia, profundidad y habitats.
+  - El spawn actual ya usa catalogos tipados para `water pools`, `habitats` y arquetipos, dejando menos superficie de strings crudos en runtime y UI.
 - **Direccion actual acordada**:
   - Cada nodo de pesca parte de unas aguas base y luego se secciona en subconjuntos de pool segun la ventana horizontal del cast y la ventana vertical habilitada por la `rod` y sus aditamentos.
   - La aparicion de peces debe resolverse a partir de la apertura ya cerrada del encounter (`InitialDistance`, `InitialDepth`) y no directamente desde los limites de escape del tablero.
@@ -293,6 +299,71 @@ Este documento concentra el backlog activo del proyecto, con estado visible para
   - algunos flujos de seleccion hoy basados en presets concretos pueden necesitar un contrato mas abstracto para no arrastrar contenido directo hasta el borde.
 - **Prioridad**: Media
 
+### BL-029 Descomponer `match.State` y fijar fronteras del runtime tactico
+- **Estado**: `planned`
+- **Tipo**: Calidad + Discovery
+- **Objetivo**: reducir el acoplamiento actual del runtime tactico separando encounter, estado de mazo, recursos del jugador, thresholds de ronda y vistas de presentacion, evitando que `match.State` siga creciendo como estado universal del juego.
+- **Resultado esperado**: ownership mas claro del estado mutable del combate, contratos mas estrechos entre `game`, `progression`, `endings`, `presentation` y futuros estados de run, y una ruta concreta para convivir con un `RunState` sin convertir `match.State` en un god object.
+- **Dependencias**: `BL-018`
+- **Plan relacionado**: `docs/features/019-descomponer-match-state-y-fronteras-runtime-tactico.md`
+- **Contexto actual detectado**:
+  - `match.State` concentra encounter, deck, loadout, recursos del jugador, stats y flag de fin del duelo en una sola estructura compartida.
+  - `game`, `progression`, `endings`, `presentation` y `app/session` consumen o mutan directamente ese estado, lo que hace que cualquier ampliacion ripplee varias capas.
+  - El crecimiento futuro de la run, servicios, rewards y persistencia amenaza con empujar mas datos hacia este estado si no se fijan fronteras antes.
+- **Direccion actual acordada**:
+  - `match.State` debe seguir siendo tactico y no absorber runtime de expedicion.
+  - El combate necesita subestados o contratos mas finos para aislar responsabilidades sin reescribir el engine completo en una sola iteracion.
+  - La refactorizacion debe ocurrir antes de expandir `BL-001` para evitar que la run nazca sobre un estado tactico ya sobredimensionado.
+  - Debe priorizar claridad de ownership y compatibilidad con futuras capas de run antes que una estetica perfecta de tipos.
+- **Prioridad**: Alta
+
+### BL-030 Consolidar runtime de combate y fronteras de paquetes
+- **Estado**: `pending`
+- **Tipo**: Calidad + Delivery
+- **Objetivo**: reducir la fragmentacion funcional actual entre `internal/game/`, `internal/rules/`, `internal/progression/`, `internal/endings/` e `internal/encounter/`, dejando ownership mas claro de la logica del duelo y preparando una arquitectura de combate mas estable para seguir creciendo.
+- **Resultado esperado**: mapa de responsabilidades y una refactorizacion acotada que reduzca imports cruzados, clarifique que parte del combate evalua, que parte progresa, que parte cierra el encounter y que parte modela runtime, alineandose con la direccion ya expresada en la feature de arquitectura de paquetes.
+- **Dependencias**: `BL-018`, `BL-029`
+- **Contexto actual detectado**:
+  - La capacidad de combate sigue repartida entre varios paquetes transicionales y no converge todavia en una frontera estable.
+  - Las reglas de progresion, evaluacion y cierre del encounter ya estan separadas, pero la expansion futura de zonas, roles de encounter o run puede volver mas opaca la superficie entre esos paquetes.
+  - El propio plan de arquitectura ya reconocio esta convergencia como direccion futura, pero no existe un item especifico para materializarla.
+- **Direccion actual acordada**:
+  - La meta no es un gran rewrite, sino completar una consolidacion incremental del runtime de combate.
+  - Esta tarea debe apoyarse en fronteras mejores de estado y no al reves.
+  - La reorganizacion debe preservar el comportamiento actual del duelo y su capacidad de testeo.
+- **Prioridad**: Media
+
+### BL-031 Centralizar constantes y politicas de balance del encounter
+- **Estado**: `pending`
+- **Tipo**: Calidad + Discovery
+- **Objetivo**: reducir magic numbers, strings repetidos y heuristicas opacas dentro del loop tactico, moviendo defaults y reglas sensibles a puntos de configuracion o politicas nombradas y documentadas.
+- **Resultado esperado**: ownership claro para constantes de reciclado, recovery, agotamiento, timing de cast y scoring de spawn; menos drift entre runtime, UI y contenido; y una base mas segura para balancear el juego sin perseguir valores escondidos en multiples archivos.
+- **Dependencias**: `BL-020`, `BL-021`, `BL-022`
+- **Contexto actual detectado**:
+  - Hay reglas importantes repartidas entre valores numericos embedidos en runtime, presenter, deck y contenido por defecto.
+  - El resolver de spawn usa heuristicas numericas funcionales pero poco explicitadas, lo que dificulta tuning y lectura de intencion.
+  - Parte de los textos de flujo y titulos globales se repite en varias capas del borde CLI o de presentacion.
+- **Direccion actual acordada**:
+  - No todo numero duro debe desaparecer, pero los que expresan politica de balance o contrato de UX deben tener nombre y ownership.
+  - Conviene distinguir constantes de gameplay, constantes de UI y defaults de contenido para no mezclar capas.
+  - La tarea debe dejar preparada una base de tuning antes de que la run y el contenido crezcan demasiado.
+- **Prioridad**: Media
+
+### BL-032 Automatizar pipeline tecnico de calidad
+- **Estado**: `pending`
+- **Tipo**: Infra + Delivery
+- **Objetivo**: asegurar que test, lint y checks basicos de integracion no dependan solo del entorno local del desarrollador, formalizando un pipeline minimo de calidad y entrypoints consistentes para el workflow tecnico del proyecto.
+- **Resultado esperado**: automatizacion reproducible para `go test`, `golangci-lint` y checks clave del repositorio, con una ruta simple para correrlos localmente y una base minima para CI o equivalentes.
+- **Dependencias**: `BL-018`
+- **Contexto actual detectado**:
+  - El repo ya usa buenas herramientas de calidad, pero no tiene todavia una capa visible de automatizacion de pipeline en el propio proyecto.
+  - Al crecer el backlog y los refactors, depender solo del ritual manual aumenta el riesgo de drift en el workflow.
+  - La ausencia de entrypoints o automatizacion minima tambien dificulta colaborar o escalar el proyecto con menos friccion.
+- **Direccion actual acordada**:
+  - La tarea debe ser ligera: no busca introducir infraestructura sobredimensionada, sino endurecer el workflow real ya usado por el proyecto.
+  - Debe respetar la simplicidad actual del repo y evitar acoplar la solucion a una plataforma unica si no es necesario.
+- **Prioridad**: Media
+
 ## Completados
 
 ### BL-019 Hacer visible el descarte del pez y modular la lectura del historial
@@ -346,19 +417,22 @@ Este documento concentra el backlog activo del proyecto, con estado visible para
 
 ## Orden sugerido del trabajo pendiente
 
-1. `BL-001`
-2. `BL-011`
-3. `BL-002`
-4. `BL-008`
-5. `BL-003`
-6. `BL-022`
-7. `BL-012`
-8. `BL-007`
-9. `BL-009`
-10. `BL-017`
-11. `BL-023`
-12. `BL-013`
+1. `BL-023`
+2. `BL-029`
+3. `BL-030`
+4. `BL-031`
+5. `BL-032`
+6. `BL-001`
+7. `BL-011`
+8. `BL-002`
+9. `BL-008`
+10. `BL-003`
+11. `BL-012`
+12. `BL-007`
 13. `BL-015`
-14. `BL-016`
-15. `BL-010`
-16. `BL-014`
+14. `BL-017`
+15. `BL-013`
+16. `BL-016`
+17. `BL-010`
+18. `BL-009`
+19. `BL-014`

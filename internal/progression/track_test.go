@@ -148,9 +148,9 @@ func TestTrackPolicyApply(t *testing.T) {
 
 			assert.Equal(t, test.wantDistance, state.Encounter.Distance)
 			assert.Equal(t, test.wantDepth, state.Encounter.Depth)
-			assert.Equal(t, test.wantPlayerWins, state.Stats.PlayerWins)
-			assert.Equal(t, test.wantFishWins, state.Stats.FishWins)
-			assert.Equal(t, test.wantDraws, state.Stats.Draws)
+			assert.Equal(t, test.wantPlayerWins, state.Lifecycle.Stats.PlayerWins)
+			assert.Equal(t, test.wantFishWins, state.Lifecycle.Stats.FishWins)
+			assert.Equal(t, test.wantDraws, state.Lifecycle.Stats.Draws)
 			assert.Equal(t, test.wantEvent, state.Encounter.LastEvent)
 			assert.Equal(t, test.wantEndReason, state.Encounter.EndReason)
 		})
@@ -161,7 +161,7 @@ func TestTrackPolicyApplyUsesRoundThresholdBonuses(t *testing.T) {
 	state := newMatchState(t)
 	state.Encounter.Distance = 1
 	state.Encounter.Depth = 2
-	state.RoundState.Thresholds.CaptureDistanceBonus = 1
+	state.Round.Thresholds.CaptureDistanceBonus = 1
 
 	TrackPolicy{}.Apply(&state, match.ResolvedRound{
 		PlayerMove:     domain.Blue,
@@ -172,7 +172,7 @@ func TestTrackPolicyApplyUsesRoundThresholdBonuses(t *testing.T) {
 
 	assert.Equal(t, 1, state.Encounter.Distance)
 	assert.Equal(t, 1, state.Encounter.Depth)
-	assert.Equal(t, 1, state.Stats.PlayerWins)
+	assert.Equal(t, 1, state.Lifecycle.Stats.PlayerWins)
 }
 
 func TestAccumulateCardEffects(t *testing.T) {
@@ -217,7 +217,7 @@ func newMatchState(t *testing.T) match.State {
 	require.NoError(t, err)
 
 	return match.State{
-		Encounter:     encounterState,
-		PlayerLoadout: playerLoadout,
+		Encounter: encounterState,
+		Player:    match.PlayerState{Loadout: playerLoadout},
 	}
 }

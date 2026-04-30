@@ -64,18 +64,26 @@ type RoundThresholdState struct {
 }
 
 type RoundState struct {
+	Number     int
 	Thresholds RoundThresholdState
 }
 
+type PlayerState struct {
+	Loadout loadout.State
+	Moves   PlayerMoveResources
+}
+
+type LifecycleState struct {
+	Stats    Stats
+	Finished bool
+}
+
 type State struct {
-	Round         int
-	RoundState    RoundState
-	Deck          DeckState
-	Encounter     encounter.State
-	PlayerLoadout loadout.State
-	PlayerMoves   PlayerMoveResources
-	Stats         Stats
-	Finished      bool
+	Round     RoundState
+	Deck      DeckState
+	Encounter encounter.State
+	Player    PlayerState
+	Lifecycle LifecycleState
 }
 
 type ResolvedRound struct {

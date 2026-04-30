@@ -109,6 +109,37 @@ Implementation branch naming:
 - `docs/features/001-nombre-corto.md` -> branch `001-nombre-corto`
 - `docs/features/002-nombre-corto.md` -> branch `002-nombre-corto`
 
+## Engineering Principles
+
+All implementation work should stay aligned with both Effective Go and practical SOLID-style design adapted to Go.
+
+### Effective Go baseline
+
+- Prefer small packages with clear ownership and stable vocabulary.
+- Keep APIs simple, explicit and idiomatic; avoid unnecessary abstraction layers.
+- Use composition over inheritance-style patterns or deep object hierarchies.
+- Keep naming short, precise and consistent with the domain.
+- Let behavior live close to the types or packages that own it.
+- Avoid speculative generalization; extract only when a capability is demonstrably reusable.
+- Keep the zero value useful when it makes sense.
+- Return concrete errors with clear messages and wrap them when crossing boundaries.
+
+### SOLID applied pragmatically in Go
+
+- Single Responsibility: each package, type or function should have one clear reason to change.
+- Open/Closed: extend behavior through stable seams, policies, interfaces or data, instead of editing unrelated code paths repeatedly.
+- Liskov Substitution: interface implementations must preserve the contract expected by their consumers.
+- Interface Segregation: prefer small, focused interfaces owned by the consuming package.
+- Dependency Inversion: high-level flows should depend on abstractions and contracts, not concrete edge adapters or hardcoded infrastructure.
+
+### Code health expectations
+
+- Avoid god objects, oversized files and packages with mixed responsibilities.
+- Avoid magic strings and magic numbers when they represent domain policy, balance, UX contract or shared defaults.
+- Prefer typed catalogs, named constants or explicit policy objects when a value is reused or semantically important.
+- Keep runtime, content/configuration and delivery edges clearly separated.
+- Refactor opportunistically when new work reveals repeated logic, unstable boundaries or rising coupling.
+
 ## Backlog Convention
 
 - Product backlog items live in `docs/backlog/`.

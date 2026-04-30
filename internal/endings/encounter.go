@@ -9,16 +9,16 @@ type EncounterEndCondition struct{}
 
 func (EncounterEndCondition) Apply(state *match.State) {
 	if state.Encounter.EndReason == encounter.EndReasonSplashEscape {
-		state.Finished = true
+		state.Lifecycle.Finished = true
 		state.Encounter.Status = encounter.StatusEscaped
 		return
 	}
 
-	captureDistance := state.Encounter.Config.CaptureDistance + state.RoundState.Thresholds.CaptureDistanceBonus
-	surfaceDepth := state.Encounter.Config.SurfaceDepth + state.RoundState.Thresholds.SurfaceDepthBonus
-	exhaustionCaptureDistance := state.Encounter.Config.ExhaustionCaptureDistance + state.RoundState.Thresholds.ExhaustionCaptureDistanceBonus
+	captureDistance := state.Encounter.Config.CaptureDistance + state.Round.Thresholds.CaptureDistanceBonus
+	surfaceDepth := state.Encounter.Config.SurfaceDepth + state.Round.Thresholds.SurfaceDepthBonus
+	exhaustionCaptureDistance := state.Encounter.Config.ExhaustionCaptureDistance + state.Round.Thresholds.ExhaustionCaptureDistanceBonus
 
-	state.Finished = false
+	state.Lifecycle.Finished = false
 	state.Encounter.Status = encounter.StatusOngoing
 	state.Encounter.EndReason = encounter.EndReasonNone
 
@@ -26,10 +26,10 @@ func (EncounterEndCondition) Apply(state *match.State) {
 	case state.Encounter.Distance <= captureDistance && state.Encounter.Depth <= surfaceDepth:
 		state.Encounter.Status = encounter.StatusCaptured
 		state.Encounter.EndReason = encounter.EndReasonTrackCapture
-	case state.Encounter.Distance > state.PlayerLoadout.TrackMaxDistance():
+	case state.Encounter.Distance > state.Player.Loadout.TrackMaxDistance():
 		state.Encounter.Status = encounter.StatusEscaped
 		state.Encounter.EndReason = encounter.EndReasonTrackEscape
-	case state.Encounter.Depth > state.PlayerLoadout.TrackMaxDepth():
+	case state.Encounter.Depth > state.Player.Loadout.TrackMaxDepth():
 		state.Encounter.Status = encounter.StatusEscaped
 		state.Encounter.EndReason = encounter.EndReasonDepthEscape
 	case state.Deck.Exhausted:
@@ -44,5 +44,5 @@ func (EncounterEndCondition) Apply(state *match.State) {
 		return
 	}
 
-	state.Finished = true
+	state.Lifecycle.Finished = true
 }

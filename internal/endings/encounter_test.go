@@ -37,7 +37,7 @@ func TestEncounterEndConditionApply(t *testing.T) {
 			title: "captures when a temporary round bonus extends the capture distance",
 			state: func() match.State {
 				state := newMatchState(t, 1, 0)
-				state.RoundState.Thresholds.CaptureDistanceBonus = 1
+				state.Round.Thresholds.CaptureDistanceBonus = 1
 				return state
 			}(),
 			wantFinished:  true,
@@ -48,7 +48,7 @@ func TestEncounterEndConditionApply(t *testing.T) {
 			title: "captures when a temporary round bonus raises the effective surface threshold",
 			state: func() match.State {
 				state := newMatchState(t, 0, 1)
-				state.RoundState.Thresholds.SurfaceDepthBonus = 1
+				state.Round.Thresholds.SurfaceDepthBonus = 1
 				return state
 			}(),
 			wantFinished:  true,
@@ -97,7 +97,7 @@ func TestEncounterEndConditionApply(t *testing.T) {
 			state: func() match.State {
 				state := newMatchState(t, 3, 1)
 				state.Deck.Exhausted = true
-				state.RoundState.Thresholds.ExhaustionCaptureDistanceBonus = 1
+				state.Round.Thresholds.ExhaustionCaptureDistanceBonus = 1
 				return state
 			}(),
 			wantFinished:  true,
@@ -141,7 +141,7 @@ func TestEncounterEndConditionApply(t *testing.T) {
 
 			EncounterEndCondition{}.Apply(&state)
 
-			assert.Equal(t, test.wantFinished, state.Finished)
+			assert.Equal(t, test.wantFinished, state.Lifecycle.Finished)
 			assert.Equal(t, test.wantStatus, state.Encounter.Status)
 			assert.Equal(t, test.wantEndReason, state.Encounter.EndReason)
 		})
@@ -161,7 +161,7 @@ func newMatchState(t *testing.T, distance, depth int) match.State {
 	require.NoError(t, err)
 
 	return match.State{
-		Encounter:     encounterState,
-		PlayerLoadout: playerLoadout,
+		Encounter: encounterState,
+		Player:    match.PlayerState{Loadout: playerLoadout},
 	}
 }
