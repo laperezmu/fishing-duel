@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"pesca/internal/content/attachmentpresets"
 	"pesca/internal/content/fishprofiles"
+	"pesca/internal/content/habitats"
 	"pesca/internal/content/playerprofiles"
 	"pesca/internal/content/rodpresets"
 	"pesca/internal/content/watercontexts"
+	"pesca/internal/content/waterpools"
 	"pesca/internal/encounter"
 	"pesca/internal/player/loadout"
 	"pesca/internal/presentation"
@@ -22,11 +24,14 @@ const (
 	encounterColumnSpan = encounterCellWidth + len(encounterSeparator)
 )
 
-func renderPromptScreen(title string, status presentation.StatusView, options []presentation.MoveOption, opening *encounter.Opening, lastRound *presentation.RoundView, message string) string {
+func renderPromptScreen(title string, status presentation.StatusView, options []presentation.MoveOption, opening *encounter.Opening, spawn *fishprofiles.Spawn, lastRound *presentation.RoundView, message string) string {
 	var sections []string
 	sections = append(sections, renderHeader(title))
 	if opening != nil {
 		sections = append(sections, renderEncounterOpeningSection(*opening))
+	}
+	if spawn != nil {
+		sections = append(sections, renderFishSpawnSection(*spawn))
 	}
 	sections = append(sections, renderTrackSection(status))
 	sections = append(sections, renderStatsSection(status))
@@ -223,6 +228,21 @@ func renderEncounterOpeningSection(opening encounter.Opening) string {
 		fmt.Sprintf("  Lance      : %s", opening.CastResult.Band.Label()),
 		fmt.Sprintf("  Inicio     : distancia %d | profundidad %d", opening.InitialDistance, opening.InitialDepth),
 	}, "\n")
+}
+
+func renderFishSpawnSection(spawn fishprofiles.Spawn) string {
+	lines := []string{
+		accent("Pez en el agua"),
+		fmt.Sprintf("  Perfil     : %s", spawn.Profile.Name),
+		fmt.Sprintf("  Agua base  : %s", waterpools.Name(spawn.Context.WaterPoolTag)),
+		fmt.Sprintf("  Ventana    : distancia %d | profundidad %d", spawn.Context.InitialDistance, spawn.Context.InitialDepth),
+		fmt.Sprintf("  Candidatos : %d", spawn.CandidateCount),
+	}
+	if len(spawn.Context.HabitatTags) > 0 {
+		lines = append(lines, "  Habitats   : "+strings.Join(habitats.Names(spawn.Context.HabitatTags), ", "))
+	}
+
+	return strings.Join(lines, "\n")
 }
 
 func renderFishDiscardSection(status presentation.StatusView) string {
@@ -455,7 +475,7 @@ func renderFishDeckConfirmationSection(preset fishprofiles.FishDeckPreset) strin
 	lines := []string{
 		accent("Confirmar preset"),
 		fmt.Sprintf("  Nombre      : %s", preset.Name),
-		fmt.Sprintf("  Arquetipo   : %s", preset.ArchetypeID),
+		fmt.Sprintf("  Arquetipo   : %s", fishprofiles.Name(preset.ArchetypeID)),
 		fmt.Sprintf("  Resumen     : %s", preset.Description),
 		fmt.Sprintf("  Cartas      : %d", len(preset.FishCards)),
 		fmt.Sprintf("  Orden       : %s", renderFishDeckOrder(preset)),

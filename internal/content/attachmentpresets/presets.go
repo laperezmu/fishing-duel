@@ -1,6 +1,9 @@
 package attachmentpresets
 
-import "pesca/internal/player/loadout"
+import (
+	"pesca/internal/content/habitats"
+	"pesca/internal/player/loadout"
+)
 
 type Preset struct {
 	ID          string
@@ -14,7 +17,7 @@ func (preset Preset) BuildAttachments() []loadout.Attachment {
 	attachments := make([]loadout.Attachment, 0, len(preset.Attachments))
 	for _, attachment := range preset.Attachments {
 		clonedAttachment := attachment
-		clonedAttachment.HabitatTags = append([]string(nil), attachment.HabitatTags...)
+		clonedAttachment.HabitatTags = append([]habitats.Tag(nil), attachment.HabitatTags...)
 		attachments = append(attachments, clonedAttachment)
 	}
 
@@ -48,7 +51,7 @@ func DefaultPresets() []Preset {
 				OpeningDistanceModifier: -1,
 				OpeningDepthModifier:    1,
 				TrackDepthModifier:      1,
-				HabitatTags:             []string{"bottom", "channel"},
+				HabitatTags:             []habitats.Tag{habitats.Bottom, habitats.Channel},
 			}},
 		},
 		{
@@ -67,7 +70,7 @@ func DefaultPresets() []Preset {
 				OpeningDistanceModifier: 1,
 				OpeningDepthModifier:    -1,
 				TrackDistanceModifier:   1,
-				HabitatTags:             []string{"open-water", "surface"},
+				HabitatTags:             []habitats.Tag{habitats.OpenWater, habitats.Surface},
 			}},
 		},
 		{
@@ -85,7 +88,7 @@ func DefaultPresets() []Preset {
 				Description:           "Aguanta mejor la presion del pez en el tablero.",
 				TrackDistanceModifier: 1,
 				TrackDepthModifier:    1,
-				HabitatTags:           []string{"weed", "rock"},
+				HabitatTags:           []habitats.Tag{habitats.Weed, habitats.Rock},
 			}},
 		},
 	}

@@ -24,6 +24,7 @@ type UI struct {
 	intro      presentation.IntroView
 	lastRound  *presentation.RoundView
 	opening    *encounter.Opening
+	spawn      *fishprofiles.Spawn
 	castDelay  time.Duration
 	castFrames []int
 }
@@ -212,7 +213,7 @@ func (ui *UI) ChooseAttachmentPreset(title string, baseRod rod.State, presets []
 func (ui *UI) ChooseMove(status presentation.StatusView, options []presentation.MoveOption) (domain.Move, error) {
 	message := ""
 	for {
-		if _, err := io.WriteString(ui.out, renderPromptScreen(ui.intro.Title, status, options, ui.opening, ui.lastRound, message)); err != nil {
+		if _, err := io.WriteString(ui.out, renderPromptScreen(ui.intro.Title, status, options, ui.opening, ui.spawn, ui.lastRound, message)); err != nil {
 			return 0, err
 		}
 		if _, err := fmt.Fprint(ui.out, "Elige 1, 2 o 3: "); err != nil {
@@ -247,6 +248,12 @@ func (ui *UI) ShowRound(view presentation.RoundView) error {
 func (ui *UI) ShowGameOver(view presentation.SummaryView) error {
 	_, err := io.WriteString(ui.out, renderGameOverScreen(ui.intro.Title, view, ui.lastRound))
 	return err
+}
+
+func (ui *UI) ShowFishSpawn(_ string, spawn fishprofiles.Spawn) error {
+	resolvedSpawn := spawn
+	ui.spawn = &resolvedSpawn
+	return nil
 }
 
 func (ui *UI) confirmPlayerDeckPreset(title string, preset playerprofiles.DeckPreset) (bool, error) {

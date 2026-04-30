@@ -1,6 +1,9 @@
 package encounter
 
-import "fmt"
+import (
+	"fmt"
+	"pesca/internal/content/waterpools"
+)
 
 type CastBand string
 
@@ -17,7 +20,7 @@ type WaterContext struct {
 	Name                string
 	Description         string
 	VisibleSignals      []string
-	PoolTag             string
+	PoolTag             waterpools.ID
 	BandInitialDistance map[CastBand]int
 	BaseInitialDepth    int
 }
@@ -72,6 +75,9 @@ func (context WaterContext) Validate() error {
 	}
 	if context.Name == "" {
 		return fmt.Errorf("water context name is required")
+	}
+	if err := context.PoolTag.Validate(); err != nil {
+		return err
 	}
 	if len(context.BandInitialDistance) != len(OrderedCastBands()) {
 		return fmt.Errorf("water context must define an initial distance for every cast band")

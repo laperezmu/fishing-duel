@@ -1,6 +1,7 @@
 package attachmentpresets
 
 import (
+	"pesca/internal/content/habitats"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -14,7 +15,7 @@ func TestBuildAttachmentsClonesSlices(t *testing.T) {
 
 	attachments[0].HabitatTags[0] = "changed"
 
-	assert.Equal(t, "bottom", preset.Attachments[0].HabitatTags[0])
+	assert.Equal(t, habitats.Bottom, preset.Attachments[0].HabitatTags[0])
 }
 
 func TestDefaultPresets(t *testing.T) {

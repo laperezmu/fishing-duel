@@ -56,16 +56,16 @@ func main() {
 	if err != nil {
 		exitWithError("error configurando loadout del jugador", err)
 	}
-	fishDeckPreset, err := ui.ChooseFishDeckPreset("Pesca: duelo contra el pez", fishprofiles.DefaultPresets())
-	if err != nil {
-		exitWithError("error eligiendo preset de baraja", err)
-	}
-
-	fishDeck := fishDeckPreset.BuildDeck(shuffler)
 	opening, err := app.ResolveEncounterOpening("Pesca: duelo contra el pez", encounter.DefaultConfig(), playerLoadout, watercontexts.DefaultPresets(), ui)
 	if err != nil {
 		exitWithError("error resolviendo la apertura de pesca", err)
 	}
+	spawn, err := app.ResolveFishSpawn("Pesca: duelo contra el pez", opening, playerLoadout, fishprofiles.DefaultProfiles(), ui)
+	if err != nil {
+		exitWithError("error resolviendo la aparicion del pez", err)
+	}
+
+	fishDeck := spawn.Profile.BuildPreset().BuildDeck(shuffler)
 
 	encounterState, err := encounter.NewState(opening.Config)
 	if err != nil {

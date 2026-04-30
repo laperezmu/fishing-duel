@@ -33,16 +33,7 @@ func DefaultPresets() []FishDeckPreset {
 	profiles := DefaultProfiles()
 	presets := make([]FishDeckPreset, 0, len(profiles))
 	for _, profile := range profiles {
-		presets = append(presets, FishDeckPreset{
-			ID:            profile.ID,
-			ArchetypeID:   profile.ArchetypeID,
-			Name:          profile.Name,
-			Description:   profile.Description,
-			Details:       append([]string(nil), profile.Details...),
-			FishCards:     profile.BuildCards(),
-			CardsToRemove: profile.CardsToRemove,
-			Shuffle:       profile.Shuffle,
-		})
+		presets = append(presets, profile.BuildPreset())
 	}
 
 	return presets

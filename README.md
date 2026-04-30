@@ -4,9 +4,10 @@ Motor de juego en Go para un duelo de pesca por rondas. El proyecto ya no es sol
 
 ## Estado actual del juego
 
-- El jugador elige un preset de barajas propias, una `rod` base, un preset de aditamentos, un preset de pez y una situacion de agua antes de empezar el encuentro.
+- El jugador elige un preset de barajas propias, una `rod` base, un preset de aditamentos y una situacion de agua antes de empezar el encuentro.
 - Cada pesca se abre con una lectura breve del agua y un minijuego de cast por timing que define la distancia inicial del duelo.
 - La `rod` separa limites de apertura del lance frente a limites de track que gobiernan el tablero y los escapes.
+- El pez aparece ahora segun el agua base, la apertura efectiva del lance y los habitats habilitados por el loadout.
 - Cada ronda el jugador sigue eligiendo entre tres acciones base: `Tirar`, `Recoger` y `Soltar`.
 - Cada accion del jugador consume la carta superior visible de una mini-baraja por color.
 - El pez roba su siguiente carta desde una baraja configurable, con orden fijo o barajado segun el perfil.
@@ -31,8 +32,8 @@ Flujo actual del CLI:
 1. Elige un preset del jugador.
 2. Elige una `rod` base.
 3. Elige un preset de aditamentos.
-4. Elige un preset del pez.
-5. Elige una situacion de agua y resuelve el cast inicial.
+4. Elige una situacion de agua y resuelve el cast inicial.
+5. El juego resuelve que pez aparece segun esa ventana de lanzamiento.
 6. Juega el duelo ronda a ronda desde la terminal.
 
 Tambien puedes validar el proyecto con:
@@ -48,12 +49,13 @@ $(go env GOPATH)/bin/golangci-lint run
 2. La `rod` del jugador aporta la base estructural del loadout.
 3. Los aditamentos modifican limites de apertura, limites de track y preparan tags de habitat futuras.
 4. El jugador resuelve un cast por timing que fija la distancia inicial del duelo dentro de esos limites efectivos.
-5. Se inicializa el estado del encuentro, el loadout del jugador, las barajas del jugador y la baraja del pez.
-6. El jugador ve sus tres acciones disponibles junto a la carta superior visible de cada color cuando aplica.
-7. El pez revela su carta activa para la ronda al robar del mazo, y el juego conserva un historial visible de lo ya descartado en el ciclo actual.
-8. El motor aplica efectos de `draw`, resuelve el outcome base del combate y luego aplica efectos condicionados por victoria, derrota o empate.
-9. La progresion modifica distancia y profundidad del pez, y puede disparar eventos derivados como `chapotea en la superficie`.
-10. El encuentro termina por captura, escape horizontal, escape por profundidad, escape por chapoteo o resolucion al agotarse la baraja del pez.
+5. El juego selecciona un perfil de pez compatible con el agua base, la ventana de distancia/profundidad y los habitats del loadout.
+6. Se inicializa el estado del encuentro, el loadout del jugador, las barajas del jugador y la baraja del pez.
+7. El jugador ve sus tres acciones disponibles junto a la carta superior visible de cada color cuando aplica.
+8. El pez revela su carta activa para la ronda al robar del mazo, y el juego conserva un historial visible de lo ya descartado en el ciclo actual.
+9. El motor aplica efectos de `draw`, resuelve el outcome base del combate y luego aplica efectos condicionados por victoria, derrota o empate.
+10. La progresion modifica distancia y profundidad del pez, y puede disparar eventos derivados como `chapotea en la superficie`.
+11. El encuentro termina por captura, escape horizontal, escape por profundidad, escape por chapoteo o resolucion al agotarse la baraja del pez.
 
 ## Presets actuales
 
@@ -79,6 +81,7 @@ $(go env GOPATH)/bin/golangci-lint run
 
 ### Presets del pez
 
+- El juego ya no pide elegirlos manualmente en el flujo principal; aparecen segun agua, apertura y loadout.
 - `Clasico`: referencia base sin efectos, barajada y con reciclado que retira cartas.
 - `Apertura con anzuelo`: perfil de `draw_tempo` con orden fijo.
 - `Presion horizontal`: empuja el encuentro hacia mar abierto.

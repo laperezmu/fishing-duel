@@ -1,6 +1,7 @@
 package loadout
 
 import (
+	"pesca/internal/content/habitats"
 	"pesca/internal/encounter"
 	"pesca/internal/player/rod"
 	"testing"
@@ -24,7 +25,7 @@ func TestNewState(t *testing.T) {
 				ID:          "float-basic",
 				Name:        "Flotador basico",
 				Description: "Placeholder para futuros aditamentos.",
-				HabitatTags: []string{"surface"},
+				HabitatTags: []habitats.Tag{habitats.Surface},
 			}},
 			wantState: State{
 				Rod: sampleRodState(),
@@ -32,7 +33,7 @@ func TestNewState(t *testing.T) {
 					ID:          "float-basic",
 					Name:        "Flotador basico",
 					Description: "Placeholder para futuros aditamentos.",
-					HabitatTags: []string{"surface"},
+					HabitatTags: []habitats.Tag{habitats.Surface},
 				}},
 			},
 		},
@@ -85,9 +86,9 @@ func TestNewState(t *testing.T) {
 			attachments: []Attachment{{
 				ID:          "bad-tag",
 				Name:        "Tag vacio",
-				HabitatTags: []string{""},
+				HabitatTags: []habitats.Tag{""},
 			}},
-			wantErrText: "attachment habitat tags must not be empty",
+			wantErrText: "unknown habitat tag \"\"",
 		},
 	}
 
@@ -126,20 +127,20 @@ func TestEffectiveTrackAndHabitats(t *testing.T) {
 		Name:                  "Linea reforzada",
 		TrackDistanceModifier: 1,
 		TrackDepthModifier:    2,
-		HabitatTags:           []string{"rock", "weed", "rock"},
+		HabitatTags:           []habitats.Tag{habitats.Rock, habitats.Weed, habitats.Rock},
 	}})
 	require.NoError(t, err)
 
 	assert.Equal(t, 6, state.TrackMaxDistance())
 	assert.Equal(t, 5, state.TrackMaxDepth())
-	assert.Equal(t, []string{"rock", "weed"}, state.HabitatTags())
+	assert.Equal(t, []habitats.Tag{habitats.Rock, habitats.Weed}, state.HabitatTags())
 }
 
 func TestNewStateClonesAttachmentHabitatTags(t *testing.T) {
 	attachments := []Attachment{{
 		ID:          "line-reinforced",
 		Name:        "Linea reforzada",
-		HabitatTags: []string{"rock"},
+		HabitatTags: []habitats.Tag{habitats.Rock},
 	}}
 
 	state, err := NewState(sampleRodState(), attachments)
@@ -147,7 +148,7 @@ func TestNewStateClonesAttachmentHabitatTags(t *testing.T) {
 
 	attachments[0].HabitatTags[0] = "changed"
 
-	assert.Equal(t, []string{"rock"}, state.Attachments[0].HabitatTags)
+	assert.Equal(t, []habitats.Tag{habitats.Rock}, state.Attachments[0].HabitatTags)
 }
 
 func sampleRodState() rod.State {
