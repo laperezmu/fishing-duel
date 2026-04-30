@@ -40,23 +40,23 @@ func NewUsageController(config Config) (*UsageController, error) {
 }
 
 func (controller *UsageController) Initialize(state *match.State) {
-	state.PlayerMoves = match.PlayerMoveResources{Moves: make([]match.PlayerMoveState, 0, len(supportedMoves()))}
+	state.Player.Moves = match.PlayerMoveResources{Moves: make([]match.PlayerMoveState, 0, len(supportedMoves()))}
 	for _, move := range supportedMoves() {
 		moveState := match.PlayerMoveState{
 			Move:        move,
 			ActiveCards: controller.config.initialDeckFor(move),
 		}
 		syncMoveStateCounts(&moveState)
-		state.PlayerMoves.Moves = append(state.PlayerMoves.Moves, moveState)
+		state.Player.Moves.Moves = append(state.Player.Moves.Moves, moveState)
 	}
 
 	controller.PrepareRound(state)
 }
 
 func (controller *UsageController) PrepareRound(state *match.State) {
-	currentSelectionRound := state.Round + 1
-	for moveIndex := range state.PlayerMoves.Moves {
-		moveState := &state.PlayerMoves.Moves[moveIndex]
+	currentSelectionRound := state.Round.Number + 1
+	for moveIndex := range state.Player.Moves.Moves {
+		moveState := &state.Player.Moves.Moves[moveIndex]
 		if moveState.RestoresOnRound == 0 {
 			continue
 		}
@@ -75,7 +75,7 @@ func (controller *UsageController) PrepareRound(state *match.State) {
 }
 
 func (controller *UsageController) ValidateMove(state match.State, playerMove domain.Move) error {
-	moveState, ok := findMoveState(state.PlayerMoves, playerMove)
+	moveState, ok := findMoveState(state.Player.Moves, playerMove)
 	if !ok {
 		return MoveUnavailableError{Move: playerMove}
 	}
@@ -90,7 +90,7 @@ func (controller *UsageController) ValidateMove(state match.State, playerMove do
 }
 
 func (controller *UsageController) PeekMoveCard(state match.State, playerMove domain.Move) (cards.PlayerCard, error) {
-	moveState, ok := findMoveState(state.PlayerMoves, playerMove)
+	moveState, ok := findMoveState(state.Player.Moves, playerMove)
 	if !ok || len(moveState.ActiveCards) == 0 {
 		return cards.PlayerCard{}, MoveUnavailableError{Move: playerMove, RestoresOnRound: moveState.RestoresOnRound}
 	}
@@ -99,7 +99,7 @@ func (controller *UsageController) PeekMoveCard(state match.State, playerMove do
 }
 
 func (controller *UsageController) ConsumeMove(state *match.State, playerMove domain.Move) cards.PlayerCard {
-	moveState, ok := findMoveStatePointer(&state.PlayerMoves, playerMove)
+	moveState, ok := findMoveStatePointer(&state.Player.Moves, playerMove)
 	if !ok || len(moveState.ActiveCards) == 0 {
 		return cards.PlayerCard{}
 	}
@@ -112,7 +112,7 @@ func (controller *UsageController) ConsumeMove(state *match.State, playerMove do
 		return selectedCard
 	}
 
-	moveState.RestoresOnRound = state.Round + controller.config.RecoveryDelayRounds + 1
+	moveState.RestoresOnRound = state.Round.Number + controller.config.RecoveryDelayRounds + 1
 	return selectedCard
 }
 

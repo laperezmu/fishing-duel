@@ -57,7 +57,7 @@ func TestPresenterIntro(t *testing.T) {
 func TestPresenterStatus(t *testing.T) {
 	presenter := NewPresenter(DefaultCatalog())
 	state := match.State{
-		Round: 2,
+		Round: match.RoundState{Number: 2},
 		Deck: match.DeckState{
 			ActiveCards:       4,
 			DiscardCards:      5,
@@ -90,17 +90,15 @@ func TestPresenterStatus(t *testing.T) {
 			Distance: 3,
 			Depth:    2,
 		},
-		PlayerLoadout: mustLoadout(t, rod.State{OpeningMaxDistance: 4, OpeningMaxDepth: 3, TrackMaxDistance: 5, TrackMaxDepth: 4}),
-		Stats: match.Stats{
-			PlayerWins: 2,
-			FishWins:   1,
-			Draws:      3,
+		Player: match.PlayerState{
+			Loadout: mustLoadout(t, rod.State{OpeningMaxDistance: 4, OpeningMaxDepth: 3, TrackMaxDistance: 5, TrackMaxDepth: 4}),
+			Moves: match.PlayerMoveResources{Moves: []match.PlayerMoveState{
+				{Move: domain.Blue, MaxUses: 3, RemainingUses: 2, ActiveCards: []cards.PlayerCard{cards.NewNamedPlayerCard("Anzuelo tenso", "Capturas desde un paso mas lejos este round.", domain.Blue, cards.CardEffect{Trigger: cards.TriggerOnDraw, CaptureDistanceBonus: 1}), cards.NewPlayerCard(domain.Blue)}},
+				{Move: domain.Red, MaxUses: 3, RemainingUses: 0, RestoresOnRound: 5},
+				{Move: domain.Yellow, MaxUses: 3, RemainingUses: 1},
+			}},
 		},
-		PlayerMoves: match.PlayerMoveResources{Moves: []match.PlayerMoveState{
-			{Move: domain.Blue, MaxUses: 3, RemainingUses: 2, ActiveCards: []cards.PlayerCard{cards.NewNamedPlayerCard("Anzuelo tenso", "Capturas desde un paso mas lejos este round.", domain.Blue, cards.CardEffect{Trigger: cards.TriggerOnDraw, CaptureDistanceBonus: 1}), cards.NewPlayerCard(domain.Blue)}},
-			{Move: domain.Red, MaxUses: 3, RemainingUses: 0, RestoresOnRound: 5},
-			{Move: domain.Yellow, MaxUses: 3, RemainingUses: 1},
-		}},
+		Lifecycle: match.LifecycleState{Stats: match.Stats{PlayerWins: 2, FishWins: 1, Draws: 3}},
 	}
 
 	status := presenter.Status(state)

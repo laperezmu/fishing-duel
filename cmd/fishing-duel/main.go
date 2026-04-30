@@ -85,7 +85,7 @@ func main() {
 			return rng.Float64() < chance
 		})},
 		endings.EncounterEndCondition{},
-		match.State{Encounter: encounterState, PlayerLoadout: playerLoadout},
+		match.State{Encounter: encounterState, Player: match.PlayerState{Loadout: playerLoadout}},
 	)
 	if err != nil {
 		exitWithError("error inicializando partida", err)

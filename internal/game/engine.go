@@ -85,7 +85,7 @@ func (engine *Engine) State() match.State {
 }
 
 func (engine *Engine) PlayRound(playerMove domain.Move) (match.RoundResult, error) {
-	if engine.state.Finished {
+	if engine.state.Lifecycle.Finished {
 		return match.RoundResult{}, ErrGameFinished
 	}
 
@@ -103,13 +103,13 @@ func (engine *Engine) PlayRound(playerMove domain.Move) (match.RoundResult, erro
 	if err != nil {
 		engine.refreshState()
 		engine.endCondition.Apply(&engine.state)
-		if engine.state.Finished {
+		if engine.state.Lifecycle.Finished {
 			return match.RoundResult{}, ErrGameFinished
 		}
 		return match.RoundResult{}, err
 	}
 
-	engine.state.Round++
+	engine.state.Round.Number++
 	drawEffects := cards.FilterEffects(playerCard.Effects, cards.EffectContext{
 		Owner: cards.OwnerPlayer,
 		Phase: cards.PhaseDraw,
@@ -149,7 +149,7 @@ func (engine *Engine) PlayRound(playerMove domain.Move) (match.RoundResult, erro
 	engine.resetRoundState()
 
 	return match.RoundResult{
-		Round:      engine.state.Round,
+		Round:      engine.state.Round.Number,
 		PlayerMove: playerMove,
 		PlayerCard: playerCard,
 		FishMove:   fishCard.Move,
@@ -172,7 +172,7 @@ func (engine *Engine) refreshState() {
 }
 
 func (engine *Engine) resetRoundState() {
-	engine.state.RoundState = match.RoundState{}
+	engine.state.Round = match.RoundState{Number: engine.state.Round.Number}
 }
 
 func mapVisibleDiscardCycleState(cycle deck.VisibleDiscardCycle) match.FishDiscardCycleState {

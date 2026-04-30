@@ -198,8 +198,8 @@ func newSessionFixture(t *testing.T) sessionFixture {
 		},
 	}
 	status := presentation.StatusView{RoundNumber: 1, MoveOptions: intro.Options}
-	ongoingState := match.State{Round: 0, Finished: false}
-	finishedState := match.State{Round: 1, Finished: true}
+	ongoingState := match.State{Round: match.RoundState{Number: 0}}
+	finishedState := match.State{Round: match.RoundState{Number: 1}, Lifecycle: match.LifecycleState{Finished: true}}
 	roundResult := match.RoundResult{Round: 1, PlayerMove: domain.Blue, Outcome: domain.PlayerWin, State: finishedState}
 	round := presentation.RoundView{Outcome: domain.PlayerWin, OutcomeLabel: "gana el jugador"}
 	summary := presentation.SummaryView{TotalRounds: 1}

@@ -18,7 +18,7 @@ func TestApplyRoundScopedEffects(t *testing.T) {
 		SurfaceDepthBonus:              2,
 	}})
 
-	assert.Equal(t, 1, state.RoundState.Thresholds.CaptureDistanceBonus)
-	assert.Equal(t, -1, state.RoundState.Thresholds.ExhaustionCaptureDistanceBonus)
-	assert.Equal(t, 2, state.RoundState.Thresholds.SurfaceDepthBonus)
+	assert.Equal(t, 1, state.Round.Thresholds.CaptureDistanceBonus)
+	assert.Equal(t, -1, state.Round.Thresholds.ExhaustionCaptureDistanceBonus)
+	assert.Equal(t, 2, state.Round.Thresholds.SurfaceDepthBonus)
 }
