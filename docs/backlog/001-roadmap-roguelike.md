@@ -11,8 +11,8 @@ Este documento concentra el backlog activo del proyecto, con estado visible para
 
 ## Foto actual
 
-- `done`: `BL-005`, `BL-006`, `BL-018`, `BL-019`, `BL-020`, `BL-021`, `BL-022`
-- `planned`: `BL-029`
+- `done`: `BL-005`, `BL-006`, `BL-018`, `BL-019`, `BL-020`, `BL-021`, `BL-022`, `BL-029`
+- `planned`: `BL-030`
 - `pending`: resto del roadmap
 - Foco recomendado inmediato: sanear la deuda tecnica critica antes de abrir mas superficie de producto, empezando por `BL-023`, `BL-029`, `BL-030`, `BL-031` y `BL-032`.
 
@@ -300,12 +300,16 @@ Este documento concentra el backlog activo del proyecto, con estado visible para
 - **Prioridad**: Media
 
 ### BL-029 Descomponer `match.State` y fijar fronteras del runtime tactico
-- **Estado**: `planned`
+- **Estado**: `done`
 - **Tipo**: Calidad + Discovery
 - **Objetivo**: reducir el acoplamiento actual del runtime tactico separando encounter, estado de mazo, recursos del jugador, thresholds de ronda y vistas de presentacion, evitando que `match.State` siga creciendo como estado universal del juego.
 - **Resultado esperado**: ownership mas claro del estado mutable del combate, contratos mas estrechos entre `game`, `progression`, `endings`, `presentation` y futuros estados de run, y una ruta concreta para convivir con un `RunState` sin convertir `match.State` en un god object.
 - **Dependencias**: `BL-018`
 - **Plan relacionado**: `docs/features/019-descomponer-match-state-y-fronteras-runtime-tactico.md`
+- **Notas de cierre**:
+  - El runtime tactico ya separa `Round`, `Player` y `Lifecycle` como subestados explicitos dentro de `match.State`.
+  - `engine`, `progression`, `endings`, `presentation`, `session` y el runtime de recursos del jugador ya consumen esa frontera mas explicita.
+  - Queda fijado que `match.State` representa solo un duelo aislado y no debe absorber estado futuro de run.
 - **Contexto actual detectado**:
   - `match.State` concentra encounter, deck, loadout, recursos del jugador, stats y flag de fin del duelo en una sola estructura compartida.
   - `game`, `progression`, `endings`, `presentation` y `app/session` consumen o mutan directamente ese estado, lo que hace que cualquier ampliacion ripplee varias capas.
@@ -318,11 +322,12 @@ Este documento concentra el backlog activo del proyecto, con estado visible para
 - **Prioridad**: Alta
 
 ### BL-030 Consolidar runtime de combate y fronteras de paquetes
-- **Estado**: `pending`
+- **Estado**: `planned`
 - **Tipo**: Calidad + Delivery
 - **Objetivo**: reducir la fragmentacion funcional actual entre `internal/game/`, `internal/rules/`, `internal/progression/`, `internal/endings/` e `internal/encounter/`, dejando ownership mas claro de la logica del duelo y preparando una arquitectura de combate mas estable para seguir creciendo.
 - **Resultado esperado**: mapa de responsabilidades y una refactorizacion acotada que reduzca imports cruzados, clarifique que parte del combate evalua, que parte progresa, que parte cierra el encounter y que parte modela runtime, alineandose con la direccion ya expresada en la feature de arquitectura de paquetes.
 - **Dependencias**: `BL-018`, `BL-029`
+- **Plan relacionado**: `docs/features/020-consolidar-runtime-de-combate-y-fronteras-de-paquetes.md`
 - **Contexto actual detectado**:
   - La capacidad de combate sigue repartida entre varios paquetes transicionales y no converge todavia en una frontera estable.
   - Las reglas de progresion, evaluacion y cierre del encounter ya estan separadas, pero la expansion futura de zonas, roles de encounter o run puede volver mas opaca la superficie entre esos paquetes.
@@ -330,6 +335,7 @@ Este documento concentra el backlog activo del proyecto, con estado visible para
 - **Direccion actual acordada**:
   - La meta no es un gran rewrite, sino completar una consolidacion incremental del runtime de combate.
   - Esta tarea debe apoyarse en fronteras mejores de estado y no al reves.
+  - Debe incluir la revision de si `presentation` puede depender de snapshots tacticos mas estrechos que el ensamblado completo actual.
   - La reorganizacion debe preservar el comportamiento actual del duelo y su capacidad de testeo.
 - **Prioridad**: Media
 

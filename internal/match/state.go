@@ -57,15 +57,9 @@ type PlayerMoveResources struct {
 	Moves []PlayerMoveState
 }
 
-type RoundThresholdState struct {
-	CaptureDistanceBonus           int
-	ExhaustionCaptureDistanceBonus int
-	SurfaceDepthBonus              int
-}
-
 type RoundState struct {
 	Number     int
-	Thresholds RoundThresholdState
+	Thresholds encounter.RoundThresholds
 }
 
 type PlayerState struct {

@@ -6,6 +6,7 @@ import (
 	"pesca/internal/cards"
 	"pesca/internal/deck"
 	"pesca/internal/domain"
+	"pesca/internal/encounter"
 	"pesca/internal/match"
 )
 
@@ -118,7 +119,7 @@ func (engine *Engine) PlayRound(playerMove domain.Move) (match.RoundResult, erro
 		Owner: cards.OwnerFish,
 		Phase: cards.PhaseDraw,
 	})...)
-	applyRoundScopedEffects(&engine.state, drawEffects)
+	encounter.ApplyThresholdEffects(&engine.state.Round.Thresholds, drawEffects)
 
 	roundOutcome := engine.roundEvaluator.Evaluate(playerMove, fishCard.Move)
 	engine.playerMoves.ConsumeMove(&engine.state, playerMove)
@@ -132,7 +133,7 @@ func (engine *Engine) PlayRound(playerMove domain.Move) (match.RoundResult, erro
 		Phase:   cards.PhaseOutcome,
 		Outcome: roundOutcome,
 	})...)
-	applyRoundScopedEffects(&engine.state, outcomeEffects)
+	encounter.ApplyThresholdEffects(&engine.state.Round.Thresholds, outcomeEffects)
 	engine.progressionPolicy.Apply(&engine.state, match.ResolvedRound{
 		PlayerMove:     playerMove,
 		PlayerCard:     playerCard,

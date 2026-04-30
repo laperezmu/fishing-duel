@@ -4,7 +4,7 @@ Traduccion de estado tecnico a contenido mostrable.
 
 ## Responsabilidad
 
-- Convertir `match.State` y `match.RoundResult` en view models.
+- Convertir snapshots tacticos estrechos del duelo en view models.
 - Resolver titulos, etiquetas de acciones y textos de resultado.
 - Permitir cambiar idioma, tono o nomenclatura sin tocar el motor.
 
@@ -12,6 +12,7 @@ Traduccion de estado tecnico a contenido mostrable.
 
 - `Catalog`: diccionario de textos.
 - `Presenter`: transforma estado a vistas.
+- `match.StatusSnapshot`, `match.RoundSnapshot`, `match.SummarySnapshot`: contratos de lectura tactica consumidos por presentacion.
 - `IntroView`, `StatusView`, `RoundView`, `SummaryView`: contratos de presentacion.
 - `MoveOption`: representa una accion del jugador junto con sus usos y su estado de recarga.
 - Las vistas del encounter muestran tanto distancia como profundidad y eventos de superficie.
@@ -23,5 +24,5 @@ Traduccion de estado tecnico a contenido mostrable.
 
 ## Regla de arquitectura
 
-- Este paquete puede conocer el dominio y el estado del juego.
+- Este paquete puede conocer el dominio y snapshots tacticos del juego.
 - No debe depender de una UI concreta.

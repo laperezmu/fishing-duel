@@ -30,7 +30,7 @@ func TestShowIntroIncludesColoredOptions(t *testing.T) {
 	err := ui.ShowIntro(presenter.Intro())
 	require.NoError(t, err)
 
-	status := presenter.Status(samplePromptState(t))
+	status := presenter.Status(match.NewStatusSnapshot(samplePromptState(t)))
 	move, err := ui.ChooseMove(status, status.MoveOptions)
 	require.NoError(t, err)
 	assert.Equal(t, domain.Blue, move)
@@ -77,7 +77,7 @@ func TestChooseMoveShowsLastRoundSummary(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	nextRoundStatus := presenter.Status(samplePromptState(t))
+	nextRoundStatus := presenter.Status(match.NewStatusSnapshot(samplePromptState(t)))
 	nextRoundStatus.RoundNumber = 2
 	nextRoundStatus.FishDistance = 2
 	nextRoundStatus.FishDepth = 1
@@ -105,7 +105,7 @@ func TestChooseMoveRejectsUnavailableMoveUntilPlayerSelectsAvailableOption(t *te
 	presenter := presentation.NewPresenter(presentation.DefaultCatalog())
 	require.NoError(t, ui.ShowIntro(presenter.Intro()))
 
-	status := presenter.Status(samplePromptState(t))
+	status := presenter.Status(match.NewStatusSnapshot(samplePromptState(t)))
 	status.MoveOptions[0].RemainingUses = 0
 	status.MoveOptions[0].Available = false
 	status.MoveOptions[0].RestoresOnRound = 3
@@ -203,7 +203,7 @@ func TestResolveCastUsesOscillatingBarAndStoresOpeningSummary(t *testing.T) {
 
 	presenter := presentation.NewPresenter(presentation.DefaultCatalog())
 	require.NoError(t, ui.ShowIntro(presenter.Intro()))
-	status := presenter.Status(samplePromptState(t))
+	status := presenter.Status(match.NewStatusSnapshot(samplePromptState(t)))
 	_, err = ui.ChooseMove(status, status.MoveOptions)
 	require.NoError(t, err)
 
