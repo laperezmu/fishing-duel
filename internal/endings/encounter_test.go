@@ -138,8 +138,9 @@ func TestEncounterEndConditionApply(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.title, func(t *testing.T) {
 			state := test.state
+			endingState := state.EndingState()
 
-			EncounterEndCondition{}.Apply(&state)
+			EncounterEndCondition{}.Apply(&endingState)
 
 			assert.Equal(t, test.wantFinished, state.Lifecycle.Finished)
 			assert.Equal(t, test.wantStatus, state.Encounter.Status)

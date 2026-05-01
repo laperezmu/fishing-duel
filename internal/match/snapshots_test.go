@@ -45,7 +45,8 @@ func TestNewRoundAndSummarySnapshot(t *testing.T) {
 		PlayerMove: domain.Blue,
 		FishMove:   domain.Red,
 		Outcome:    domain.PlayerWin,
-		State:      state,
+		Status:     NewStatusSnapshot(state),
+		Encounter:  EncounterEventSnapshot{LastEvent: state.Encounter.LastEvent},
 	})
 	summarySnapshot := NewSummarySnapshot(state)
 

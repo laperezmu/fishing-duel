@@ -11,16 +11,15 @@ Este documento concentra el backlog activo del proyecto, con estado visible para
 
 ## Foto actual
 
-- `done`: `BL-005`, `BL-006`, `BL-018`, `BL-019`, `BL-020`, `BL-021`, `BL-022`, `BL-029`
-- `planned`: `BL-030`
+- `done`: `BL-005`, `BL-006`, `BL-018`, `BL-019`, `BL-020`, `BL-021`, `BL-022`, `BL-029`, `BL-030`
+- `planned`: `BL-033`
 - `pending`: resto del roadmap
-- Foco recomendado inmediato: sanear la deuda tecnica critica antes de abrir mas superficie de producto, empezando por `BL-023`, `BL-029`, `BL-030`, `BL-031` y `BL-032`.
+- Foco recomendado inmediato: sanear la deuda tecnica critica antes de abrir mas superficie de producto, empezando por `BL-033`, `BL-023`, `BL-031` y `BL-032`.
 
 ## Foco sugerido actual
 
+- `BL-033`: cerrar el acoplamiento residual que quedo tras `BL-030` antes de crecer sobre run o UI-agnostic.
 - `BL-023`: desacoplar setup, opening y presentacion para dejar el CLI como adaptador y bajar riesgo de crecimiento.
-- `BL-029`: cortar el crecimiento de `match.State` antes de introducir runtime de run.
-- `BL-030`: consolidar fronteras del runtime de combate sobre una base de estado mas sana.
 - `BL-031`: centralizar politicas, defaults y heuristicas tacticas para reducir magic numbers y drift.
 - `BL-032`: endurecer el pipeline tecnico para que el refactor se sostenga con menos friccion.
 
@@ -322,12 +321,16 @@ Este documento concentra el backlog activo del proyecto, con estado visible para
 - **Prioridad**: Alta
 
 ### BL-030 Consolidar runtime de combate y fronteras de paquetes
-- **Estado**: `planned`
+- **Estado**: `done`
 - **Tipo**: Calidad + Delivery
 - **Objetivo**: reducir la fragmentacion funcional actual entre `internal/game/`, `internal/rules/`, `internal/progression/`, `internal/endings/` e `internal/encounter/`, dejando ownership mas claro de la logica del duelo y preparando una arquitectura de combate mas estable para seguir creciendo.
 - **Resultado esperado**: mapa de responsabilidades y una refactorizacion acotada que reduzca imports cruzados, clarifique que parte del combate evalua, que parte progresa, que parte cierra el encounter y que parte modela runtime, alineandose con la direccion ya expresada en la feature de arquitectura de paquetes.
 - **Dependencias**: `BL-018`, `BL-029`
 - **Plan relacionado**: `docs/features/020-consolidar-runtime-de-combate-y-fronteras-de-paquetes.md`
+- **Notas de cierre**:
+  - `presentation` ya consume snapshots tacticos mas estrechos para status, ronda y resumen final en lugar de depender del ensamblado completo del duelo.
+  - Los thresholds y helpers de captura quedaron consolidados bajo `encounter`, dejando a `game` mas centrado en orquestacion.
+  - La consolidacion principal del runtime ya esta integrada y la deuda residual queda trazada en `BL-033`.
 - **Contexto actual detectado**:
   - La capacidad de combate sigue repartida entre varios paquetes transicionales y no converge todavia en una frontera estable.
   - Las reglas de progresion, evaluacion y cierre del encounter ya estan separadas, pero la expansion futura de zonas, roles de encounter o run puede volver mas opaca la superficie entre esos paquetes.
@@ -338,6 +341,28 @@ Este documento concentra el backlog activo del proyecto, con estado visible para
   - Debe incluir la revision de si `presentation` puede depender de snapshots tacticos mas estrechos que el ensamblado completo actual.
   - La reorganizacion debe preservar el comportamiento actual del duelo y su capacidad de testeo.
 - **Prioridad**: Media
+
+### BL-033 Adelgazar contratos residuales del runtime tactico post-`BL-030`
+- **Estado**: `planned`
+- **Tipo**: Calidad + Delivery
+- **Objetivo**: cerrar el acoplamiento residual que sigue concentrado en contratos transicionales del duelo, especialmente en `match.RoundResult`, el mapeo de estado visible del mazo y las mutaciones directas de `*match.State` desde colaboradores tacticos, para que el runtime quede listo para crecer sin volver a recentralizar conocimiento en `game`.
+- **Resultado esperado**: superficies de lectura y escritura mas estrechas entre `game`, `match`, `progression`, `endings` y `encounter`; ownership mas claro del estado visible del mazo; y resultados de ronda que expongan solo la informacion tactica que realmente necesitan las capas consumidoras.
+- **Dependencias**: `BL-030`
+- **Plan relacionado**: `docs/features/021-adelgazar-contratos-residuales-del-runtime-tactico.md`
+- **Justificacion**:
+  - `BL-030` ya resolvio la consolidacion principal, pero el merge deja visible una segunda capa de deuda mas fina que no conviene arrastrar a `BL-023` ni al futuro runtime de run.
+  - Si `RoundResult` y los colaboradores tacticos siguen apoyandose en `match.State` o en mapeos orquestados desde `game`, el proyecto corre el riesgo de reintroducir un nuevo centro de gravedad accidental en el engine.
+  - Capturar este follow-up como backlog explicito permite cerrar la frontera del duelo con una tarea acotada, en vez de diluirla dentro de futuras features de UI o producto.
+- **Contexto actual detectado**:
+  - El duelo ya tiene snapshots tacticos utiles para `presentation`, pero el resultado de ronda sigue siendo mas ancho de lo necesario para algunas capas consumidoras.
+  - Parte del estado visible del mazo sigue dependiendo de mapeos ensamblados desde el engine en lugar de vivir claramente junto a su owner natural.
+  - `progression` y `endings` todavia pueden apoyarse en mutaciones directas del ensamblado tactico completo en puntos donde convendria evaluar contratos mas finos.
+- **Direccion actual acordada**:
+  - Revisar si `match.RoundResult` puede adelgazar su superficie sin perder legibilidad ni testabilidad.
+  - Mover el mapeo del estado visible del mazo hacia un owner mas natural que `game` cuando el cambio reduzca coupling real.
+  - Evaluar interfaces o subestados mas estrechos para `progression` y `endings` sin convertir la tarea en un rewrite total del combate.
+  - Mantener fuera de scope una reorganizacion cosmetica de paquetes que no mejore ownership real.
+- **Prioridad**: Alta
 
 ### BL-031 Centralizar constantes y politicas de balance del encounter
 - **Estado**: `pending`
@@ -423,22 +448,21 @@ Este documento concentra el backlog activo del proyecto, con estado visible para
 
 ## Orden sugerido del trabajo pendiente
 
-1. `BL-023`
-2. `BL-029`
-3. `BL-030`
-4. `BL-031`
-5. `BL-032`
-6. `BL-001`
-7. `BL-011`
-8. `BL-002`
-9. `BL-008`
-10. `BL-003`
-11. `BL-012`
-12. `BL-007`
-13. `BL-015`
-14. `BL-017`
-15. `BL-013`
-16. `BL-016`
-17. `BL-010`
-18. `BL-009`
-19. `BL-014`
+1. `BL-033`
+2. `BL-023`
+3. `BL-031`
+4. `BL-032`
+5. `BL-001`
+6. `BL-011`
+7. `BL-002`
+8. `BL-008`
+9. `BL-003`
+10. `BL-012`
+11. `BL-007`
+12. `BL-015`
+13. `BL-017`
+14. `BL-013`
+15. `BL-016`
+16. `BL-010`
+17. `BL-009`
+18. `BL-014`

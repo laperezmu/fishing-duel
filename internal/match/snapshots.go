@@ -102,8 +102,8 @@ func NewStatusSnapshot(state State) StatusSnapshot {
 
 func NewRoundSnapshot(result RoundResult) RoundSnapshot {
 	return RoundSnapshot{
-		Status:     NewStatusSnapshot(result.State),
-		Encounter:  EncounterEventSnapshot{LastEvent: result.State.Encounter.LastEvent},
+		Status:     result.Status,
+		Encounter:  result.Encounter,
 		PlayerMove: result.PlayerMove,
 		FishMove:   result.FishMove,
 		Outcome:    result.Outcome,

@@ -143,8 +143,9 @@ func TestTrackPolicyApply(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.title, func(t *testing.T) {
 			state := test.initialState(t)
+			progressionState := state.ProgressionState()
 
-			test.policy.Apply(&state, test.round)
+			test.policy.Apply(&progressionState, test.round)
 
 			assert.Equal(t, test.wantDistance, state.Encounter.Distance)
 			assert.Equal(t, test.wantDepth, state.Encounter.Depth)
@@ -162,8 +163,9 @@ func TestTrackPolicyApplyUsesRoundThresholdBonuses(t *testing.T) {
 	state.Encounter.Distance = 1
 	state.Encounter.Depth = 2
 	state.Round.Thresholds.CaptureDistanceBonus = 1
+	progressionState := state.ProgressionState()
 
-	TrackPolicy{}.Apply(&state, match.ResolvedRound{
+	TrackPolicy{}.Apply(&progressionState, match.ResolvedRound{
 		PlayerMove:     domain.Blue,
 		FishCard:       cards.NewFishCard(domain.Red),
 		OutcomeEffects: nil,

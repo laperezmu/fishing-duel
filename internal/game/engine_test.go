@@ -145,7 +145,7 @@ func TestEnginePlayRound(t *testing.T) {
 		discardCountCall := fixture.fishDeck.On("DiscardCount").Return(5).Once()
 		recycleCountCall := fixture.fishDeck.On("RecycleCount").Return(2).Once()
 		exhaustedCall := fixture.fishDeck.On("Exhausted").Return(false).Once()
-		endConditionCall := fixture.endCondition.On("Apply", mock.AnythingOfType("*match.State")).Once()
+		endConditionCall := fixture.endCondition.On("Apply", mock.AnythingOfType("*match.EndingState")).Once()
 		mock.InOrder(prepareRoundCall, validateMoveCall, peekCardCall, drawCall, activeCountCall, discardCountCall, recycleCountCall, exhaustedCall, endConditionCall)
 
 		result, err := fixture.engine.PlayRound(domain.Blue)
@@ -166,8 +166,8 @@ func TestEnginePlayRound(t *testing.T) {
 		discardCountCall := fixture.fishDeck.On("DiscardCount").Return(0).Once()
 		recycleCountCall := fixture.fishDeck.On("RecycleCount").Return(3).Once()
 		exhaustedCall := fixture.fishDeck.On("Exhausted").Return(true).Once()
-		endConditionCall := fixture.endCondition.On("Apply", mock.AnythingOfType("*match.State")).Run(func(arguments mock.Arguments) {
-			state := arguments.Get(0).(*match.State)
+		endConditionCall := fixture.endCondition.On("Apply", mock.AnythingOfType("*match.EndingState")).Run(func(arguments mock.Arguments) {
+			state := arguments.Get(0).(*match.EndingState)
 			state.Lifecycle.Finished = true
 		}).Once()
 		mock.InOrder(prepareRoundCall, validateMoveCall, peekCardCall, drawCall, activeCountCall, discardCountCall, recycleCountCall, exhaustedCall, endConditionCall)
@@ -203,7 +203,7 @@ func TestEnginePlayRound(t *testing.T) {
 			state := arguments.Get(0).(*match.State)
 			assert.Equal(t, 1, state.Round.Number)
 		}).Return(playerCard).Once()
-		progressionCall := fixture.progressionPolicy.On("Apply", mock.AnythingOfType("*match.State"), match.ResolvedRound{
+		progressionCall := fixture.progressionPolicy.On("Apply", mock.AnythingOfType("*match.ProgressionState"), match.ResolvedRound{
 			PlayerMove: domain.Blue,
 			PlayerCard: playerCard,
 			FishCard:   fishCard,
@@ -220,7 +220,7 @@ func TestEnginePlayRound(t *testing.T) {
 			}},
 			Outcome: domain.PlayerWin,
 		}).Run(func(arguments mock.Arguments) {
-			state := arguments.Get(0).(*match.State)
+			state := arguments.Get(0).(*match.ProgressionState)
 			assert.Equal(t, 1, state.Round.Thresholds.CaptureDistanceBonus)
 			assert.Equal(t, 1, state.Round.Thresholds.SurfaceDepthBonus)
 			state.Lifecycle.Stats.PlayerWins++
@@ -234,8 +234,8 @@ func TestEnginePlayRound(t *testing.T) {
 			state := arguments.Get(0).(*match.State)
 			assert.Equal(t, 1, state.Round.Number)
 		}).Once()
-		endConditionCall := fixture.endCondition.On("Apply", mock.AnythingOfType("*match.State")).Run(func(arguments mock.Arguments) {
-			state := arguments.Get(0).(*match.State)
+		endConditionCall := fixture.endCondition.On("Apply", mock.AnythingOfType("*match.EndingState")).Run(func(arguments mock.Arguments) {
+			state := arguments.Get(0).(*match.EndingState)
 			assert.Equal(t, 1, state.Round.Thresholds.CaptureDistanceBonus)
 			assert.Equal(t, 1, state.Round.Thresholds.SurfaceDepthBonus)
 		}).Once()
@@ -266,10 +266,10 @@ func TestEnginePlayRound(t *testing.T) {
 		assert.Equal(t, domain.Red, result.FishMove)
 		assert.Equal(t, fishCard, result.FishCard)
 		assert.Equal(t, domain.PlayerWin, result.Outcome)
-		assert.Equal(t, 6, result.State.Deck.ActiveCards)
-		assert.Equal(t, 3, result.State.Deck.DiscardCards)
-		assert.Equal(t, 1, result.State.Lifecycle.Stats.PlayerWins)
-		assert.Equal(t, match.RoundState{Number: 1}, result.State.Round)
+		assert.Equal(t, 6, result.Status.FishDiscard.ActiveCards)
+		assert.Equal(t, 3, result.Status.FishDiscard.DiscardCards)
+		assert.Equal(t, 1, result.Status.Stats.PlayerWins)
+		assert.Equal(t, 2, result.Status.RoundNumber)
 		assert.Equal(t, match.RoundState{Number: 1}, fixture.engine.State().Round)
 		fixture.assertExpectations(t)
 	})
@@ -346,10 +346,12 @@ func TestEnginePlayRound(t *testing.T) {
 		result, err := engine.PlayRound(domain.Blue)
 
 		require.NoError(t, err)
-		assert.True(t, result.State.Lifecycle.Finished)
-		assert.Equal(t, encounter.StatusCaptured, result.State.Encounter.Status)
-		assert.Equal(t, encounter.EndReasonTrackCapture, result.State.Encounter.EndReason)
-		assert.Equal(t, match.RoundState{Number: 1}, result.State.Round)
+		assert.Equal(t, engine.State().Encounter.LastEvent, result.Encounter.LastEvent)
+		assert.Equal(t, 2, result.Status.RoundNumber)
+		assert.True(t, engine.State().Lifecycle.Finished)
+		assert.Equal(t, encounter.StatusCaptured, engine.State().Encounter.Status)
+		assert.Equal(t, encounter.EndReasonTrackCapture, engine.State().Encounter.EndReason)
+		assert.Equal(t, match.RoundState{Number: 1}, engine.State().Round)
 		fishDeck.AssertExpectations(t)
 		playerMoveController.AssertExpectations(t)
 		roundEvaluator.AssertExpectations(t)
@@ -406,7 +408,7 @@ func newEngineFixture(t *testing.T, initialState match.State) engineFixture {
 	discardCountCall := fishDeck.On("DiscardCount").Return(2).Once()
 	recycleCountCall := fishDeck.On("RecycleCount").Return(1).Once()
 	exhaustedCall := fishDeck.On("Exhausted").Return(true).Once()
-	endConditionCall := endCondition.On("Apply", mock.AnythingOfType("*match.State")).Once()
+	endConditionCall := endCondition.On("Apply", mock.AnythingOfType("*match.EndingState")).Once()
 	mock.InOrder(initializeCall, prepareDeckCall, activeCountCall, discardCountCall, recycleCountCall, exhaustedCall, endConditionCall)
 
 	engine, err := game.NewEngine(
@@ -550,7 +552,7 @@ type mockProgressionPolicy struct {
 	mock.Mock
 }
 
-func (mockPolicy *mockProgressionPolicy) Apply(state *match.State, round match.ResolvedRound) {
+func (mockPolicy *mockProgressionPolicy) Apply(state *match.ProgressionState, round match.ResolvedRound) {
 	mockPolicy.Called(state, round)
 }
 
@@ -558,6 +560,6 @@ type mockEndCondition struct {
 	mock.Mock
 }
 
-func (mockCondition *mockEndCondition) Apply(state *match.State) {
+func (mockCondition *mockEndCondition) Apply(state *match.EndingState) {
 	mockCondition.Called(state)
 }

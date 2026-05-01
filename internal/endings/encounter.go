@@ -7,7 +7,7 @@ import (
 
 type EncounterEndCondition struct{}
 
-func (EncounterEndCondition) Apply(state *match.State) {
+func (EncounterEndCondition) Apply(state *match.EndingState) {
 	if state.Encounter.EndReason == encounter.EndReasonSplashEscape {
 		state.Lifecycle.Finished = true
 		state.Encounter.Status = encounter.StatusEscaped
@@ -19,7 +19,7 @@ func (EncounterEndCondition) Apply(state *match.State) {
 	state.Encounter.EndReason = encounter.EndReasonNone
 
 	switch {
-	case encounter.IsTrackCapture(state.Encounter, state.Round.Thresholds):
+	case encounter.IsTrackCapture(*state.Encounter, state.Round.Thresholds):
 		state.Encounter.Status = encounter.StatusCaptured
 		state.Encounter.EndReason = encounter.EndReasonTrackCapture
 	case state.Encounter.Distance > state.Player.Loadout.TrackMaxDistance():
@@ -29,7 +29,7 @@ func (EncounterEndCondition) Apply(state *match.State) {
 		state.Encounter.Status = encounter.StatusEscaped
 		state.Encounter.EndReason = encounter.EndReasonDepthEscape
 	case state.Deck.Exhausted:
-		if encounter.IsDeckExhaustionCapture(state.Encounter, state.Round.Thresholds) {
+		if encounter.IsDeckExhaustionCapture(*state.Encounter, state.Round.Thresholds) {
 			state.Encounter.Status = encounter.StatusCaptured
 			state.Encounter.EndReason = encounter.EndReasonDeckCapture
 		} else {

@@ -203,7 +203,13 @@ func newSessionFixture(t *testing.T) sessionFixture {
 	status := presentation.StatusView{RoundNumber: 1, MoveOptions: intro.Options}
 	ongoingState := match.State{Round: match.RoundState{Number: 0}}
 	finishedState := match.State{Round: match.RoundState{Number: 1}, Lifecycle: match.LifecycleState{Finished: true}}
-	roundResult := match.RoundResult{Round: 1, PlayerMove: domain.Blue, Outcome: domain.PlayerWin, State: finishedState}
+	roundResult := match.RoundResult{
+		Round:      1,
+		PlayerMove: domain.Blue,
+		Outcome:    domain.PlayerWin,
+		Status:     match.NewStatusSnapshot(finishedState),
+		Encounter:  match.EncounterEventSnapshot{LastEvent: finishedState.Encounter.LastEvent},
+	}
 	statusSnapshot := match.NewStatusSnapshot(ongoingState)
 	roundSnapshot := match.NewRoundSnapshot(roundResult)
 	summarySnapshot := match.NewSummarySnapshot(finishedState)

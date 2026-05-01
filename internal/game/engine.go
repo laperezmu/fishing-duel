@@ -17,11 +17,11 @@ type RoundEvaluator interface {
 }
 
 type MatchProgressionPolicy interface {
-	Apply(state *match.State, round match.ResolvedRound)
+	Apply(state *match.ProgressionState, round match.ResolvedRound)
 }
 
 type MatchEndCondition interface {
-	Apply(state *match.State)
+	Apply(state *match.EndingState)
 }
 
 type FishDeck interface {
@@ -76,7 +76,8 @@ func NewEngine(fishDeck FishDeck, playerMoves PlayerMoveController, roundEvaluat
 	engine.playerMoves.Initialize(&engine.state)
 	engine.fishDeck.PrepareNextRound()
 	engine.refreshState()
-	engine.endCondition.Apply(&engine.state)
+	endingState := engine.state.EndingState()
+	engine.endCondition.Apply(&endingState)
 
 	return engine, nil
 }
@@ -103,7 +104,8 @@ func (engine *Engine) PlayRound(playerMove domain.Move) (match.RoundResult, erro
 	fishCard, err := engine.fishDeck.Draw()
 	if err != nil {
 		engine.refreshState()
-		engine.endCondition.Apply(&engine.state)
+		endingState := engine.state.EndingState()
+		engine.endCondition.Apply(&endingState)
 		if engine.state.Lifecycle.Finished {
 			return match.RoundResult{}, ErrGameFinished
 		}
@@ -134,7 +136,8 @@ func (engine *Engine) PlayRound(playerMove domain.Move) (match.RoundResult, erro
 		Outcome: roundOutcome,
 	})...)
 	encounter.ApplyThresholdEffects(&engine.state.Round.Thresholds, outcomeEffects)
-	engine.progressionPolicy.Apply(&engine.state, match.ResolvedRound{
+	progressionState := engine.state.ProgressionState()
+	engine.progressionPolicy.Apply(&progressionState, match.ResolvedRound{
 		PlayerMove:     playerMove,
 		PlayerCard:     playerCard,
 		FishCard:       fishCard,
@@ -146,7 +149,8 @@ func (engine *Engine) PlayRound(playerMove domain.Move) (match.RoundResult, erro
 	engine.fishDeck.PrepareNextRound()
 	engine.refreshState()
 	engine.playerMoves.PrepareRound(&engine.state)
-	engine.endCondition.Apply(&engine.state)
+	endingState := engine.state.EndingState()
+	engine.endCondition.Apply(&endingState)
 	engine.resetRoundState()
 
 	return match.RoundResult{
@@ -156,54 +160,22 @@ func (engine *Engine) PlayRound(playerMove domain.Move) (match.RoundResult, erro
 		FishMove:   fishCard.Move,
 		FishCard:   fishCard,
 		Outcome:    roundOutcome,
-		State:      engine.state,
+		Status:     match.NewStatusSnapshot(engine.state),
+		Encounter:  match.EncounterEventSnapshot{LastEvent: engine.state.Encounter.LastEvent},
 	}, nil
 }
 
 func (engine *Engine) refreshState() {
 	visibilitySnapshot := engine.fishDeck.VisibilitySnapshot()
-	engine.state.Deck.ActiveCards = engine.fishDeck.ActiveCount()
-	engine.state.Deck.DiscardCards = engine.fishDeck.DiscardCount()
-	engine.state.Deck.RecycleCount = engine.fishDeck.RecycleCount()
-	engine.state.Deck.Exhausted = engine.fishDeck.Exhausted()
-	engine.state.Deck.ShufflesOnRecycle = visibilitySnapshot.ShufflesOnRecycle
-	engine.state.Deck.CardsToRemove = visibilitySnapshot.CardsToRemove
-	engine.state.Deck.CurrentCycle = mapVisibleDiscardCycleState(visibilitySnapshot.CurrentCycle)
-	engine.state.Deck.PreviousCycleStats = mapVisibleDiscardCycleSummaryStates(visibilitySnapshot.PreviousCycles)
+	engine.state.Deck = match.NewDeckState(
+		engine.fishDeck.ActiveCount(),
+		engine.fishDeck.DiscardCount(),
+		engine.fishDeck.RecycleCount(),
+		engine.fishDeck.Exhausted(),
+		visibilitySnapshot,
+	)
 }
 
 func (engine *Engine) resetRoundState() {
 	engine.state.Round = match.RoundState{Number: engine.state.Round.Number}
-}
-
-func mapVisibleDiscardCycleState(cycle deck.VisibleDiscardCycle) match.FishDiscardCycleState {
-	entries := make([]match.FishDiscardEntryState, 0, len(cycle.Entries))
-	for _, entry := range cycle.Entries {
-		entries = append(entries, match.FishDiscardEntryState{
-			Visibility: entry.Visibility,
-			Move:       entry.Move,
-			Name:       entry.Name,
-			Summary:    entry.Summary,
-		})
-	}
-
-	return match.FishDiscardCycleState{
-		Number:     cycle.Number,
-		TotalCards: cycle.TotalCards,
-		Entries:    entries,
-	}
-}
-
-func mapVisibleDiscardCycleSummaryStates(summaries []deck.VisibleDiscardCycleSummary) []match.FishDiscardCycleSummaryState {
-	mappedSummaries := make([]match.FishDiscardCycleSummaryState, 0, len(summaries))
-	for _, summary := range summaries {
-		mappedSummaries = append(mappedSummaries, match.FishDiscardCycleSummaryState{
-			Number:       summary.Number,
-			TotalCards:   summary.TotalCards,
-			VisibleCards: summary.VisibleCards,
-			HiddenCards:  summary.HiddenCards,
-		})
-	}
-
-	return mappedSummaries
 }

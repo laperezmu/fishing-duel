@@ -11,7 +11,7 @@ type TrackPolicy struct {
 	SplashEscapeDecider encounter.SplashEscapeDecider
 }
 
-func (policy TrackPolicy) Apply(state *match.State, round match.ResolvedRound) {
+func (policy TrackPolicy) Apply(state *match.ProgressionState, round match.ResolvedRound) {
 	delta := encounter.Delta{}
 	captureDistance := encounter.EffectiveCaptureDistance(state.Encounter.Config, state.Round.Thresholds)
 	surfaceDepth := encounter.EffectiveSurfaceDepth(state.Encounter.Config, state.Round.Thresholds)
@@ -33,7 +33,7 @@ func (policy TrackPolicy) Apply(state *match.State, round match.ResolvedRound) {
 
 	delta = accumulateCardEffects(delta, round.OutcomeEffects)
 
-	encounter.ApplyDelta(&state.Encounter, delta, policy.SplashEscapeDecider)
+	encounter.ApplyDelta(state.Encounter, delta, policy.SplashEscapeDecider)
 }
 
 func accumulateCardEffects(delta encounter.Delta, effects []cards.CardEffect) encounter.Delta {

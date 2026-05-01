@@ -140,7 +140,8 @@ func TestPresenterRound(t *testing.T) {
 		PlayerMove: domain.Blue,
 		FishMove:   domain.Red,
 		Outcome:    domain.PlayerWin,
-		State:      match.State{Encounter: encounterState},
+		Status:     match.NewStatusSnapshot(match.State{Encounter: encounterState}),
+		Encounter:  match.EncounterEventSnapshot{LastEvent: encounterState.LastEvent},
 	}))
 
 	assert.Equal(t, "Lanzar", round.PlayerLabel)
