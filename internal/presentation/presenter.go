@@ -3,6 +3,9 @@ package presentation
 import (
 	"fmt"
 	"pesca/internal/cards"
+	"pesca/internal/content/fishprofiles"
+	"pesca/internal/content/habitats"
+	"pesca/internal/content/waterpools"
 	"pesca/internal/domain"
 	"pesca/internal/encounter"
 	"pesca/internal/match"
@@ -122,6 +125,35 @@ func (p Presenter) Summary(snapshot match.SummarySnapshot) SummaryView {
 		PlayerWins:      snapshot.Stats.PlayerWins,
 		FishWins:        snapshot.Stats.FishWins,
 		Draws:           snapshot.Stats.Draws,
+	}
+}
+
+func (p Presenter) Opening(opening encounter.Opening) OpeningView {
+	return OpeningView{
+		WaterLabel:      opening.WaterContext.Name,
+		CastLabel:       opening.CastResult.Band.Label(),
+		InitialDistance: opening.InitialDistance,
+		InitialDepth:    opening.InitialDepth,
+	}
+}
+
+func (p Presenter) Spawn(spawn fishprofiles.Spawn) SpawnView {
+	return SpawnView{
+		ProfileLabel:    spawn.Profile.Name,
+		WaterBaseLabel:  waterpools.Name(spawn.Context.WaterPoolTag),
+		InitialDistance: spawn.Context.InitialDistance,
+		InitialDepth:    spawn.Context.InitialDepth,
+		CandidateCount:  spawn.CandidateCount,
+		HabitatLabels:   habitats.Names(spawn.Context.HabitatTags),
+	}
+}
+
+func (p Presenter) Cast(context encounter.WaterContext, position, totalSlots, sectionWidth int) CastView {
+	return CastView{
+		WaterLabel:   context.Name,
+		Position:     position,
+		TotalSlots:   totalSlots,
+		SectionWidth: sectionWidth,
 	}
 }
 

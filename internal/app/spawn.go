@@ -5,15 +5,23 @@ import (
 	"pesca/internal/content/fishprofiles"
 	"pesca/internal/encounter"
 	"pesca/internal/player/loadout"
+	"pesca/internal/presentation"
 )
 
 type SpawnUI interface {
-	ShowFishSpawn(title string, spawn fishprofiles.Spawn) error
+	ShowFishSpawn(title string, spawn presentation.SpawnView) error
 }
 
-func ResolveFishSpawn(title string, opening encounter.Opening, playerLoadout loadout.State, profiles []fishprofiles.Profile, ui SpawnUI) (fishprofiles.Spawn, error) {
+type SpawnPresenter interface {
+	Spawn(spawn fishprofiles.Spawn) presentation.SpawnView
+}
+
+func ResolveFishSpawn(title string, opening encounter.Opening, playerLoadout loadout.State, profiles []fishprofiles.Profile, ui SpawnUI, presenter SpawnPresenter) (fishprofiles.Spawn, error) {
 	if ui == nil {
 		return fishprofiles.Spawn{}, fmt.Errorf("spawn ui is required")
+	}
+	if presenter == nil {
+		return fishprofiles.Spawn{}, fmt.Errorf("spawn presenter is required")
 	}
 	if err := playerLoadout.Validate(); err != nil {
 		return fishprofiles.Spawn{}, fmt.Errorf("player loadout: %w", err)
@@ -32,7 +40,7 @@ func ResolveFishSpawn(title string, opening encounter.Opening, playerLoadout loa
 		return fishprofiles.Spawn{}, fmt.Errorf("resolve fish spawn: %w", err)
 	}
 
-	if err := ui.ShowFishSpawn(title, spawn); err != nil {
+	if err := ui.ShowFishSpawn(title, presenter.Spawn(spawn)); err != nil {
 		return fishprofiles.Spawn{}, fmt.Errorf("show fish spawn: %w", err)
 	}
 

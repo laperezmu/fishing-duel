@@ -9,6 +9,7 @@ import (
 	"pesca/internal/encounter"
 	"pesca/internal/player/loadout"
 	"pesca/internal/player/rod"
+	"pesca/internal/presentation"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -24,12 +25,13 @@ func TestResolveFishSpawn(t *testing.T) {
 		InitialDepth:    1,
 	}
 	ui := &mockSpawnUI{}
+	presenter := presentation.NewPresenter(presentation.DefaultCatalog())
 
-	ui.On("ShowFishSpawn", "Pesca", mock.MatchedBy(func(spawn fishprofiles.Spawn) bool {
-		return spawn.Profile.ID == "surface-control" && spawn.CandidateCount >= 2
+	ui.On("ShowFishSpawn", "Pesca", mock.MatchedBy(func(spawn presentation.SpawnView) bool {
+		return spawn.ProfileLabel == "Control de superficie" && spawn.CandidateCount >= 2
 	})).Return(nil).Once()
 
-	spawn, err := app.ResolveFishSpawn("Pesca", opening, playerLoadout, fishprofiles.DefaultProfiles(), ui)
+	spawn, err := app.ResolveFishSpawn("Pesca", opening, playerLoadout, fishprofiles.DefaultProfiles(), ui, presenter)
 
 	require.NoError(t, err)
 	assert.Equal(t, "surface-control", spawn.Profile.ID)
@@ -38,7 +40,7 @@ func TestResolveFishSpawn(t *testing.T) {
 
 func TestResolveFishSpawnWrapsErrors(t *testing.T) {
 	t.Run("returns an error when ui is missing", func(t *testing.T) {
-		_, err := app.ResolveFishSpawn("Pesca", encounter.Opening{}, sampleSurfaceLoadout(t), fishprofiles.DefaultProfiles(), nil)
+		_, err := app.ResolveFishSpawn("Pesca", encounter.Opening{}, sampleSurfaceLoadout(t), fishprofiles.DefaultProfiles(), nil, presentation.NewPresenter(presentation.DefaultCatalog()))
 
 		require.Error(t, err)
 		assert.EqualError(t, err, "spawn ui is required")
@@ -52,7 +54,7 @@ func TestResolveFishSpawnWrapsErrors(t *testing.T) {
 			InitialDepth:    4,
 		}
 
-		_, err := app.ResolveFishSpawn("Pesca", opening, sampleLoadout(t), fishprofiles.DefaultProfiles(), ui)
+		_, err := app.ResolveFishSpawn("Pesca", opening, sampleLoadout(t), fishprofiles.DefaultProfiles(), ui, presentation.NewPresenter(presentation.DefaultCatalog()))
 
 		require.Error(t, err)
 		assert.Contains(t, err.Error(), "resolve fish spawn: no fish profile matches water offshore")
@@ -67,7 +69,7 @@ func TestResolveFishSpawnWrapsErrors(t *testing.T) {
 		}
 		ui.On("ShowFishSpawn", "Pesca", mock.Anything).Return(errors.New("ui failed")).Once()
 
-		_, err := app.ResolveFishSpawn("Pesca", opening, sampleLoadout(t), fishprofiles.DefaultProfiles(), ui)
+		_, err := app.ResolveFishSpawn("Pesca", opening, sampleLoadout(t), fishprofiles.DefaultProfiles(), ui, presentation.NewPresenter(presentation.DefaultCatalog()))
 
 		require.Error(t, err)
 		assert.EqualError(t, err, "show fish spawn: ui failed")
@@ -79,7 +81,7 @@ type mockSpawnUI struct {
 	mock.Mock
 }
 
-func (ui *mockSpawnUI) ShowFishSpawn(title string, spawn fishprofiles.Spawn) error {
+func (ui *mockSpawnUI) ShowFishSpawn(title string, spawn presentation.SpawnView) error {
 	return ui.Called(title, spawn).Error(0)
 }
 

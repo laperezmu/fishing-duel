@@ -187,21 +187,21 @@ func TestResolveCastUsesOscillatingBarAndStoresOpeningSummary(t *testing.T) {
 	ui.castDelay = 0
 	ui.castFrames = []int{0}
 	waterContext := sampleWaterContextPresets()[0].BuildContext()
+	presenter := presentation.NewPresenter(presentation.DefaultCatalog())
 
-	castResult, err := ui.ResolveCast("Pesca: duelo contra el pez", waterContext)
+	castResult, err := ui.ResolveCast("Pesca: duelo contra el pez", waterContext, presenter)
 	require.NoError(t, err)
 	assert.Equal(t, encounter.CastBandVeryShort, castResult.Band)
 
 	opening, err := encounter.ResolveOpening(encounter.DefaultConfig(), waterContext, castResult, encounter.OpeningLimits{MaxInitialDistance: 5, MaxInitialDepth: 3})
 	require.NoError(t, err)
-	require.NoError(t, ui.ShowEncounterOpening("Pesca: duelo contra el pez", opening))
-	require.NoError(t, ui.ShowFishSpawn("Pesca: duelo contra el pez", fishprofiles.Spawn{
+	require.NoError(t, ui.ShowEncounterOpening("Pesca: duelo contra el pez", presenter.Opening(opening)))
+	require.NoError(t, ui.ShowFishSpawn("Pesca: duelo contra el pez", presenter.Spawn(fishprofiles.Spawn{
 		Profile:        fishprofiles.DefaultProfiles()[0],
 		Context:        fishprofiles.SpawnContext{WaterPoolTag: waterpools.Shoreline, InitialDistance: 0, InitialDepth: 1, HabitatTags: []habitats.Tag{habitats.Surface}},
 		CandidateCount: 1,
-	}))
+	})))
 
-	presenter := presentation.NewPresenter(presentation.DefaultCatalog())
 	require.NoError(t, ui.ShowIntro(presenter.Intro()))
 	status := presenter.Status(match.NewStatusSnapshot(samplePromptState(t)))
 	_, err = ui.ChooseMove(status, status.MoveOptions)

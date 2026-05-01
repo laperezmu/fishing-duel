@@ -9,7 +9,6 @@ import (
 	"pesca/internal/content/playerprofiles"
 	"pesca/internal/content/rodpresets"
 	"pesca/internal/domain"
-	"pesca/internal/encounter"
 	"pesca/internal/player/loadout"
 	"pesca/internal/player/rod"
 	"pesca/internal/presentation"
@@ -23,8 +22,8 @@ type UI struct {
 	out        io.Writer
 	intro      presentation.IntroView
 	lastRound  *presentation.RoundView
-	opening    *encounter.Opening
-	spawn      *fishprofiles.Spawn
+	opening    *presentation.OpeningView
+	spawn      *presentation.SpawnView
 	castDelay  time.Duration
 	castFrames []int
 }
@@ -250,7 +249,7 @@ func (ui *UI) ShowGameOver(view presentation.SummaryView) error {
 	return err
 }
 
-func (ui *UI) ShowFishSpawn(_ string, spawn fishprofiles.Spawn) error {
+func (ui *UI) ShowFishSpawn(_ string, spawn presentation.SpawnView) error {
 	resolvedSpawn := spawn
 	ui.spawn = &resolvedSpawn
 	return nil

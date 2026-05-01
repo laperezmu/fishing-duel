@@ -4,12 +4,9 @@ import (
 	"fmt"
 	"pesca/internal/content/attachmentpresets"
 	"pesca/internal/content/fishprofiles"
-	"pesca/internal/content/habitats"
 	"pesca/internal/content/playerprofiles"
 	"pesca/internal/content/rodpresets"
 	"pesca/internal/content/watercontexts"
-	"pesca/internal/content/waterpools"
-	"pesca/internal/encounter"
 	"pesca/internal/player/loadout"
 	"pesca/internal/presentation"
 	"strings"
@@ -24,7 +21,7 @@ const (
 	encounterColumnSpan = encounterCellWidth + len(encounterSeparator)
 )
 
-func renderPromptScreen(title string, status presentation.StatusView, options []presentation.MoveOption, opening *encounter.Opening, spawn *fishprofiles.Spawn, lastRound *presentation.RoundView, message string) string {
+func renderPromptScreen(title string, status presentation.StatusView, options []presentation.MoveOption, opening *presentation.OpeningView, spawn *presentation.SpawnView, lastRound *presentation.RoundView, message string) string {
 	var sections []string
 	sections = append(sections, renderHeader(title))
 	if opening != nil {
@@ -221,25 +218,25 @@ func renderStatsSection(status presentation.StatusView) string {
 	}, "\n")
 }
 
-func renderEncounterOpeningSection(opening encounter.Opening) string {
+func renderEncounterOpeningSection(opening presentation.OpeningView) string {
 	return strings.Join([]string{
 		accent("Apertura del lance"),
-		fmt.Sprintf("  Agua       : %s", opening.WaterContext.Name),
-		fmt.Sprintf("  Lance      : %s", opening.CastResult.Band.Label()),
+		fmt.Sprintf("  Agua       : %s", opening.WaterLabel),
+		fmt.Sprintf("  Lance      : %s", opening.CastLabel),
 		fmt.Sprintf("  Inicio     : distancia %d | profundidad %d", opening.InitialDistance, opening.InitialDepth),
 	}, "\n")
 }
 
-func renderFishSpawnSection(spawn fishprofiles.Spawn) string {
+func renderFishSpawnSection(spawn presentation.SpawnView) string {
 	lines := []string{
 		accent("Pez en el agua"),
-		fmt.Sprintf("  Perfil     : %s", spawn.Profile.Name),
-		fmt.Sprintf("  Agua base  : %s", waterpools.Name(spawn.Context.WaterPoolTag)),
-		fmt.Sprintf("  Ventana    : distancia %d | profundidad %d", spawn.Context.InitialDistance, spawn.Context.InitialDepth),
+		fmt.Sprintf("  Perfil     : %s", spawn.ProfileLabel),
+		fmt.Sprintf("  Agua base  : %s", spawn.WaterBaseLabel),
+		fmt.Sprintf("  Ventana    : distancia %d | profundidad %d", spawn.InitialDistance, spawn.InitialDepth),
 		fmt.Sprintf("  Candidatos : %d", spawn.CandidateCount),
 	}
-	if len(spawn.Context.HabitatTags) > 0 {
-		lines = append(lines, "  Habitats   : "+strings.Join(habitats.Names(spawn.Context.HabitatTags), ", "))
+	if len(spawn.HabitatLabels) > 0 {
+		lines = append(lines, "  Habitats   : "+strings.Join(spawn.HabitatLabels, ", "))
 	}
 
 	return strings.Join(lines, "\n")
@@ -548,10 +545,10 @@ func renderFishDeckOrder(preset fishprofiles.FishDeckPreset) string {
 	return "orden fijo"
 }
 
-func renderCastScreen(title string, context encounter.WaterContext, position int, totalSlots int, slotWidth int, message string) string {
+func renderCastScreen(view presentation.CastView, message string) string {
 	sections := []string{
-		renderHeader(title),
-		renderCastSection(context, position, totalSlots, slotWidth),
+		renderHeader("Pesca: duelo contra el pez"),
+		renderCastSection(view),
 	}
 	if message != "" {
 		sections = append(sections, accent("Aviso")+"\n  "+message)
@@ -560,27 +557,17 @@ func renderCastScreen(title string, context encounter.WaterContext, position int
 	return clearSequence + strings.Join(sections, "\n\n") + "\n\n"
 }
 
-func renderCastSection(context encounter.WaterContext, position int, totalSlots int, slotWidth int) string {
-	bands := encounter.OrderedCastBands()
-	bandParts := make([]string, 0, len(bands))
-	for _, band := range bands {
-		bandParts = append(bandParts, band.Label())
-	}
-
+func renderCastSection(view presentation.CastView) string {
 	lines := []string{
 		accent("Lectura del agua"),
-		fmt.Sprintf("  Agua       : %s", context.Name),
-		fmt.Sprintf("  Resumen    : %s", context.Description),
-	}
-	for _, signal := range context.VisibleSignals {
-		lines = append(lines, "  - "+signal)
+		fmt.Sprintf("  Agua       : %s", view.WaterLabel),
 	}
 	lines = append(lines,
 		"",
 		accent("Cast"),
 		"  Pulsa Enter para detener la barra en la franja deseada.",
-		"  Bandas     : "+strings.Join(bandParts, " | "),
-		"  Barra      : "+renderCastBar(position, totalSlots, slotWidth),
+		"  Bandas     : muy corto | corto | medio | largo | muy largo",
+		"  Barra      : "+renderCastBar(view.Position, view.TotalSlots, view.SectionWidth),
 	)
 
 	return strings.Join(lines, "\n")

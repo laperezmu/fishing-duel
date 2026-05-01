@@ -5,6 +5,29 @@ import (
 	"pesca/internal/encounter"
 )
 
+type OpeningView struct {
+	WaterLabel      string
+	CastLabel       string
+	InitialDistance int
+	InitialDepth    int
+}
+
+type SpawnView struct {
+	ProfileLabel    string
+	WaterBaseLabel  string
+	InitialDistance int
+	InitialDepth    int
+	CandidateCount  int
+	HabitatLabels   []string
+}
+
+type CastView struct {
+	WaterLabel   string
+	Position     int
+	TotalSlots   int
+	SectionWidth int
+}
+
 type MoveOption struct {
 	Index           int
 	Move            domain.Move

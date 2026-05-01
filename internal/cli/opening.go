@@ -3,8 +3,10 @@ package cli
 import (
 	"fmt"
 	"io"
+	"pesca/internal/app"
 	"pesca/internal/content/watercontexts"
 	"pesca/internal/encounter"
+	"pesca/internal/presentation"
 	"time"
 )
 
@@ -52,13 +54,8 @@ func (ui *UI) ChooseWaterContext(title string, presets []watercontexts.Preset) (
 	}
 }
 
-func (ui *UI) ResolveCast(title string, context encounter.WaterContext) (encounter.CastResult, error) {
-	bands := encounter.OrderedCastBands()
-	totalSlots := len(bands) * castBarSectionWidth
-	positions := ui.castFrames
-	if len(positions) == 0 {
-		positions = buildCastPositions(totalSlots)
-	}
+func (ui *UI) ResolveCast(_ string, context encounter.WaterContext, presenter app.CastPresenter) (encounter.CastResult, error) {
+	controller := encounter.NewCastController(castBarSectionWidth, ui.castFrames)
 
 	inputCh := make(chan struct{}, 1)
 	errCh := make(chan error, 1)
@@ -74,11 +71,11 @@ func (ui *UI) ResolveCast(title string, context encounter.WaterContext) (encount
 		inputCh <- struct{}{}
 	}()
 
-	currentPosition := 0
+	currentPosition := controller.CurrentPosition()
 	for {
-		for _, position := range positions {
-			currentPosition = position
-			if _, err := io.WriteString(ui.out, renderCastScreen(title, context, currentPosition, totalSlots, castBarSectionWidth, "")); err != nil {
+		for step := 0; step < len(ui.castFrames)+controller.TotalSlots(); step++ {
+			castView := presenter.Cast(context, currentPosition, controller.TotalSlots(), castBarSectionWidth)
+			if _, err := io.WriteString(ui.out, renderCastScreen(castView, "")); err != nil {
 				return encounter.CastResult{}, err
 			}
 
@@ -89,16 +86,17 @@ func (ui *UI) ResolveCast(title string, context encounter.WaterContext) (encount
 				if _, err := io.WriteString(ui.out, clearSequence); err != nil {
 					return encounter.CastResult{}, err
 				}
-				return encounter.CastResult{Band: castBandForPosition(currentPosition, castBarSectionWidth)}, nil
+				return encounter.CastResult{Band: controller.ResolveBand(currentPosition)}, nil
 			default:
 			}
 
 			time.Sleep(ui.castDelay)
+			currentPosition = controller.Advance()
 		}
 	}
 }
 
-func (ui *UI) ShowEncounterOpening(_ string, opening encounter.Opening) error {
+func (ui *UI) ShowEncounterOpening(_ string, opening presentation.OpeningView) error {
 	ui.opening = &opening
 	return nil
 }
@@ -126,37 +124,4 @@ func (ui *UI) confirmWaterContext(title string, preset watercontexts.Preset) (bo
 
 		message = err.Error()
 	}
-}
-
-func buildCastPositions(totalSlots int) []int {
-	if totalSlots <= 1 {
-		return []int{0}
-	}
-
-	positions := make([]int, 0, totalSlots*2-2)
-	for position := 0; position < totalSlots; position++ {
-		positions = append(positions, position)
-	}
-	for position := totalSlots - 2; position > 0; position-- {
-		positions = append(positions, position)
-	}
-
-	return positions
-}
-
-func castBandForPosition(position int, slotWidth int) encounter.CastBand {
-	bands := encounter.OrderedCastBands()
-	if len(bands) == 0 {
-		return ""
-	}
-	if position < 0 {
-		return bands[0]
-	}
-
-	bandIndex := position / slotWidth
-	if bandIndex >= len(bands) {
-		bandIndex = len(bands) - 1
-	}
-
-	return bands[bandIndex]
 }
