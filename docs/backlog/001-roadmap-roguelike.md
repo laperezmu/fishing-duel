@@ -14,7 +14,7 @@ Este documento concentra el backlog activo del proyecto, con estado visible para
 - `done`: `BL-005`, `BL-006`, `BL-018`, `BL-019`, `BL-020`, `BL-021`, `BL-022`, `BL-029`, `BL-030`, `BL-033`
 - `planned`: `BL-034`
 - `pending`: resto del roadmap
-- Foco recomendado inmediato: cerrar primero la base MVP de una run sin persistencia meta, pero abrir ya slices data-driven independientes donde el dominio actual ya los soporta, empezando por `BL-001`, `BL-034`, `BL-035`, `BL-041` y `BL-050`.
+- Foco recomendado inmediato: cerrar primero la base MVP de una run sin persistencia meta, pero abrir ya slices data-driven independientes donde el dominio actual ya los soporta, empezando por `BL-001`, `BL-034`, `BL-035` y `BL-041`.
 
 ## Foco sugerido actual
 
@@ -22,7 +22,7 @@ Este documento concentra el backlog activo del proyecto, con estado visible para
 - `BL-034`: desacoplar setup, opening y bootstrap antes del primer delivery real de run.
 - `BL-035`: definir el flujo minimo navegable de zona y nodos para el MVP de expedicion.
 - `BL-041`: externalizar el catalogo base de peces y las pools cerradas de encounter a un formato data-driven validable.
-- `BL-050`: reducir el determinismo total del spawn sin perder legibilidad ni control del contenido.
+- `BL-050`: ya integrado; usarlo como base para que futuras fish pools no hereden un spawn totalmente deducible.
 
 ## Core Loop
 
@@ -178,6 +178,7 @@ Este documento concentra el backlog activo del proyecto, con estado visible para
 - **Objetivo**: mover el catalogo actual de perfiles de pez fuera del codigo a un formato data-driven validable y definir pools cerradas de peces por encounter a partir de listas de `profile_ids`, para acelerar configuracion y ajuste de encuentros sin depender de recompilar ni de avanzar todavia en el sistema de nodos.
 - **Resultado esperado**: loader y validacion de catalogo global de peces, schema o contrato estable para perfiles, mazos, arquetipos y metadata minima de aparicion, mas una capa de `fish pools` cerradas y reutilizables que referencien perfiles por id sin duplicar su definicion.
 - **Dependencias**: `BL-006`, `BL-022`
+- **Plan relacionado**: `docs/features/024-externalizar-catalogo-base-de-peces-y-fish-pools.md`
 - **Prioridad**: Alta
 
 ### BL-042 Externalizar arquetipos y patrones de cartas de pez
@@ -213,12 +214,16 @@ Este documento concentra el backlog activo del proyecto, con estado visible para
 - **Prioridad**: Alta
 
 ### BL-050 Reducir el determinismo total del spawn de peces
-- **Estado**: `pending`
+- **Estado**: `done`
 - **Tipo**: Discovery + Delivery
 - **Objetivo**: evitar que el sistema actual de spawn sea completamente deducible para el jugador cuando conoce agua, distancia, profundidad y habitats, introduciendo variedad controlada sin perder legibilidad, control de balance ni capacidad de testeo.
 - **Resultado esperado**: estrategia clara para desempates, pesos, variacion por pool o sampling controlado dentro de candidatos validos, con contratos reproducibles para tests y configuracion futura desde data-driven.
 - **Dependencias**: `BL-022`, `BL-041`
 - **Plan relacionado**: `docs/features/023-reducir-determinismo-del-spawn-de-peces.md`
+- **Notas de cierre**:
+  - El matching contextual del spawn se mantiene estable y separado de la seleccion final del pez.
+  - El runtime ya permite inyectar randomizer para variar reproduciblemente entre candidatos empatados en score.
+  - El camino sin randomizer sigue siendo estable para tests y para diagnostico del dominio.
 - **Direccion actual acordada**:
   - El spawn no debe elegir sobre todo el catalogo global si el encounter ya opera sobre una `fish pool` cerrada.
   - Dentro de una pool valida, conviene reducir el determinismo absoluto del `best match` actual.
