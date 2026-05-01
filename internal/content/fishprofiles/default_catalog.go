@@ -17,3 +17,5 @@ func DefaultCatalog() Catalog {
 
 	return catalog
 }
+
+const DefaultEncounterFishPoolID = "all-default-fish"
