@@ -17,6 +17,14 @@ type SpawnPresenter interface {
 }
 
 func ResolveFishSpawn(title string, opening encounter.Opening, playerLoadout loadout.State, profiles []fishprofiles.Profile, ui SpawnUI, presenter SpawnPresenter) (fishprofiles.Spawn, error) {
+	return resolveFishSpawn(title, opening, playerLoadout, profiles, ui, presenter, nil)
+}
+
+func ResolveFishSpawnWithRandomizer(title string, opening encounter.Opening, playerLoadout loadout.State, profiles []fishprofiles.Profile, ui SpawnUI, presenter SpawnPresenter, randomizer fishprofiles.SpawnRandomizer) (fishprofiles.Spawn, error) {
+	return resolveFishSpawn(title, opening, playerLoadout, profiles, ui, presenter, randomizer)
+}
+
+func resolveFishSpawn(title string, opening encounter.Opening, playerLoadout loadout.State, profiles []fishprofiles.Profile, ui SpawnUI, presenter SpawnPresenter, randomizer fishprofiles.SpawnRandomizer) (fishprofiles.Spawn, error) {
 	if ui == nil {
 		return fishprofiles.Spawn{}, fmt.Errorf("spawn ui is required")
 	}
@@ -35,7 +43,7 @@ func ResolveFishSpawn(title string, opening encounter.Opening, playerLoadout loa
 		return fishprofiles.Spawn{}, fmt.Errorf("spawn context: %w", err)
 	}
 
-	spawn, err := fishprofiles.ResolveSpawn(profiles, spawnContext)
+	spawn, err := fishprofiles.ResolveSpawnWithRandomizer(profiles, spawnContext, randomizer)
 	if err != nil {
 		return fishprofiles.Spawn{}, fmt.Errorf("resolve fish spawn: %w", err)
 	}

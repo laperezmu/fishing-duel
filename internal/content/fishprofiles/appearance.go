@@ -9,6 +9,10 @@ import (
 	"strings"
 )
 
+type SpawnRandomizer interface {
+	Intn(n int) int
+}
+
 type Appearance struct {
 	WaterPoolTags       []waterpools.ID
 	MinInitialDistance  int
@@ -133,6 +137,14 @@ func (appearance Appearance) MatchScore(context SpawnContext) int {
 }
 
 func ResolveSpawn(profiles []Profile, context SpawnContext) (Spawn, error) {
+	return resolveSpawn(profiles, context, nil)
+}
+
+func ResolveSpawnWithRandomizer(profiles []Profile, context SpawnContext, randomizer SpawnRandomizer) (Spawn, error) {
+	return resolveSpawn(profiles, context, randomizer)
+}
+
+func resolveSpawn(profiles []Profile, context SpawnContext, randomizer SpawnRandomizer) (Spawn, error) {
 	if err := context.Validate(); err != nil {
 		return Spawn{}, err
 	}
@@ -172,8 +184,17 @@ func ResolveSpawn(profiles []Profile, context SpawnContext) (Spawn, error) {
 		return candidates[left].score > candidates[right].score
 	})
 
+	selectedCandidate := candidates[0]
+	if randomizer != nil {
+		topScoreCount := 1
+		for topScoreCount < len(candidates) && candidates[topScoreCount].score == selectedCandidate.score {
+			topScoreCount++
+		}
+		selectedCandidate = candidates[randomizer.Intn(topScoreCount)]
+	}
+
 	return Spawn{
-		Profile:        candidates[0].profile,
+		Profile:        selectedCandidate.profile,
 		Context:        context,
 		CandidateCount: len(candidates),
 	}, nil

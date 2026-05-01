@@ -14,14 +14,15 @@ Este documento concentra el backlog activo del proyecto, con estado visible para
 - `done`: `BL-005`, `BL-006`, `BL-018`, `BL-019`, `BL-020`, `BL-021`, `BL-022`, `BL-029`, `BL-030`, `BL-033`
 - `planned`: `BL-034`
 - `pending`: resto del roadmap
-- Foco recomendado inmediato: cerrar primero la base MVP de una run sin persistencia meta y preparar su entrega por etapas, empezando por `BL-001`, `BL-034`, `BL-035` y `BL-023`.
+- Foco recomendado inmediato: cerrar primero la base MVP de una run sin persistencia meta, pero abrir ya slices data-driven independientes donde el dominio actual ya los soporta, empezando por `BL-001`, `BL-034`, `BL-035`, `BL-041` y `BL-050`.
 
 ## Foco sugerido actual
 
 - `BL-001`: fijar el contrato base y el MVP secuencial de una run sin persistencia meta.
 - `BL-034`: desacoplar setup, opening y bootstrap antes del primer delivery real de run.
 - `BL-035`: definir el flujo minimo navegable de zona y nodos para el MVP de expedicion.
-- `BL-023`: mantener como refactor UI-agnostic amplio, despues del slice minimo necesario para la run.
+- `BL-041`: externalizar el catalogo base de peces y las pools cerradas de encounter a un formato data-driven validable.
+- `BL-050`: reducir el determinismo total del spawn sin perder legibilidad ni control del contenido.
 
 ## Core Loop
 
@@ -145,11 +146,11 @@ Este documento concentra el backlog activo del proyecto, con estado visible para
 ## Fish y Encounters
 
 ### BL-007 Expandir perfiles data-driven de pez
-- **Estado**: `pending`
+- **Estado**: `cancelled`
 - **Tipo**: Delivery
-- **Objetivo**: extender la primera base configurable de arquetipos hacia perfiles de pez que soporten encuentros normales, elites, bosses de zona y legendarios finales dentro de la expedicion, concentrando tambien la metadata editorial o fotografica propia de cada especie o encuentro.
-- **Resultado esperado**: estructura ampliable para mazo, efectos, metadata de descubrimiento, tags editoriales de foto y condiciones de aparicion por zona o rol de encounter, dejando claro que la capa fotografica vive en el contenido data-driven del pez y no en la resolucion generica del cast.
-- **Dependencias**: `BL-006`, `BL-003`, `BL-040`
+- **Objetivo**: item absorbido por tareas data-driven mas pequenas y modulares para no mezclar catalogo de peces, metadata de encounters, aparicion por rol y contenido editorial en una sola pieza demasiado amplia.
+- **Resultado esperado**: el trabajo queda redistribuido en `BL-041`, `BL-042`, `BL-043`, `BL-044` y `BL-045`, cada una con ownership y dependencias mas concretas.
+- **Dependencias**: `BL-006`
 - **Prioridad**: Media
 
 ### BL-022 Definir aparicion de peces por aguas base y ventana de lanzamiento
@@ -169,6 +170,60 @@ Este documento concentra el backlog activo del proyecto, con estado visible para
   - La aparicion de peces debe seguir siendo compatible con zonas, elites, bosses y roles especiales de encounter.
   - El sistema debe permitir que a veces el jugador tenga lectura explicita al entrar al nodo y a veces no, sin exigir que el mapa revele antes la estructura del subpool.
   - La capa de economia o tags editoriales de fotografia queda fuera de este item y se aborda dentro de la extension data-driven del pez.
+- **Prioridad**: Alta
+
+### BL-041 Externalizar catalogo base de peces a formato data-driven
+- **Estado**: `pending`
+- **Tipo**: Delivery
+- **Objetivo**: mover el catalogo actual de perfiles de pez fuera del codigo a un formato data-driven validable y definir pools cerradas de peces por encounter a partir de listas de `profile_ids`, para acelerar configuracion y ajuste de encuentros sin depender de recompilar ni de avanzar todavia en el sistema de nodos.
+- **Resultado esperado**: loader y validacion de catalogo global de peces, schema o contrato estable para perfiles, mazos, arquetipos y metadata minima de aparicion, mas una capa de `fish pools` cerradas y reutilizables que referencien perfiles por id sin duplicar su definicion.
+- **Dependencias**: `BL-006`, `BL-022`
+- **Prioridad**: Alta
+
+### BL-042 Externalizar arquetipos y patrones de cartas de pez
+- **Estado**: `pending`
+- **Tipo**: Delivery
+- **Objetivo**: separar del codigo la definicion reusable de arquetipos, patrones y bloques de cartas del pez para que nuevos perfiles puedan componerse desde datos sin duplicar wiring manual.
+- **Resultado esperado**: capa data-driven para arquetipos o plantillas de mazo del pez, reutilizable por el catalogo de perfiles y preparada para crecer en complejidad de contenido.
+- **Dependencias**: `BL-041`
+- **Prioridad**: Media
+
+### BL-043 Externalizar metadata editorial y de encounter de especies
+- **Estado**: `pending`
+- **Tipo**: Discovery + Delivery
+- **Objetivo**: sacar a datos la metadata propia de cada especie o encuentro que despues alimentara fotografia, descubrimiento, roles especiales o lectura tematica, sin mezclarla todavia con economia o coleccion meta.
+- **Resultado esperado**: contrato data-driven para nombre, descripcion, tags, rareza, notas editoriales y otros campos semanticos del pez que no pertenecen al runtime tactico puro.
+- **Dependencias**: `BL-041`
+- **Prioridad**: Media
+
+### BL-044 Externalizar tablas de aparicion de peces por contexto de encounter
+- **Estado**: `pending`
+- **Tipo**: Delivery
+- **Objetivo**: preparar las reglas de aparicion para que puedan resolverse desde tablas data-driven por agua, distancia, profundidad, habitats y futuros roles de encounter, siempre operando sobre pools cerradas de peces y no sobre el catalogo global completo.
+- **Resultado esperado**: tablas o reglas configurables de spawn consumibles por el resolver actual, capaces de seleccionar una `fish pool` concreta por contexto de encounter y extensibles luego a zonas, elites, bosses y nodos de pesca.
+- **Dependencias**: `BL-022`, `BL-041`
+- **Prioridad**: Alta
+
+### BL-045 Resolver spawns de encounter desde catalogos data-driven
+- **Estado**: `pending`
+- **Tipo**: Delivery
+- **Objetivo**: conectar el flujo actual `agua -> apertura -> spawn -> mazo del pez` a los nuevos catalogos data-driven para que el runtime deje de depender de listas hardcodeadas de perfiles y pueda limitar cada encounter a una `fish pool` cerrada.
+- **Resultado esperado**: pipeline de spawn consumiendo catalogos externos de peces, pools cerradas y reglas de aparicion, manteniendo tests, comportamiento de encuentro y contratos de app actuales.
+- **Dependencias**: `BL-041`, `BL-044`
+- **Prioridad**: Alta
+
+### BL-050 Reducir el determinismo total del spawn de peces
+- **Estado**: `pending`
+- **Tipo**: Discovery + Delivery
+- **Objetivo**: evitar que el sistema actual de spawn sea completamente deducible para el jugador cuando conoce agua, distancia, profundidad y habitats, introduciendo variedad controlada sin perder legibilidad, control de balance ni capacidad de testeo.
+- **Resultado esperado**: estrategia clara para desempates, pesos, variacion por pool o sampling controlado dentro de candidatos validos, con contratos reproducibles para tests y configuracion futura desde data-driven.
+- **Dependencias**: `BL-022`, `BL-041`
+- **Plan relacionado**: `docs/features/023-reducir-determinismo-del-spawn-de-peces.md`
+- **Direccion actual acordada**:
+  - El spawn no debe elegir sobre todo el catalogo global si el encounter ya opera sobre una `fish pool` cerrada.
+  - Dentro de una pool valida, conviene reducir el determinismo absoluto del `best match` actual.
+  - La variacion debe seguir siendo controlable y reproducible para debug, seeds y tests.
+  - La solucion inicial deberia priorizar pesos o sampling simple antes que sistemas opacos o muy dificiles de balancear.
 - **Prioridad**: Alta
 
 ## Items y Build
@@ -259,12 +314,44 @@ Este documento concentra el backlog activo del proyecto, con estado visible para
 ## Tech y UX
 
 ### BL-015 Disenar sistema de contenido data-driven
-- **Estado**: `pending`
+- **Estado**: `cancelled`
 - **Tipo**: Discovery
-- **Objetivo**: preparar peces, patrocinadores, zonas, nodos, eventos y catalogos de tienda para crecer sin depender de wiring duro en codigo.
-- **Resultado esperado**: estrategia de datos y versionado de contenido para perfiles de pez, tablas de ruta, ofertas de patrocinador, recompensas y servicios.
-- **Dependencias**: `BL-040`, `BL-002`, `BL-007`, `BL-008`, `BL-011`
+- **Objetivo**: item descartado por ser demasiado amplio; su scope se redistribuye en tareas data-driven especificas por modulo para poder ejecutarlas de forma independiente conforme el flujo del desarrollo lo vaya habilitando.
+- **Resultado esperado**: el plan global se reemplaza por items concretos para peces, apariciones, nodos, servicios, recompensas, patrocinadores y otros catalogos, evitando una mega-tarea transversal dificil de cerrar.
+- **Dependencias**: ninguna
 - **Prioridad**: Media
+
+### BL-046 Externalizar catalogo de nodos y rutas del MVP
+- **Estado**: `pending`
+- **Tipo**: Delivery
+- **Objetivo**: mover a datos la estructura minima de nodos y rutas del MVP de run una vez exista el flujo base de expedicion, para evitar que la primera navegacion de zona quede cableada a mano.
+- **Resultado esperado**: catalogo data-driven para nodos, secuencias y variantes de ruta del MVP, desacoplado del render y del runtime tactico.
+- **Dependencias**: `BL-035`, `BL-040`
+- **Prioridad**: Media
+
+### BL-047 Externalizar catalogo de servicios y acciones de build
+- **Estado**: `pending`
+- **Tipo**: Delivery
+- **Objetivo**: llevar a datos la oferta minima de servicios, reparaciones y mejoras de run para que el MVP pueda crecer sin ampliar wiring duro en codigo.
+- **Resultado esperado**: catalogo data-driven de acciones de servicio y build consumible por la capa de run y alineado con `BL-038`.
+- **Dependencias**: `BL-038`, `BL-040`
+- **Prioridad**: Media
+
+### BL-048 Externalizar recompensas y economia contextual
+- **Estado**: `pending`
+- **Tipo**: Delivery
+- **Objetivo**: convertir a catalogos configurables la distribucion de recompensas, conversion economica y variaciones contextuales que hoy nazcan primero como reglas de MVP.
+- **Resultado esperado**: tablas data-driven de recompensas, payout editorial y variaciones por nodo u outcome, listas para crecer despues del primer vertical slice.
+- **Dependencias**: `BL-037`, `BL-012`, `BL-040`
+- **Prioridad**: Media
+
+### BL-049 Externalizar catalogo de patrocinadores y ofertas
+- **Estado**: `pending`
+- **Tipo**: Delivery
+- **Objetivo**: mover a datos las ofertas, efectos y compatibilidades basicas de patrocinadores cuando el sistema ya este validado como parte de run.
+- **Resultado esperado**: catalogo data-driven de patrocinadores y reglas de oferta, separado del runtime de encounter y de la UI.
+- **Dependencias**: `BL-039`, `BL-040`
+- **Prioridad**: Baja
 
 ### BL-016 Disenar guardado de run y progreso meta
 - **Estado**: `pending`
@@ -481,24 +568,32 @@ Este documento concentra el backlog activo del proyecto, con estado visible para
 1. `BL-001`
 2. `BL-034`
 3. `BL-035`
-4. `BL-036`
-5. `BL-037`
-6. `BL-038`
-7. `BL-039`
-8. `BL-040`
-9. `BL-002`
-10. `BL-003`
-11. `BL-011`
-12. `BL-008`
-13. `BL-012`
-14. `BL-007`
-15. `BL-015`
-16. `BL-017`
-17. `BL-013`
-18. `BL-016`
-19. `BL-010`
-20. `BL-009`
-21. `BL-014`
-22. `BL-023`
-23. `BL-031`
-24. `BL-032`
+4. `BL-041`
+5. `BL-050`
+6. `BL-036`
+7. `BL-037`
+8. `BL-038`
+9. `BL-039`
+10. `BL-040`
+11. `BL-045`
+12. `BL-044`
+13. `BL-002`
+14. `BL-003`
+15. `BL-011`
+16. `BL-008`
+17. `BL-012`
+18. `BL-046`
+19. `BL-047`
+20. `BL-048`
+21. `BL-042`
+22. `BL-043`
+23. `BL-017`
+24. `BL-013`
+25. `BL-016`
+26. `BL-010`
+27. `BL-009`
+28. `BL-049`
+29. `BL-014`
+30. `BL-023`
+31. `BL-031`
+32. `BL-032`

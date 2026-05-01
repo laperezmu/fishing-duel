@@ -43,6 +43,85 @@ func TestResolveSpawnPrefersSpecificHabitatMatch(t *testing.T) {
 	assert.GreaterOrEqual(t, spawn.CandidateCount, 2)
 }
 
+func TestResolveSpawnWithRandomizerVariesWithinTopScoreTies(t *testing.T) {
+	context := SpawnContext{
+		WaterPoolTag:    waterpools.Shoreline,
+		InitialDistance: 1,
+		InitialDepth:    1,
+	}
+	profiles := []Profile{
+		{
+			ID:          "tie-first",
+			ArchetypeID: ArchetypeBaselineCycle,
+			Name:        "Tie First",
+			Appearance: Appearance{
+				WaterPoolTags:      []waterpools.ID{waterpools.Shoreline},
+				MinInitialDistance: 0,
+				MaxInitialDistance: 2,
+				MinInitialDepth:    0,
+				MaxInitialDepth:    2,
+			},
+		},
+		{
+			ID:          "tie-second",
+			ArchetypeID: ArchetypeBaselineCycle,
+			Name:        "Tie Second",
+			Appearance: Appearance{
+				WaterPoolTags:      []waterpools.ID{waterpools.Shoreline},
+				MinInitialDistance: 0,
+				MaxInitialDistance: 2,
+				MinInitialDepth:    0,
+				MaxInitialDepth:    2,
+			},
+		},
+	}
+
+	spawn, err := ResolveSpawnWithRandomizer(profiles, context, fixedSpawnRandomizer{value: 1})
+
+	require.NoError(t, err)
+	assert.Equal(t, "tie-second", spawn.Profile.ID)
+	assert.Equal(t, 2, spawn.CandidateCount)
+}
+
+func TestResolveSpawnWithoutRandomizerRemainsStableForTies(t *testing.T) {
+	context := SpawnContext{
+		WaterPoolTag:    waterpools.Shoreline,
+		InitialDistance: 1,
+		InitialDepth:    1,
+	}
+	profiles := []Profile{
+		{
+			ID:          "tie-first",
+			ArchetypeID: ArchetypeBaselineCycle,
+			Name:        "Tie First",
+			Appearance: Appearance{
+				WaterPoolTags:      []waterpools.ID{waterpools.Shoreline},
+				MinInitialDistance: 0,
+				MaxInitialDistance: 2,
+				MinInitialDepth:    0,
+				MaxInitialDepth:    2,
+			},
+		},
+		{
+			ID:          "tie-second",
+			ArchetypeID: ArchetypeBaselineCycle,
+			Name:        "Tie Second",
+			Appearance: Appearance{
+				WaterPoolTags:      []waterpools.ID{waterpools.Shoreline},
+				MinInitialDistance: 0,
+				MaxInitialDistance: 2,
+				MinInitialDepth:    0,
+				MaxInitialDepth:    2,
+			},
+		},
+	}
+
+	spawn, err := ResolveSpawn(profiles, context)
+
+	require.NoError(t, err)
+	assert.Equal(t, "tie-first", spawn.Profile.ID)
+}
+
 func TestResolveSpawnReturnsErrorWhenNoProfileMatches(t *testing.T) {
 	context := SpawnContext{
 		WaterPoolTag:    waterpools.Offshore,
@@ -65,4 +144,15 @@ func TestProfileBuildPreset(t *testing.T) {
 	assert.Equal(t, profile.Shuffle, preset.Shuffle)
 	assert.Equal(t, profile.CardsToRemove, preset.CardsToRemove)
 	require.Len(t, preset.FishCards, len(profile.Cards))
+}
+
+type fixedSpawnRandomizer struct {
+	value int
+}
+
+func (randomizer fixedSpawnRandomizer) Intn(n int) int {
+	if n <= 0 {
+		return 0
+	}
+	return randomizer.value % n
 }
