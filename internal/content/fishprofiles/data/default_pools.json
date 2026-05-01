@@ -1,0 +1,51 @@
+{
+  "pools": [
+    {
+      "id": "all-default-fish",
+      "name": "All Default Fish",
+      "description": "Pool global de referencia con todos los perfiles actuales.",
+      "profile_ids": [
+        "classic",
+        "hooked-opening",
+        "horizontal-pressure",
+        "vertical-pressure",
+        "surface-control",
+        "deck-exhaustion",
+        "mixed-current"
+      ]
+    },
+    {
+      "id": "shoreline-basics",
+      "name": "Shoreline Basics",
+      "description": "Pool costera cerrada para encuentros de superficie o alcance corto.",
+      "profile_ids": [
+        "classic",
+        "hooked-opening",
+        "surface-control",
+        "deck-exhaustion"
+      ]
+    },
+    {
+      "id": "mixed-current-basics",
+      "name": "Mixed Current Basics",
+      "description": "Pool de referencia para encuentros en corriente irregular.",
+      "profile_ids": [
+        "classic",
+        "vertical-pressure",
+        "surface-control",
+        "deck-exhaustion",
+        "mixed-current"
+      ]
+    },
+    {
+      "id": "shoreline-weighted",
+      "name": "Shoreline Weighted",
+      "description": "Pool costera con pesos de aparicion para pruebas de variedad controlada.",
+      "entries": [
+        { "profile_id": "classic", "weight": 3 },
+        { "profile_id": "surface-control", "weight": 2 },
+        { "profile_id": "deck-exhaustion", "weight": 1 }
+      ]
+    }
+  ]
+}

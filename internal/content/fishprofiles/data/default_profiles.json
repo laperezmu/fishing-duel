@@ -1,0 +1,202 @@
+{
+  "profiles": [
+    {
+      "id": "classic",
+      "archetype_id": "baseline_cycle",
+      "name": "Clasico",
+      "description": "Baraja base de referencia sin efectos, util para comparar cambios de sistema.",
+      "details": [
+        "Arquetipo: ciclo base sin presion especializada.",
+        "Nueve cartas lisas sin efectos: tres rojas, tres azules y tres amarillas.",
+        "Orden: barajada antes de empezar y en cada reciclado.",
+        "Reciclado: retira 3 cartas por ciclo."
+      ],
+      "appearance": {
+        "water_pool_tags": ["shoreline", "mixed-current"],
+        "min_initial_distance": 0,
+        "max_initial_distance": 2,
+        "min_initial_depth": 0,
+        "max_initial_depth": 2,
+        "required_habitat_tags": []
+      },
+      "cards": [{"move": "blue"}, {"move": "blue"}, {"move": "blue"}, {"move": "red"}, {"move": "red"}, {"move": "red"}, {"move": "yellow"}, {"move": "yellow"}, {"move": "yellow"}],
+      "cards_to_remove": 3,
+      "shuffle": true
+    },
+    {
+      "id": "hooked-opening",
+      "archetype_id": "draw_tempo",
+      "name": "Apertura con anzuelo",
+      "description": "Perfil de tempo que concentra su presion al revelar cartas de apertura.",
+      "details": [
+        "Arquetipo: draw_tempo.",
+        "Rojo - Tiron de apertura: al revelarse permite capturar desde un paso mas lejos ese round.",
+        "Azul - Salto de espuma: al revelarse el pez cuenta como un nivel mas cerca de la superficie ese round.",
+        "Amarillo - Ultima ventana: al revelarse amplia el margen de captura cuando se agota la baraja ese round.",
+        "Orden: fijo para probar cada apertura de forma reproducible."
+      ],
+      "appearance": {
+        "water_pool_tags": ["shoreline", "offshore"],
+        "min_initial_distance": 1,
+        "max_initial_distance": 5,
+        "min_initial_depth": 0,
+        "max_initial_depth": 2,
+        "required_habitat_tags": []
+      },
+      "cards": [
+        {"name": "Tiron de apertura", "summary": "Permite capturar desde un paso mas lejos este round.", "move": "red", "effects": [{"trigger": "on_draw", "capture_distance_bonus": 1}]},
+        {"name": "Salto de espuma", "summary": "El pez cuenta como un nivel mas cerca de la superficie este round.", "move": "blue", "effects": [{"trigger": "on_draw", "surface_depth_bonus": 1}]},
+        {"name": "Ultima ventana", "summary": "Amplia el margen de captura por agotamiento durante este round.", "move": "yellow", "effects": [{"trigger": "on_draw", "exhaustion_capture_distance_bonus": 1}]},
+        {"name": "Tiron de apertura", "summary": "Permite capturar desde un paso mas lejos este round.", "move": "red", "effects": [{"trigger": "on_draw", "capture_distance_bonus": 1}]}
+      ],
+      "cards_to_remove": 0,
+      "shuffle": false
+    },
+    {
+      "id": "horizontal-pressure",
+      "archetype_id": "horizontal_pressure",
+      "name": "Presion horizontal",
+      "description": "Perfil que prioriza empujar el encuentro hacia mar abierto cuando obtiene ventaja.",
+      "details": [
+        "Arquetipo: horizontal_pressure.",
+        "Azul - Oleaje abierto: si gana, empuja un paso hacia mar abierto.",
+        "Rojo - Deriva neutra: en empate gana un paso hacia el escape horizontal.",
+        "Amarillo - Oleaje abierto: si gana, empuja un paso hacia mar abierto.",
+        "Orden: fijo para leer la presion horizontal de forma controlada."
+      ],
+      "appearance": {
+        "water_pool_tags": ["offshore"],
+        "min_initial_distance": 3,
+        "max_initial_distance": 5,
+        "min_initial_depth": 0,
+        "max_initial_depth": 2,
+        "required_habitat_tags": ["open-water"]
+      },
+      "cards": [
+        {"name": "Oleaje abierto", "summary": "Si gana, empuja un paso hacia mar abierto.", "move": "blue", "effects": [{"trigger": "on_owner_win", "distance_shift": 1}]},
+        {"name": "Deriva neutra", "summary": "En empate gana un paso hacia el escape horizontal.", "move": "red", "effects": [{"trigger": "on_round_draw", "distance_shift": 1}]},
+        {"name": "Oleaje abierto", "summary": "Si gana, empuja un paso hacia mar abierto.", "move": "yellow", "effects": [{"trigger": "on_owner_win", "distance_shift": 1}]},
+        {"name": "Deriva neutra", "summary": "En empate gana un paso hacia el escape horizontal.", "move": "red", "effects": [{"trigger": "on_round_draw", "distance_shift": 1}]}
+      ],
+      "cards_to_remove": 0,
+      "shuffle": false
+    },
+    {
+      "id": "vertical-pressure",
+      "archetype_id": "vertical_escape",
+      "name": "Presion vertical",
+      "description": "Perfil orientado a hundirse al ganar y a respirar al perder.",
+      "details": [
+        "Arquetipo: vertical_escape.",
+        "Azul - Tiron al fondo: si gana, el pez baja un nivel mas profundo.",
+        "Rojo - Respiro corto: si pierde, el pez sube un nivel hacia la superficie.",
+        "Amarillo - Caida larga: si gana, el pez baja un nivel mas profundo.",
+        "Orden: fijo para validar la capa vertical paso a paso."
+      ],
+      "appearance": {
+        "water_pool_tags": ["offshore", "mixed-current"],
+        "min_initial_distance": 2,
+        "max_initial_distance": 5,
+        "min_initial_depth": 2,
+        "max_initial_depth": 4,
+        "required_habitat_tags": ["bottom", "channel"]
+      },
+      "cards": [
+        {"name": "Tiron al fondo", "summary": "Si gana, baja un nivel mas profundo.", "move": "blue", "effects": [{"trigger": "on_owner_win", "depth_shift": 1}]},
+        {"name": "Respiro corto", "summary": "Si pierde, sube un nivel hacia la superficie.", "move": "red", "effects": [{"trigger": "on_owner_lose", "depth_shift": -1}]},
+        {"name": "Caida larga", "summary": "Si gana, baja un nivel mas profundo.", "move": "yellow", "effects": [{"trigger": "on_owner_win", "depth_shift": 1}]},
+        {"name": "Respiro corto", "summary": "Si pierde, sube un nivel hacia la superficie.", "move": "blue", "effects": [{"trigger": "on_owner_lose", "depth_shift": -1}]}
+      ],
+      "cards_to_remove": 0,
+      "shuffle": false
+    },
+    {
+      "id": "surface-control",
+      "archetype_id": "surface_control",
+      "name": "Control de superficie",
+      "description": "Perfil que gira en torno a mantener el pez cerca de la capa superficial y forzar eventos legibles.",
+      "details": [
+        "Arquetipo: surface_control.",
+        "Azul - Rebote de espuma: si pierde, el pez sube un nivel.",
+        "Rojo - Marea calma: en empate el pez cuenta como un nivel mas cerca de la superficie ese round.",
+        "Amarillo - Rebote de espuma: si pierde, el pez sube un nivel.",
+        "Lectura parcial: una Marea calma solo deja visible el movimiento en el historial del pez.",
+        "Orden: fijo para probar lecturas de superficie y cierre visual."
+      ],
+      "appearance": {
+        "water_pool_tags": ["shoreline", "mixed-current"],
+        "min_initial_distance": 0,
+        "max_initial_distance": 3,
+        "min_initial_depth": 0,
+        "max_initial_depth": 1,
+        "required_habitat_tags": ["surface"]
+      },
+      "cards": [
+        {"name": "Rebote de espuma", "summary": "Si pierde, sube un nivel hacia la superficie.", "move": "blue", "effects": [{"trigger": "on_owner_lose", "depth_shift": -1}]},
+        {"name": "Marea calma", "summary": "En empate el pez cuenta como un nivel mas cerca de la superficie.", "move": "red", "effects": [{"trigger": "on_round_draw", "surface_depth_bonus": 1}], "discard_visibility": "move_only"},
+        {"name": "Rebote de espuma", "summary": "Si pierde, sube un nivel hacia la superficie.", "move": "yellow", "effects": [{"trigger": "on_owner_lose", "depth_shift": -1}]},
+        {"name": "Marea calma", "summary": "En empate el pez cuenta como un nivel mas cerca de la superficie.", "move": "red", "effects": [{"trigger": "on_round_draw", "surface_depth_bonus": 1}]}
+      ],
+      "cards_to_remove": 0,
+      "shuffle": false
+    },
+    {
+      "id": "deck-exhaustion",
+      "archetype_id": "deck_exhaustion",
+      "name": "Agotamiento de mazo",
+      "description": "Perfil que concentra su plan en el cierre por agotamiento y en ventanas cortas de cierre.",
+      "details": [
+        "Arquetipo: deck_exhaustion.",
+        "Rojo - Ultima ventana: al revelarse amplia la captura por agotamiento ese round.",
+        "Azul - Tiron de cierre: al revelarse acerca la captura ese round.",
+        "Amarillo - Ultima ventana: repite el empuje al cierre por agotamiento.",
+        "Orden: fijo para revisar finales de encuentro y baraja corta."
+      ],
+      "appearance": {
+        "water_pool_tags": ["shoreline", "mixed-current"],
+        "min_initial_distance": 0,
+        "max_initial_distance": 2,
+        "min_initial_depth": 0,
+        "max_initial_depth": 2,
+        "required_habitat_tags": ["weed", "rock"]
+      },
+      "cards": [
+        {"name": "Ultima ventana", "summary": "Amplia el margen de captura por agotamiento durante este round.", "move": "red", "effects": [{"trigger": "on_draw", "exhaustion_capture_distance_bonus": 1}]},
+        {"name": "Tiron de cierre", "summary": "Permite capturar desde un paso mas lejos este round.", "move": "blue", "effects": [{"trigger": "on_draw", "capture_distance_bonus": 1}]},
+        {"name": "Ultima ventana", "summary": "Amplia el margen de captura por agotamiento durante este round.", "move": "yellow", "effects": [{"trigger": "on_draw", "exhaustion_capture_distance_bonus": 1}]},
+        {"name": "Tiron de cierre", "summary": "Permite capturar desde un paso mas lejos este round.", "move": "blue", "effects": [{"trigger": "on_draw", "capture_distance_bonus": 1}]}
+      ],
+      "cards_to_remove": 0,
+      "shuffle": false
+    },
+    {
+      "id": "mixed-current",
+      "archetype_id": "hybrid_pressure",
+      "name": "Corriente mixta",
+      "description": "Perfil mixto que combina ventajas al revelarse con respuestas segun el resultado.",
+      "details": [
+        "Arquetipo: hybrid_pressure.",
+        "Rojo - Corriente cerrada: al revelarse amplia la captura y, si pierde, sube un nivel hacia la superficie.",
+        "Azul - Oleaje abierto: al revelarse se acerca a la superficie y, si gana, empuja un paso hacia mar abierto.",
+        "Amarillo - Deriva neutra: en empate gana un paso hacia el escape horizontal.",
+        "Orden: fijo para revisar el pipeline completo round a round."
+      ],
+      "appearance": {
+        "water_pool_tags": ["mixed-current"],
+        "min_initial_distance": 1,
+        "max_initial_distance": 4,
+        "min_initial_depth": 1,
+        "max_initial_depth": 3,
+        "required_habitat_tags": []
+      },
+      "cards": [
+        {"name": "Corriente cerrada", "summary": "Amplia la captura al revelarse y sube si pierde.", "move": "red", "effects": [{"trigger": "on_draw", "capture_distance_bonus": 1}, {"trigger": "on_owner_lose", "depth_shift": -1}]},
+        {"name": "Oleaje abierto", "summary": "Se acerca a superficie al revelarse y empuja si gana.", "move": "blue", "effects": [{"trigger": "on_draw", "surface_depth_bonus": 1}, {"trigger": "on_owner_win", "distance_shift": 1}]},
+        {"name": "Deriva neutra", "summary": "En empate gana un paso hacia mar abierto.", "move": "yellow", "effects": [{"trigger": "on_round_draw", "distance_shift": 1}]},
+        {"name": "Corriente cerrada", "summary": "Amplia la captura al revelarse y sube si pierde.", "move": "red", "effects": [{"trigger": "on_owner_lose", "depth_shift": -1}]}
+      ],
+      "cards_to_remove": 0,
+      "shuffle": false
+    }
+  ]
+}
