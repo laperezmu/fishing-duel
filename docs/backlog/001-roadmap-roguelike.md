@@ -11,17 +11,17 @@ Este documento concentra el backlog activo del proyecto, con estado visible para
 
 ## Foto actual
 
-- `done`: `BL-005`, `BL-006`, `BL-018`, `BL-019`, `BL-020`, `BL-021`, `BL-022`, `BL-029`, `BL-030`, `BL-033`
-- `planned`: `BL-034`
+- `done`: `BL-005`, `BL-006`, `BL-018`, `BL-019`, `BL-020`, `BL-021`, `BL-022`, `BL-029`, `BL-030`, `BL-033`, `BL-041`, `BL-050`
+- `planned`: `BL-034`, `BL-045`
 - `pending`: resto del roadmap
-- Foco recomendado inmediato: cerrar primero la base MVP de una run sin persistencia meta, pero abrir ya slices data-driven independientes donde el dominio actual ya los soporta, empezando por `BL-001`, `BL-034`, `BL-035` y `BL-041`.
+- Foco recomendado inmediato: cerrar primero la base MVP de una run sin persistencia meta y conectar el runtime actual a los nuevos catalogos cerrados, empezando por `BL-001`, `BL-034`, `BL-035` y `BL-045`.
 
 ## Foco sugerido actual
 
 - `BL-001`: fijar el contrato base y el MVP secuencial de una run sin persistencia meta.
 - `BL-034`: desacoplar setup, opening y bootstrap antes del primer delivery real de run.
 - `BL-035`: definir el flujo minimo navegable de zona y nodos para el MVP de expedicion.
-- `BL-041`: externalizar el catalogo base de peces y las pools cerradas de encounter a un formato data-driven validable.
+- `BL-045`: conectar el spawn actual a fish pools cerradas para que el runtime deje de depender del catalogo global.
 - `BL-050`: ya integrado; usarlo como base para que futuras fish pools no hereden un spawn totalmente deducible.
 
 ## Core Loop
@@ -173,12 +173,16 @@ Este documento concentra el backlog activo del proyecto, con estado visible para
 - **Prioridad**: Alta
 
 ### BL-041 Externalizar catalogo base de peces a formato data-driven
-- **Estado**: `pending`
+- **Estado**: `done`
 - **Tipo**: Delivery
 - **Objetivo**: mover el catalogo actual de perfiles de pez fuera del codigo a un formato data-driven validable y definir pools cerradas de peces por encounter a partir de listas de `profile_ids`, para acelerar configuracion y ajuste de encuentros sin depender de recompilar ni de avanzar todavia en el sistema de nodos.
 - **Resultado esperado**: loader y validacion de catalogo global de peces, schema o contrato estable para perfiles, mazos, arquetipos y metadata minima de aparicion, mas una capa de `fish pools` cerradas y reutilizables que referencien perfiles por id sin duplicar su definicion.
 - **Dependencias**: `BL-006`, `BL-022`
 - **Plan relacionado**: `docs/features/024-externalizar-catalogo-base-de-peces-y-fish-pools.md`
+- **Notas de cierre**:
+  - El catalogo base de peces ya vive en JSON embebido con carga y validacion explicita.
+  - Las `fish pools` ya soportan subsets cerrados por id y entradas ponderadas por peso.
+  - El spawn ya puede trabajar sobre subcatalogos resueltos desde pools sin cambiar su contrato base de `[]Profile`.
 - **Prioridad**: Alta
 
 ### BL-042 Externalizar arquetipos y patrones de cartas de pez
@@ -206,11 +210,12 @@ Este documento concentra el backlog activo del proyecto, con estado visible para
 - **Prioridad**: Alta
 
 ### BL-045 Resolver spawns de encounter desde catalogos data-driven
-- **Estado**: `pending`
+- **Estado**: `planned`
 - **Tipo**: Delivery
 - **Objetivo**: conectar el flujo actual `agua -> apertura -> spawn -> mazo del pez` a los nuevos catalogos data-driven para que el runtime deje de depender de listas hardcodeadas de perfiles y pueda limitar cada encounter a una `fish pool` cerrada.
 - **Resultado esperado**: pipeline de spawn consumiendo catalogos externos de peces, pools cerradas y reglas de aparicion, manteniendo tests, comportamiento de encuentro y contratos de app actuales.
 - **Dependencias**: `BL-041`, `BL-044`
+- **Plan relacionado**: `docs/features/025-resolver-spawns-desde-catalogos-y-fish-pools.md`
 - **Prioridad**: Alta
 
 ### BL-050 Reducir el determinismo total del spawn de peces

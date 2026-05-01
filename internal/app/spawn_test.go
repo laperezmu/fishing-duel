@@ -3,8 +3,12 @@ package app_test
 import (
 	"errors"
 	"pesca/internal/app"
+	"pesca/internal/content/attachmentpresets"
 	"pesca/internal/content/fishprofiles"
 	"pesca/internal/content/habitats"
+	"pesca/internal/content/playerprofiles"
+	"pesca/internal/content/rodpresets"
+	"pesca/internal/content/watercontexts"
 	"pesca/internal/content/waterpools"
 	"pesca/internal/encounter"
 	"pesca/internal/player/loadout"
@@ -35,6 +39,59 @@ func TestResolveFishSpawn(t *testing.T) {
 
 	require.NoError(t, err)
 	assert.Equal(t, "surface-control", spawn.Profile.ID)
+	ui.AssertExpectations(t)
+}
+
+func TestBootstrapEncounterWithConfigUsesClosedFishPool(t *testing.T) {
+	ui := &bootstrapSpawnUI{}
+	rng := app.NewSeededRandom(7)
+	catalog := fishprofiles.DefaultCatalog()
+
+	deckPreset := samplePlayerDeckPreset()
+	rodPreset := sampleRodPreset()
+	attachmentPreset := sampleAttachmentPreset()
+	waterPreset := sampleWaterContextPreset()
+
+	ui.On("ChoosePlayerDeckPreset", "Pesca", mock.Anything).Return(deckPreset, nil).Once()
+	ui.On("ChooseRodPreset", "Pesca", mock.Anything).Return(rodPreset, nil).Once()
+	ui.On("ChooseAttachmentPreset", "Pesca", mock.Anything, mock.Anything).Return(attachmentPreset, nil).Once()
+	ui.On("ChooseWaterContext", "Pesca", mock.Anything).Return(waterPreset, nil).Once()
+	ui.On("ResolveCast", "Pesca", mock.Anything, mock.Anything).Return(encounter.CastResult{Band: encounter.CastBandShort}, nil).Once()
+	ui.On("ShowEncounterOpening", "Pesca", mock.Anything).Return(nil).Once()
+	ui.On("ShowFishSpawn", "Pesca", mock.MatchedBy(func(spawn presentation.SpawnView) bool {
+		return spawn.ProfileLabel != "Presion horizontal" && spawn.ProfileLabel != "Corriente mixta"
+	})).Return(nil).Once()
+
+	engine, err := app.BootstrapEncounterWithConfig("Pesca", rng, ui, app.EncounterBootstrapConfig{
+		FishCatalog: catalog,
+		FishPoolID:  "shoreline-basics",
+	})
+
+	require.NoError(t, err)
+	require.NotNil(t, engine)
+	ui.AssertExpectations(t)
+}
+
+func TestBootstrapEncounterWithConfigReturnsPoolErrors(t *testing.T) {
+	ui := &bootstrapSpawnUI{}
+	rng := app.NewSeededRandom(7)
+
+	deckPreset := samplePlayerDeckPreset()
+	rodPreset := sampleRodPreset()
+	attachmentPreset := sampleAttachmentPreset()
+	waterPreset := sampleWaterContextPreset()
+
+	ui.On("ChoosePlayerDeckPreset", "Pesca", mock.Anything).Return(deckPreset, nil).Once()
+	ui.On("ChooseRodPreset", "Pesca", mock.Anything).Return(rodPreset, nil).Once()
+	ui.On("ChooseAttachmentPreset", "Pesca", mock.Anything, mock.Anything).Return(attachmentPreset, nil).Once()
+	ui.On("ChooseWaterContext", "Pesca", mock.Anything).Return(waterPreset, nil).Once()
+	ui.On("ResolveCast", "Pesca", mock.Anything, mock.Anything).Return(encounter.CastResult{Band: encounter.CastBandShort}, nil).Once()
+	ui.On("ShowEncounterOpening", "Pesca", mock.Anything).Return(nil).Once()
+
+	_, err := app.BootstrapEncounterWithConfig("Pesca", rng, ui, app.EncounterBootstrapConfig{FishPoolID: "missing-pool"})
+
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "resolve encounter fish pool: unknown fish pool id missing-pool")
 	ui.AssertExpectations(t)
 }
 
@@ -83,6 +140,59 @@ type mockSpawnUI struct {
 
 func (ui *mockSpawnUI) ShowFishSpawn(title string, spawn presentation.SpawnView) error {
 	return ui.Called(title, spawn).Error(0)
+}
+
+type bootstrapSpawnUI struct {
+	mock.Mock
+}
+
+func (ui *bootstrapSpawnUI) ChoosePlayerDeckPreset(title string, presets []playerprofiles.DeckPreset) (playerprofiles.DeckPreset, error) {
+	args := ui.Called(title, presets)
+	return args.Get(0).(playerprofiles.DeckPreset), args.Error(1)
+}
+
+func (ui *bootstrapSpawnUI) ChooseRodPreset(title string, presets []rodpresets.Preset) (rodpresets.Preset, error) {
+	args := ui.Called(title, presets)
+	return args.Get(0).(rodpresets.Preset), args.Error(1)
+}
+
+func (ui *bootstrapSpawnUI) ChooseAttachmentPreset(title string, baseRod rod.State, presets []attachmentpresets.Preset) (attachmentpresets.Preset, error) {
+	args := ui.Called(title, baseRod, presets)
+	return args.Get(0).(attachmentpresets.Preset), args.Error(1)
+}
+
+func (ui *bootstrapSpawnUI) ChooseWaterContext(title string, presets []watercontexts.Preset) (watercontexts.Preset, error) {
+	args := ui.Called(title, presets)
+	return args.Get(0).(watercontexts.Preset), args.Error(1)
+}
+
+func (ui *bootstrapSpawnUI) ResolveCast(title string, context encounter.WaterContext, presenter app.CastPresenter) (encounter.CastResult, error) {
+	args := ui.Called(title, context, presenter)
+	return args.Get(0).(encounter.CastResult), args.Error(1)
+}
+
+func (ui *bootstrapSpawnUI) ShowEncounterOpening(title string, opening presentation.OpeningView) error {
+	return ui.Called(title, opening).Error(0)
+}
+
+func (ui *bootstrapSpawnUI) ShowFishSpawn(title string, spawn presentation.SpawnView) error {
+	return ui.Called(title, spawn).Error(0)
+}
+
+func samplePlayerDeckPreset() playerprofiles.DeckPreset {
+	return playerprofiles.DefaultPresets()[0]
+}
+
+func sampleRodPreset() rodpresets.Preset {
+	return rodpresets.DefaultPresets()[1]
+}
+
+func sampleAttachmentPreset() attachmentpresets.Preset {
+	return attachmentpresets.DefaultPresets()[0]
+}
+
+func sampleWaterContextPreset() watercontexts.Preset {
+	return watercontexts.DefaultPresets()[0]
 }
 
 func sampleSurfaceLoadout(t *testing.T) loadout.State {

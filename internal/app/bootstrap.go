@@ -40,7 +40,16 @@ type Randomizer interface {
 	Shuffle(n int, swap func(i, j int))
 }
 
+type EncounterBootstrapConfig struct {
+	FishCatalog fishprofiles.Catalog
+	FishPoolID  string
+}
+
 func BootstrapEncounter(title string, rng Randomizer, ui EncounterBootstrapUI) (*game.Engine, error) {
+	return BootstrapEncounterWithConfig(title, rng, ui, EncounterBootstrapConfig{})
+}
+
+func BootstrapEncounterWithConfig(title string, rng Randomizer, ui EncounterBootstrapUI, config EncounterBootstrapConfig) (*game.Engine, error) {
 	if rng == nil {
 		return nil, fmt.Errorf("randomizer is required")
 	}
@@ -53,7 +62,7 @@ func BootstrapEncounter(title string, rng Randomizer, ui EncounterBootstrapUI) (
 		return nil, err
 	}
 	presenter := presentation.NewPresenter(presentation.DefaultCatalog())
-	opening, spawn, err := resolveEncounterBootstrap(title, playerLoadout, ui, presenter, rng)
+	opening, spawn, err := resolveEncounterBootstrap(title, playerLoadout, ui, presenter, rng, config)
 	if err != nil {
 		return nil, err
 	}
@@ -86,17 +95,38 @@ func resolvePlayerSetup(title string, ui SetupUI) (playerprofiles.DeckPreset, lo
 	return playerDeckPreset, playerLoadout, nil
 }
 
-func resolveEncounterBootstrap(title string, playerLoadout loadout.State, ui EncounterBootstrapUI, presenter presentation.Presenter, rng Randomizer) (encounter.Opening, fishprofiles.Spawn, error) {
+func resolveEncounterBootstrap(title string, playerLoadout loadout.State, ui EncounterBootstrapUI, presenter presentation.Presenter, rng Randomizer, config EncounterBootstrapConfig) (encounter.Opening, fishprofiles.Spawn, error) {
 	opening, err := ResolveEncounterOpening(title, encounter.DefaultConfig(), playerLoadout, watercontexts.DefaultPresets(), ui, presenter)
 	if err != nil {
 		return encounter.Opening{}, fishprofiles.Spawn{}, fmt.Errorf("resolve encounter opening: %w", err)
 	}
-	spawn, err := ResolveFishSpawnWithRandomizer(title, opening, playerLoadout, fishprofiles.DefaultProfiles(), ui, presenter, rng)
+	profiles, err := resolveEncounterFishProfiles(config)
+	if err != nil {
+		return encounter.Opening{}, fishprofiles.Spawn{}, err
+	}
+	spawn, err := ResolveFishSpawnWithRandomizer(title, opening, playerLoadout, profiles, ui, presenter, rng)
 	if err != nil {
 		return encounter.Opening{}, fishprofiles.Spawn{}, fmt.Errorf("resolve fish spawn: %w", err)
 	}
 
 	return opening, spawn, nil
+}
+
+func resolveEncounterFishProfiles(config EncounterBootstrapConfig) ([]fishprofiles.Profile, error) {
+	catalog := config.FishCatalog
+	if len(catalog.Profiles()) == 0 {
+		catalog = fishprofiles.DefaultCatalog()
+	}
+	poolID := config.FishPoolID
+	if poolID == "" {
+		poolID = fishprofiles.DefaultEncounterFishPoolID
+	}
+	profiles, err := catalog.ResolvePool(poolID)
+	if err != nil {
+		return nil, fmt.Errorf("resolve encounter fish pool: %w", err)
+	}
+
+	return profiles, nil
 }
 
 func buildEncounterEngine(rng Randomizer, playerDeckPreset playerprofiles.DeckPreset, playerLoadout loadout.State, opening encounter.Opening, spawn fishprofiles.Spawn) (*game.Engine, error) {
