@@ -35,11 +35,11 @@ type FishDeck interface {
 }
 
 type PlayerMoveController interface {
-	Initialize(state *match.State)
-	PrepareRound(state *match.State)
-	ValidateMove(state match.State, playerMove domain.Move) error
-	PeekMoveCard(state match.State, playerMove domain.Move) (cards.PlayerCard, error)
-	ConsumeMove(state *match.State, playerMove domain.Move) cards.PlayerCard
+	Initialize(state *match.PlayerMoveRuntime)
+	PrepareRound(state *match.PlayerMoveRuntime)
+	ValidateMove(state match.PlayerMoveRuntime, playerMove domain.Move) error
+	PeekMoveCard(state match.PlayerMoveRuntime, playerMove domain.Move) (cards.PlayerCard, error)
+	ConsumeMove(state *match.PlayerMoveRuntime, playerMove domain.Move) cards.PlayerCard
 }
 
 type Engine struct {
@@ -73,7 +73,8 @@ func NewEngine(fishDeck FishDeck, playerMoves PlayerMoveController, roundEvaluat
 		endCondition:      endCondition,
 		state:             initialState,
 	}
-	engine.playerMoves.Initialize(&engine.state)
+	playerMoveRuntime := engine.state.PlayerMoveRuntime()
+	engine.playerMoves.Initialize(&playerMoveRuntime)
 	engine.fishDeck.PrepareNextRound()
 	engine.refreshState()
 	endingState := engine.state.EndingState()
@@ -92,11 +93,12 @@ func (engine *Engine) PlayRound(playerMove domain.Move) (match.RoundResult, erro
 	}
 
 	engine.resetRoundState()
-	engine.playerMoves.PrepareRound(&engine.state)
-	if err := engine.playerMoves.ValidateMove(engine.state, playerMove); err != nil {
+	playerMoveRuntime := engine.state.PlayerMoveRuntime()
+	engine.playerMoves.PrepareRound(&playerMoveRuntime)
+	if err := engine.playerMoves.ValidateMove(playerMoveRuntime, playerMove); err != nil {
 		return match.RoundResult{}, err
 	}
-	playerCard, err := engine.playerMoves.PeekMoveCard(engine.state, playerMove)
+	playerCard, err := engine.playerMoves.PeekMoveCard(playerMoveRuntime, playerMove)
 	if err != nil {
 		return match.RoundResult{}, err
 	}
@@ -124,7 +126,8 @@ func (engine *Engine) PlayRound(playerMove domain.Move) (match.RoundResult, erro
 	encounter.ApplyThresholdEffects(&engine.state.Round.Thresholds, drawEffects)
 
 	roundOutcome := engine.roundEvaluator.Evaluate(playerMove, fishCard.Move)
-	engine.playerMoves.ConsumeMove(&engine.state, playerMove)
+	playerMoveRuntime = engine.state.PlayerMoveRuntime()
+	engine.playerMoves.ConsumeMove(&playerMoveRuntime, playerMove)
 	outcomeEffects := cards.FilterEffects(playerCard.Effects, cards.EffectContext{
 		Owner:   cards.OwnerPlayer,
 		Phase:   cards.PhaseOutcome,
@@ -148,7 +151,8 @@ func (engine *Engine) PlayRound(playerMove domain.Move) (match.RoundResult, erro
 
 	engine.fishDeck.PrepareNextRound()
 	engine.refreshState()
-	engine.playerMoves.PrepareRound(&engine.state)
+	playerMoveRuntime = engine.state.PlayerMoveRuntime()
+	engine.playerMoves.PrepareRound(&playerMoveRuntime)
 	endingState := engine.state.EndingState()
 	engine.endCondition.Apply(&endingState)
 	engine.resetRoundState()

@@ -22,7 +22,8 @@ func TestUsageControllerInitialize(t *testing.T) {
 	require.NoError(t, err)
 
 	state := match.State{}
-	controller.Initialize(&state)
+	runtime := state.PlayerMoveRuntime()
+	controller.Initialize(&runtime)
 
 	require.Len(t, state.Player.Moves.Moves, 3)
 	assert.Equal(t, domain.Blue, state.Player.Moves.Moves[0].Move)
@@ -67,7 +68,8 @@ func TestUsageControllerPrepareRound(t *testing.T) {
 			}}},
 		}
 
-		controller.PrepareRound(&state)
+		runtime := state.PlayerMoveRuntime()
+		controller.PrepareRound(&runtime)
 
 		assert.Equal(t, 2, state.Player.Moves.Moves[0].RemainingUses)
 		assert.Equal(t, 2, state.Player.Moves.Moves[0].MaxUses)
@@ -87,7 +89,8 @@ func TestUsageControllerPrepareRound(t *testing.T) {
 			}}},
 		}
 
-		controller.PrepareRound(&state)
+		runtime := state.PlayerMoveRuntime()
+		controller.PrepareRound(&runtime)
 
 		assert.Equal(t, 0, state.Player.Moves.Moves[0].RemainingUses)
 		assert.Equal(t, 3, state.Player.Moves.Moves[0].RestoresOnRound)
@@ -107,7 +110,7 @@ func TestUsageControllerValidateMove(t *testing.T) {
 			{Move: domain.Yellow, MaxUses: 3, RemainingUses: 3, ActiveCards: []cards.PlayerCard{cards.NewPlayerCard(domain.Yellow), cards.NewPlayerCard(domain.Yellow), cards.NewPlayerCard(domain.Yellow)}},
 		}}}}
 
-		assert.NoError(t, controller.ValidateMove(state, domain.Blue))
+		assert.NoError(t, controller.ValidateMove(state.PlayerMoveRuntime(), domain.Blue))
 	})
 
 	t.Run("returns an unavailable error when the selected color is recharging", func(t *testing.T) {
@@ -117,7 +120,7 @@ func TestUsageControllerValidateMove(t *testing.T) {
 			{Move: domain.Yellow, MaxUses: 3, RemainingUses: 3, ActiveCards: []cards.PlayerCard{cards.NewPlayerCard(domain.Yellow), cards.NewPlayerCard(domain.Yellow), cards.NewPlayerCard(domain.Yellow)}},
 		}}}}
 
-		assert.ErrorIs(t, controller.ValidateMove(state, domain.Blue), ErrMoveUnavailable)
+		assert.ErrorIs(t, controller.ValidateMove(state.PlayerMoveRuntime(), domain.Blue), ErrMoveUnavailable)
 	})
 }
 
@@ -133,7 +136,7 @@ func TestUsageControllerPeekMoveCard(t *testing.T) {
 			{Move: domain.Yellow, MaxUses: 1, RemainingUses: 1, ActiveCards: []cards.PlayerCard{cards.NewPlayerCard(domain.Yellow)}},
 		}}}}
 
-		playerCard, err := controller.PeekMoveCard(state, domain.Blue)
+		playerCard, err := controller.PeekMoveCard(state.PlayerMoveRuntime(), domain.Blue)
 
 		require.NoError(t, err)
 		assert.Equal(t, expectedCard, playerCard)
@@ -142,7 +145,7 @@ func TestUsageControllerPeekMoveCard(t *testing.T) {
 	t.Run("returns an unavailable error when the deck has no visible card", func(t *testing.T) {
 		state := match.State{Player: match.PlayerState{Moves: match.PlayerMoveResources{Moves: []match.PlayerMoveState{{Move: domain.Blue, RestoresOnRound: 4}}}}}
 
-		_, err := controller.PeekMoveCard(state, domain.Blue)
+		_, err := controller.PeekMoveCard(state.PlayerMoveRuntime(), domain.Blue)
 
 		assert.ErrorIs(t, err, ErrMoveUnavailable)
 	})
@@ -171,7 +174,8 @@ func TestUsageControllerConsumeMove(t *testing.T) {
 			}}},
 		}
 
-		usedCard := controller.ConsumeMove(&state, domain.Blue)
+		runtime := state.PlayerMoveRuntime()
+		usedCard := controller.ConsumeMove(&runtime, domain.Blue)
 
 		assert.Equal(t, firstCard, usedCard)
 		assert.Equal(t, 1, state.Player.Moves.Moves[0].RemainingUses)
@@ -194,7 +198,8 @@ func TestUsageControllerConsumeMove(t *testing.T) {
 			}}},
 		}
 
-		usedCard := controller.ConsumeMove(&state, domain.Blue)
+		runtime := state.PlayerMoveRuntime()
+		usedCard := controller.ConsumeMove(&runtime, domain.Blue)
 
 		assert.Equal(t, lastCard, usedCard)
 		assert.Equal(t, 0, state.Player.Moves.Moves[0].RemainingUses)

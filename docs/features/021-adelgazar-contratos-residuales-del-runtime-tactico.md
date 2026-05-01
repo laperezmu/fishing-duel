@@ -90,6 +90,14 @@ Para mantener el scope controlado, el primer slice deberia cubrir:
 
 Con eso el runtime tactico quedara mas preparado para `BL-023` y para el futuro runtime de run sin volver a inflar el engine.
 
+## Implementacion aplicada
+
+- `match.RoundResult` ya no reexporta `match.State` y devuelve snapshots tacticos estrechos para status y evento del encounter.
+- El mapping del estado visible del mazo ya vive en `match.NewDeckState(...)`, dejando al engine sin esa traduccion de visibilidad.
+- `progression` y `endings` ya consumen `ProgressionState` y `EndingState` en lugar de mutar el ensamblado tactico completo.
+- El runtime de movimientos del jugador ya consume `PlayerMoveRuntime`, estrechando tambien la frontera entre `game` y `player/playermoves`.
+- La documentacion de `internal/match/` deja explicitados los contratos principales de lectura y mutacion del duelo.
+
 ## Validacion
 
 - Ejecutar `go test ./...`.

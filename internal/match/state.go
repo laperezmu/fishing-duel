@@ -95,6 +95,11 @@ type EndingState struct {
 	Lifecycle *LifecycleState
 }
 
+type PlayerMoveRuntime struct {
+	Round *RoundState
+	Moves *PlayerMoveResources
+}
+
 type ResolvedRound struct {
 	PlayerMove     domain.Move
 	PlayerCard     cards.PlayerCard
@@ -130,6 +135,13 @@ func (state *State) EndingState() EndingState {
 		Encounter: &state.Encounter,
 		Player:    &state.Player,
 		Lifecycle: &state.Lifecycle,
+	}
+}
+
+func (state *State) PlayerMoveRuntime() PlayerMoveRuntime {
+	return PlayerMoveRuntime{
+		Round: &state.Round,
+		Moves: &state.Player.Moves,
 	}
 }
 
