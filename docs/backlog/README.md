@@ -1,6 +1,6 @@
 # Backlog
 
-Esta carpeta contiene roadmap, priorizacion y estado visible de los pendientes del producto.
+Esta carpeta contiene backlog, priorizacion y estado visible del trabajo activo y completado del producto.
 
 ## Objetivo
 
@@ -12,7 +12,7 @@ Esta carpeta contiene roadmap, priorizacion y estado visible de los pendientes d
 
 - `pending`: item identificado pero aun sin plan activo de implementacion.
 - `planned`: item ya convertido en plan dentro de `docs/features/`, pero todavia no integrado en `main`.
-- `done`: item ya integrado en `main`.
+- `done`: item ya integrado en `main` y movido al backlog completado.
 - `cancelled`: item descartado, absorbido por otro o ya no vigente.
 
 ## Convencion
@@ -26,5 +26,6 @@ Esta carpeta contiene roadmap, priorizacion y estado visible de los pendientes d
 
 ## Documentos iniciales
 
-- `docs/backlog/001-roadmap-roguelike.md`: backlog inicial del producto con estado visible.
+- `docs/backlog/001-backlog-activo-roguelike.md`: backlog activo del producto con estado visible.
+- `docs/backlog/002-backlog-completado-roguelike.md`: backlog completado ya integrado en `main`.
 - `docs/backlog/TEMPLATE.md`: plantilla para nuevas tareas.

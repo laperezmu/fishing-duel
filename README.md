@@ -154,7 +154,7 @@ En terminos de arquitectura, el proyecto hoy funciona como un monolito modular p
 
 ## Documentacion util
 
-- `docs/backlog/001-roadmap-roguelike.md`: backlog y direccion actual del proyecto.
+- `docs/backlog/001-backlog-activo-roguelike.md`: backlog y direccion actual del proyecto.
 - `docs/features/`: planes de trabajo e iteraciones ya planteadas.
 - `docs/discoveries/`: discovery docs para decisiones de sistema mas amplias.
 
