@@ -1,14 +1,12 @@
 # Features
 
-Esta carpeta contiene los planes de features del proyecto.
+Esta carpeta contiene planes legacy del proyecto.
 
-## Convencion
+## Estado
 
-- Cada plan usa prefijo numerico secuencial.
-- Formato sugerido: `001-nombre-corto.md`.
-- Los planes siguen la plantilla definida en `PROJECT_CONTEXT.md`.
-- La rama de implementacion usa el nombre del archivo sin `.md`.
-- Cada feature debe concentrar analisis, propuesta y ejecucion en un solo documento. No se crea un discovery aparte para completar el plan.
+- No crear nuevas features aqui.
+- El flujo oficial fue reemplazado por spec-kit.
+- Las nuevas features deben vivir bajo `specs/` y seguir la constitucion en `.specify/memory/constitution.md`.
 
 ## Ejemplos
 

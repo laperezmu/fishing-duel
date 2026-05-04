@@ -1,5 +1,7 @@
 # Project Context
 
+> Legacy note: this file captures the pre-spec-kit workflow and is preserved for historical context. The active workflow now lives in `.specify/memory/constitution.md` and the active feature artifacts live under `specs/`.
+
 ## Feature Integration Workflow
 
 All new features start from a plan before implementation begins.

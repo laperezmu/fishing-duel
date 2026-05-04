@@ -1,20 +1,21 @@
 # Docs
 
-La documentacion del proyecto se divide en dos capas activas y una capa legacy.
+Esta carpeta queda como contexto historico del flujo anterior al setup de spec-kit.
 
-## Estructura
+## Estado
 
-- `docs/features/`: planes de features trabajadas bajo el flujo de implementacion. Cada feature debe resolverse en un solo documento.
-- `docs/backlog/`: backlog de investigacion, priorizacion y desarrollo futuro del juego.
-- `docs/discoveries/`: documentos legacy de discovery creados antes de la convencion actual. No deben crearse nuevos discoveries separados para una feature.
+- `docs/features/`: planes legacy ya cerrados o archivados.
+- `docs/backlog/`: backlog legacy usado antes de adoptar spec-kit como flujo oficial.
+- `docs/discoveries/`: discoveries historicos conservados solo como referencia.
 
-## Regla practica
+## Regla actual
 
-- Si una tarea ya se va a implementar, se crea como plan en `docs/features/`.
-- Si una idea aun necesita discovery, definicion o priorizacion, vive en `docs/backlog/`.
-- El analisis, la propuesta y la implementacion de una feature deben convivir en un unico documento de plan. No se abre un discovery separado para descubrir la propuesta despues.
+- No crear nuevas features activas en `docs/`.
+- El flujo oficial vive en `specs/` y `.specify/`.
+- Si una feature nueva necesita contexto legacy, debe enlazar explicitamente los docs relevantes desde su spec activa.
 
-## Referencias
+## Referencias activas
 
-- La plantilla de plan de feature sigue definida en `PROJECT_CONTEXT.md`.
-- El backlog tiene su propia guia y template en `docs/backlog/`.
+- `.specify/memory/constitution.md`: principios y gobierno del nuevo framework.
+- `.specify/templates/overrides/`: plantillas adaptadas al proyecto.
+- `specs/`: specs, planes y tareas activas.

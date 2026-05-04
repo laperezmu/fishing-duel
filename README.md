@@ -171,9 +171,9 @@ En terminos de arquitectura, el proyecto hoy funciona como un monolito modular p
 
 ## Documentacion util
 
-- `docs/backlog/001-backlog-activo-roguelike.md`: backlog y direccion actual del proyecto.
-- `docs/features/`: planes de trabajo e iteraciones ya planteadas.
-- `docs/discoveries/`: discovery docs para decisiones de sistema mas amplias.
+- `specs/`: fuente de verdad activa para nuevas features bajo spec-kit.
+- `.specify/memory/constitution.md`: principios y workflow oficiales del proyecto.
+- `docs/`: contexto historico del flujo previo; ya no recibe nuevas features activas.
 
 ## Convencion recomendada
 
