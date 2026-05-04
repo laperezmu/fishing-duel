@@ -18,7 +18,7 @@ Esta carpeta contiene backlog, priorizacion y estado visible del trabajo activo 
 ## Convencion
 
 - Usa `TEMPLATE.md` para nuevas entradas.
-- Cada item del backlog debe tener un identificador `BL-###`.
+- Cada item del backlog debe tener un identificador propio de su linea, por ejemplo `BL-###` para el backlog roguelike principal o `GUI-###` para el backlog de interfaz grafica.
 - Cada item del backlog debe declarar un `Estado` visible.
 - Un backlog item puede vivir dentro de un documento maestro o pasar a un archivo propio si crece.
 - Cuando un item este suficientemente claro para implementarse, se convierte en un plan dentro de `docs/features/`.
@@ -28,4 +28,5 @@ Esta carpeta contiene backlog, priorizacion y estado visible del trabajo activo 
 
 - `docs/backlog/001-backlog-activo-roguelike.md`: backlog activo del producto con estado visible.
 - `docs/backlog/002-backlog-completado-roguelike.md`: backlog completado ya integrado en `main`.
+- `docs/backlog/003-backlog-interfaz-grafica-y-prototipo-visual.md`: backlog separado para cliente grafico, investigacion de librerias y primer vertical slice visual.
 - `docs/backlog/TEMPLATE.md`: plantilla para nuevas tareas.

@@ -15,70 +15,19 @@ Este documento concentra el backlog activo y pendiente del proyecto. Las tareas 
 
 ## Foto actual
 
-- `planned`: `BL-001`
+- `planned`: `BL-036`
 - `pending`: resto del backlog activo
 - `done`: ver `docs/backlog/002-backlog-completado-roguelike.md`
-- Foco recomendado inmediato: cerrar primero la base MVP de una run sin persistencia meta y usar la base ya saneada del encounter para empezar a modelar la expedicion, empezando por `BL-001` y `BL-035`.
+- Foco recomendado inmediato: enriquecer la run MVP sobre la base ya montada, empezando por `BL-036`, `BL-037`, `BL-038` y `BL-040`.
 
 ## Foco sugerido actual
 
-- `BL-001`: fijar el contrato base y el MVP secuencial de una run sin persistencia meta.
-- `BL-035`: definir el flujo minimo navegable de zona y nodos para el MVP de expedicion.
-- `BL-044`: externalizar tablas de aparicion por contexto de encounter cuando ya queramos elegir `fish_pool_id` desde reglas de contenido.
-- `BL-023`: mantener en cola el refactor UI-agnostic amplio despues del slice tecnico minimo.
+- `BL-036`: terminar de cerrar reglas globales de `thread`, dano, reparacion y borde de recursos de run.
+- `BL-037`: introducir economia minima para que capturas y servicios ya produzcan decisiones entre nodos.
+- `BL-038`: dar comportamiento real al nodo `service` con reparacion y ajustes minimos de build.
+- `BL-040`: consolidar el primer vertical slice completo una vez cerrados recursos y servicio.
 
 ## Core Loop
-
-### BL-001 Definir contrato base y MVP secuencial de una run
-- **Estado**: `planned`
-- **Tipo**: Discovery
-- **Objetivo**: fijar la arquitectura minima de una expedicion jugable en una sola sesion, separando claramente encounter, run y futura meta, para que la implementacion pueda avanzar por etapas UI-agnostic y sin depender todavia de persistencia entre runs.
-- **Resultado esperado**: contrato marco del MVP de run con estados base, handoff `encounter -> run`, recursos globales de expedicion, flujo minimo de zona y lista secuencial de subtareas necesarias para llegar a una primera run jugable sin meta-persistencia.
-- **Plan relacionado**: `docs/features/026-definir-contrato-base-y-mvp-secuencial-de-una-run.md`
-- **Direccion actual acordada**:
-  - La run es una expedicion de pesca deportiva que empieza en aguas mas accesibles y avanza hacia mar abierto y peces de leyenda.
-  - El objetivo de la run es llegar vivo y suficientemente fuerte al final de la expedicion para capturar un pez legendario final.
-  - La derrota de la run ocurre cuando el jugador agota todo el hilo de la cana.
-  - El retiro voluntario puede ocurrir solo en checkpoints o servicios y cierra la expedicion sin acceder al legendario final.
-  - Cada zona tiene tiempo limitado, pero el tiempo funciona como presion local de zona y no como fail state global de la expedicion.
-  - Entre zonas persisten la build, la economia, los patrocinadores, el desgaste del hilo y cualquier otro recurso de run.
-  - Las zonas aumentan la dificultad y la cercania al final de la expedicion, pero no resetean la progresion acumulada en la run.
-  - El MVP actual no incluye persistencia entre runs ni meta-progresion; esas capas deben quedar separadas, pero fuera de scope de la primera entrega.
-- **Capas de estado a distinguir desde el analisis**:
-  - `por encuentro`: estado tactico del duelo, cartas vistas, outcome y dano puntual del enfrentamiento.
-  - `por run`: hilo restante, build del jugador, dinero, patrocinadores activos, fotos reservadas y progreso interno de la expedicion actual.
-  - `entre runs`: reservado para backlog futuro, pero fuera de este MVP.
-- **Recorte actual del MVP**:
-  - run de una sola sesion, sin guardado ni profile permanente.
-  - 1 o 2 zonas fijas como maximo.
-  - flujo de nodos simple y navegable antes de abordar mapa rico o ocultacion compleja.
-  - economia minima `captura -> fotos -> dinero -> servicio -> mejora`.
-  - hilo como condicion global de derrota.
-  - patrocinadores en forma minima y tardia, solo si no bloquean el primer vertical slice jugable.
-- **Subtareas secuenciales necesarias para implementacion**:
-  - `BL-034`: slice minimo de arquitectura UI-agnostic para setup, opening y bootstrap antes de crecer la run.
-  - `BL-035`: definir flujo minimo navegable de zona y nodos del MVP.
-  - `BL-036`: definir contrato de recursos globales de run y dano al hilo.
-  - `BL-037`: definir economia minima de fotos, dinero, liquidacion y gasto en servicio.
-  - `BL-038`: definir build minima y acciones de servicio del MVP.
-  - `BL-039`: definir patrocinadores MVP o decidir explicitamente postergarlos para el primer vertical slice.
-  - `BL-040`: implementar primer vertical slice jugable de run MVP sobre esas bases.
-- **Criterios de cierre**:
-  - queda definido el contrato de `RunState` y el handoff `encounter -> run`
-  - queda fijado el MVP de run sin persistencia meta ni guardado
-  - queda decidido el orden secuencial de implementacion hasta una primera run jugable
-  - queda claro que partes se difieren a backlog posterior: meta, coleccion, guardado y mapa rico
-- **Prioridad**: Alta
-
-### BL-035 Definir flujo minimo navegable de zona y nodos para el MVP
-- **Estado**: `planned`
-- **Tipo**: Discovery
-- **Objetivo**: bajar la expedicion a una estructura minima jugable y secuencial, con el menor numero de nodos y transiciones necesario para validar una run completa sin entrar todavia en mapa rico.
-- **Resultado esperado**: flujo concreto tipo `inicio -> pesca -> pesca -> servicio -> boss -> cierre`, con taxonomia minima de nodos, reglas de avance y puntos donde se inyectan encounters, tienda y cierre de zona.
-- **Plan relacionado**: `docs/features/027-definir-flujo-minimo-de-zona-y-nodos-para-el-mvp.md`
-- **Follow-up relacionado**: `docs/features/029-resolver-agua-desde-el-nodo-de-run.md`
-- **Dependencias**: `BL-001`
-- **Prioridad**: Alta
 
 ### BL-036 Definir recursos globales de run, reglas del hilo y `AnglerProfile` del MVP
 - **Estado**: `planned`
@@ -87,6 +36,11 @@ Este documento concentra el backlog activo y pendiente del proyecto. Las tareas 
 - **Resultado esperado**: contrato de recursos de run con hilo, dinero y otros minimos necesarios; reglas de perdida, reparacion y dano provenientes de encounters o nodos; y definicion del paquete inicial de run via `AnglerProfile`, cubriendo mazo inicial, `rod`, aditamentos base y `thread` inicial sin mezclar esos recursos con el runtime tactico.
 - **Plan relacionado**: `docs/features/028-definir-recursos-globales-de-run-y-angler-profiles.md`
 - **Dependencias**: `BL-001`, `BL-035`
+- **Estado actual**:
+  - `AnglerProfile` ya existe como paquete inicial seleccionable de la run.
+  - El `thread` inicial ya depende del pescador elegido y vive en `run.State.Thread`.
+  - El dano basico al `thread` ya puede aplicarse desde `EncounterResult`.
+  - Sigue pendiente cerrar reglas jugables de reparacion, costes, limites de recuperacion y uso del nodo `service`.
 - **Prioridad**: Alta
 
 ### BL-037 Definir economia minima de fotos, dinero y liquidacion de servicio

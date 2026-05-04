@@ -8,6 +8,31 @@ Este documento concentra las tareas ya integradas en `main`.
 
 ## Core Loop
 
+### BL-001 Definir contrato base y MVP secuencial de una run
+- **Estado**: `done`
+- **Tipo**: Discovery
+- **Objetivo**: fijar la arquitectura minima de una expedicion jugable en una sola sesion, separando claramente encounter, run y futura meta, para que la implementacion pueda avanzar por etapas UI-agnostic y sin depender todavia de persistencia entre runs.
+- **Resultado esperado**: contrato marco del MVP de run con estados base, handoff `encounter -> run`, recursos globales de expedicion, flujo minimo de zona y lista secuencial de subtareas necesarias para llegar a una primera run jugable sin meta-persistencia.
+- **Plan relacionado**: `docs/features/026-definir-contrato-base-y-mvp-secuencial-de-una-run.md`
+- **Notas de cierre**:
+  - Quedo fijada la frontera entre estado por encounter, estado por run y futura capa meta.
+  - El repo ya tiene contratos base de `run.State` y `run.EncounterResult` para evitar que la run inspeccione `match.State` completo.
+  - Quedo cerrada la secuencia de trabajo del MVP de run sobre `BL-035` a `BL-040`.
+- **Prioridad**: Alta
+
+### BL-035 Definir flujo minimo navegable de zona y nodos para el MVP
+- **Estado**: `done`
+- **Tipo**: Discovery
+- **Objetivo**: bajar la expedicion a una estructura minima jugable y secuencial, con el menor numero de nodos y transiciones necesario para validar una run completa sin entrar todavia en mapa rico.
+- **Resultado esperado**: flujo concreto tipo `inicio -> pesca -> pesca -> servicio -> boss -> cierre`, con taxonomia minima de nodos, reglas de avance y puntos donde se inyectan encounters, tienda y cierre de zona.
+- **Plan relacionado**: `docs/features/027-definir-flujo-minimo-de-zona-y-nodos-para-el-mvp.md`
+- **Follow-up integrado**: `docs/features/029-resolver-agua-desde-el-nodo-de-run.md`
+- **Notas de cierre**:
+  - Existe un binario de run separado en `cmd/fishing-run/` y el sandbox tactico sigue viviendo en `cmd/fishing-duel/`.
+  - La run ya recorre una ruta secuencial minima con nodos `start`, `fishing`, `service`, `boss` y `end`.
+  - Los nodos de pesca y boss ya inyectan encounters en la run y el agua actual se resuelve desde el nodo, no desde una eleccion manual del jugador.
+- **Prioridad**: Alta
+
 ### BL-029 Descomponer `match.State` y fijar fronteras del runtime tactico
 - **Estado**: `done`
 - **Tipo**: Calidad + Discovery
