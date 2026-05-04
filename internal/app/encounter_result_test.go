@@ -31,7 +31,7 @@ func TestResolveEncounterResultCaptured(t *testing.T) {
 	assert.Equal(t, 0, result.ThreadDamage)
 }
 
-func TestResolveEncounterResultEscapedAddsThreadDamageOnOverflow(t *testing.T) {
+func TestResolveEncounterResultTrackEscapeAlwaysAddsOneThreadDamage(t *testing.T) {
 	t.Parallel()
 
 	result, err := ResolveEncounterResult(match.State{
@@ -43,7 +43,39 @@ func TestResolveEncounterResultEscapedAddsThreadDamageOnOverflow(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, run.EncounterOutcomeEscaped, result.Outcome)
 	assert.True(t, result.NodeResolved)
-	assert.Equal(t, 2, result.ThreadDamage)
+	assert.Equal(t, 1, result.ThreadDamage)
+	assert.Nil(t, result.Capture)
+}
+
+func TestResolveEncounterResultDepthEscapeAlwaysAddsOneThreadDamage(t *testing.T) {
+	t.Parallel()
+
+	result, err := ResolveEncounterResult(match.State{
+		Encounter: encounter.State{Status: encounter.StatusEscaped, EndReason: encounter.EndReasonDepthEscape, Depth: 4},
+		Player:    match.PlayerState{Loadout: mustBuildLoadout(t, 5)},
+		Lifecycle: match.LifecycleState{Finished: true},
+	}, fishprofiles.Spawn{Profile: fishprofiles.Profile{ID: "tuna", Name: "Atun"}})
+
+	require.NoError(t, err)
+	assert.Equal(t, run.EncounterOutcomeEscaped, result.Outcome)
+	assert.True(t, result.NodeResolved)
+	assert.Equal(t, 1, result.ThreadDamage)
+	assert.Nil(t, result.Capture)
+}
+
+func TestResolveEncounterResultSplashEscapeDoesNotAddThreadDamage(t *testing.T) {
+	t.Parallel()
+
+	result, err := ResolveEncounterResult(match.State{
+		Encounter: encounter.State{Status: encounter.StatusEscaped, EndReason: encounter.EndReasonSplashEscape},
+		Player:    match.PlayerState{Loadout: mustBuildLoadout(t, 5)},
+		Lifecycle: match.LifecycleState{Finished: true},
+	}, fishprofiles.Spawn{Profile: fishprofiles.Profile{ID: "tuna", Name: "Atun"}})
+
+	require.NoError(t, err)
+	assert.Equal(t, run.EncounterOutcomeEscaped, result.Outcome)
+	assert.True(t, result.NodeResolved)
+	assert.Equal(t, 0, result.ThreadDamage)
 	assert.Nil(t, result.Capture)
 }
 

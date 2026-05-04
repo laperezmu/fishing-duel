@@ -44,13 +44,12 @@ func ResolveEncounterResult(state match.State, spawn fishprofiles.Spawn) (run.En
 }
 
 func resolveEncounterThreadDamage(state match.State) int {
-	maxDistance := state.Player.Loadout.TrackMaxDistance()
-	if maxDistance <= 0 {
+	switch state.Encounter.EndReason {
+	case encounter.EndReasonTrackEscape, encounter.EndReasonDepthEscape:
+		return 1
+	case encounter.EndReasonSplashEscape:
+		return 0
+	default:
 		return 0
 	}
-	if state.Encounter.Distance <= maxDistance {
-		return 0
-	}
-
-	return state.Encounter.Distance - maxDistance
 }

@@ -36,6 +36,62 @@ func TestAdvanceMovesToNextNode(t *testing.T) {
 	assert.Equal(t, "fishing-2", state.Progress.Next.NodeID)
 }
 
+func TestDefaultRouteUsesEightWaterPhasesAndTwentyFourCombats(t *testing.T) {
+	t.Parallel()
+
+	route := DefaultRoute()
+	combatCount := 0
+	bossCount := 0
+	phasePresets := make([]string, 0, 8)
+	lastZoneID := ""
+	combatsInPhase := 0
+
+	for _, node := range route {
+		if node.Kind == NodeKindStart || node.Kind == NodeKindEnd || node.Kind == NodeKindService || node.Kind == NodeKindCheckpoint {
+			if lastZoneID != "" && node.ZoneID != lastZoneID {
+				assert.Equal(t, 3, combatsInPhase)
+				combatsInPhase = 0
+			}
+			if node.ZoneID != lastZoneID {
+				phasePresets = append(phasePresets, node.ZoneID)
+				lastZoneID = node.ZoneID
+			}
+			continue
+		}
+
+		if node.ZoneID != lastZoneID {
+			if lastZoneID != "" {
+				assert.Equal(t, 3, combatsInPhase)
+				combatsInPhase = 0
+			}
+			phasePresets = append(phasePresets, node.ZoneID)
+			lastZoneID = node.ZoneID
+		}
+
+		combatCount++
+		combatsInPhase++
+		assert.NotEmpty(t, node.WaterPresetID)
+		assert.Equal(t, node.ZoneID, node.WaterPresetID)
+		if node.Kind == NodeKindBoss {
+			bossCount++
+		}
+	}
+
+	assert.Equal(t, 24, combatCount)
+	assert.Equal(t, 8, bossCount)
+	assert.Equal(t, 3, combatsInPhase)
+	assert.Equal(t, []string{
+		"shoreline-cove",
+		"open-channel",
+		"broken-current",
+		"reef-shadow",
+		"tidal-gate",
+		"weed-pocket",
+		"stone-drop",
+		"deep-ledge",
+	}, phasePresets)
+}
+
 func TestApplyEncounterResultUpdatesThreadAndCaptures(t *testing.T) {
 	t.Parallel()
 

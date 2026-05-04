@@ -70,6 +70,78 @@ func DefaultPresets() []Preset {
 			Distances:    consecutiveDistances(0),
 			InitialDepth: 1,
 		},
+		{
+			ID:          "reef-shadow",
+			Name:        "Sombra de arrecife",
+			Description: "La actividad se pega a estructuras medias y castiga los lances demasiado cortos con ventanas menos limpias.",
+			Signals: []string{
+				"Manchas oscuras cortan el brillo del agua a media distancia.",
+				"Hay vibracion irregular alrededor de piedra sumergida.",
+			},
+			PoolTag:      waterpools.MixedCurrent,
+			Distances:    consecutiveDistances(1),
+			InitialDepth: 2,
+		},
+		{
+			ID:          "tidal-gate",
+			Name:        "Paso de marea",
+			Description: "La marea abre un pasillo estrecho donde los peces empujan entre profundidad media y corriente viva.",
+			Signals: []string{
+				"La corriente se acelera entre dos franjas mas calmas.",
+				"Burbujas largas marcan un corredor hacia fuera.",
+			},
+			PoolTag:      waterpools.Offshore,
+			Distances:    consecutiveDistances(2),
+			InitialDepth: 2,
+		},
+		{
+			ID:          "weed-pocket",
+			Name:        "Bolsillo de maleza",
+			Description: "El agua parece retenida por vegetacion sumergida y favorece lances cortos con pelea mas vertical.",
+			Signals: []string{
+				"La superficie respira despacio entre parches verdes.",
+				"Las ondulaciones cortas se frenan antes del canal central.",
+			},
+			PoolTag:      waterpools.Shoreline,
+			Distances:    consecutiveDistances(0),
+			InitialDepth: 2,
+		},
+		{
+			ID:          "stone-drop",
+			Name:        "Caida de piedra",
+			Description: "El fondo rompe en un escalon brusco y la lectura premia sostener profundidad sin ceder toda la distancia.",
+			Signals: []string{
+				"El color del agua se oscurece de golpe despues del primer tercio.",
+				"Pequenos golpes en superficie delatan actividad sobre la caida.",
+			},
+			PoolTag:      waterpools.MixedCurrent,
+			Distances:    consecutiveDistances(1),
+			InitialDepth: 3,
+		},
+		{
+			ID:          "wind-lane",
+			Name:        "Calle de viento",
+			Description: "El viento ordena una via larga de espuma y la actividad buena aparece donde la deriva se estabiliza mar adentro.",
+			Signals: []string{
+				"Una linea continua de espuma apunta fuera de la costa.",
+				"Las crestas rompen siempre en la misma direccion.",
+			},
+			PoolTag:      waterpools.Offshore,
+			Distances:    consecutiveDistances(2),
+			InitialDepth: 1,
+		},
+		{
+			ID:          "deep-ledge",
+			Name:        "Cornisa profunda",
+			Description: "La actividad rota por una pared lejana y obliga a probar aperturas largas con margen vertical desde el inicio.",
+			Signals: []string{
+				"El agua plana se corta en un borde oscuro mar adentro.",
+				"Las burbujas suben aisladas desde una misma linea profunda.",
+			},
+			PoolTag:      waterpools.Offshore,
+			Distances:    consecutiveDistances(3),
+			InitialDepth: 3,
+		},
 	}
 }
 

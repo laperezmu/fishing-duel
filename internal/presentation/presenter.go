@@ -213,6 +213,28 @@ func (p Presenter) RunSummary(title string, state run.State) RunSummaryView {
 	}
 }
 
+func (p Presenter) RunNodeSummary(title string, node run.NodeState, result run.EncounterResult, state run.State, next *run.NodeState) RunNodeSummaryView {
+	view := RunNodeSummaryView{
+		Title:               title,
+		NodeLabel:           p.runNodeLabel(node),
+		NodeKind:            node.Kind,
+		OutcomeLabel:        p.runEncounterOutcomeLabel(result),
+		Thread:              state.Thread.Current,
+		ThreadMax:           state.Thread.Maximum,
+		ThreadDelta:         -result.ThreadDamage,
+		CaptureCount:        len(state.Captures),
+		ContinuePromptLabel: "Pulsa Enter para continuar.",
+	}
+	if result.Capture != nil {
+		view.LastCaptureLabel = result.Capture.FishName
+	}
+	if next != nil {
+		view.NextNodeLabel = p.runNodeLabel(*next)
+	}
+
+	return view
+}
+
 func (p Presenter) eventLabel(event encounter.Event) string {
 	if event.Kind == encounter.EventKindNone {
 		return ""
@@ -354,6 +376,27 @@ func (p Presenter) runStatusLabel(status run.Status) string {
 	}
 }
 
+func (p Presenter) runEncounterOutcomeLabel(result run.EncounterResult) string {
+	switch result.Outcome {
+	case run.EncounterOutcomeCaptured:
+		if result.Capture != nil {
+			return "captura confirmada: " + result.Capture.FishName
+		}
+		return "captura confirmada"
+	case run.EncounterOutcomeEscaped:
+		if result.ThreadDamage > 0 {
+			return fmt.Sprintf("el pez escapa y desgasta %d de hilo", result.ThreadDamage)
+		}
+		return "el pez escapa sin castigo de hilo"
+	case run.EncounterOutcomeDefeated:
+		return "run terminada en el nodo"
+	case run.EncounterOutcomeRetired:
+		return "retirada durante el nodo"
+	default:
+		return string(result.Outcome)
+	}
+}
+
 func (p Presenter) runNodeLabel(node run.NodeState) string {
 	suffix := strings.ReplaceAll(node.NodeID, "-", " ")
 	switch node.Kind {
@@ -376,10 +419,22 @@ func (p Presenter) runNodeLabel(node run.NodeState) string {
 
 func (p Presenter) runZoneLabel(zoneID string) string {
 	switch zoneID {
-	case "coast":
-		return "Costa cercana"
-	case "outer-bank":
-		return "Banco exterior"
+	case "shoreline-cove":
+		return "Fase 1 - Ensenada cercana"
+	case "open-channel":
+		return "Fase 2 - Canal abierto"
+	case "broken-current":
+		return "Fase 3 - Corriente irregular"
+	case "reef-shadow":
+		return "Fase 4 - Sombra de arrecife"
+	case "tidal-gate":
+		return "Fase 5 - Paso de marea"
+	case "weed-pocket":
+		return "Fase 6 - Bolsillo de maleza"
+	case "stone-drop":
+		return "Fase 7 - Caida de piedra"
+	case "deep-ledge":
+		return "Fase 8 - Cornisa profunda"
 	default:
 		return zoneID
 	}

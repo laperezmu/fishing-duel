@@ -10,15 +10,18 @@ import (
 
 func TestDefaultPresetsBuildValidContexts(t *testing.T) {
 	presets := DefaultPresets()
-	require.Len(t, presets, 3)
+	require.Len(t, presets, 9)
 
-	context := presets[0].BuildContext()
-	assert.Equal(t, presets[0].Name, context.Name)
-	assert.Equal(t, presets[0].PoolTag, context.PoolTag)
-	assert.Equal(t, 0, context.BandInitialDistance[encounter.CastBandVeryShort])
-	assert.Equal(t, 1, context.BandInitialDistance[encounter.CastBandShort])
-	assert.Equal(t, 2, context.BandInitialDistance[encounter.CastBandMedium])
-	assert.Equal(t, 3, context.BandInitialDistance[encounter.CastBandLong])
-	assert.Equal(t, 4, context.BandInitialDistance[encounter.CastBandVeryLong])
-	require.NoError(t, context.Validate())
+	for _, preset := range presets {
+		context := preset.BuildContext()
+		assert.Equal(t, preset.Name, context.Name)
+		assert.Equal(t, preset.PoolTag, context.PoolTag)
+		require.NoError(t, context.Validate())
+	}
+
+	assert.Equal(t, 0, presets[0].BuildContext().BandInitialDistance[encounter.CastBandVeryShort])
+	assert.Equal(t, 1, presets[0].BuildContext().BandInitialDistance[encounter.CastBandShort])
+	assert.Equal(t, 2, presets[0].BuildContext().BandInitialDistance[encounter.CastBandMedium])
+	assert.Equal(t, 3, presets[0].BuildContext().BandInitialDistance[encounter.CastBandLong])
+	assert.Equal(t, 4, presets[0].BuildContext().BandInitialDistance[encounter.CastBandVeryLong])
 }

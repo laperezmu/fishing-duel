@@ -12,6 +12,7 @@ La meta no es reemplazar inmediatamente el prototipo actual, sino introducir un 
 - El ejecutable actual sigue funcionando como modo de prueba del encounter aislado.
 - Queda definida una taxonomia minima de nodos para el MVP, al menos cubriendo `start`, `fishing`, `service/checkpoint`, `boss` y `end`.
 - Queda definido un flujo secuencial inicial equivalente a `inicio -> pesca -> pesca -> servicio -> boss -> cierre`, aunque luego pueda ajustarse en detalle.
+- La ruta objetivo de validacion puede escalar desde ese slice minimo hasta una expedicion lineal de 8 fases, aproximadamente 24 combates y 1 boss cada 3 encuentros para probar combinaciones de agua y spawn.
 - La capa de aplicacion expone un wiring claro para recorrer nodos de run sin empujar esa logica a `cmd/`.
 - Los puntos donde la run entra a encounter, consume su resultado y avanza al siguiente nodo quedan explicitados con contratos pequenos y estables.
 - La documentacion y README dejan claro que binario corresponde al prototipo de encounter y cual corresponde a la run MVP.
@@ -220,6 +221,14 @@ Si el nuevo binario reutiliza al principio partes del setup actual, deberia hace
 - Hay que decidir si el nombre final del ejecutable de run debe enfatizar `run`, `roguelike` o `expedicion`; mi recomendacion es algo explicito y corto como `cmd/fishing-run/`.
 - Hay que vigilar que `internal/cli.UI` no termine absorbiendo responsabilidades de dos experiencias distintas sin una frontera clara.
 - Conviene no sobredisenar un sistema de nodos generico antes de validar la secuencia lineal base.
+
+## Actualizacion posterior al primer slice
+
+- La ruta fija de `internal/run/DefaultRoute()` ya no se queda en el micro-slice inicial.
+- La run objetivo pasa a organizarse en 8 fases lineales de agua.
+- Cada fase contiene 2 nodos `fishing` y 1 nodo `boss`, para un total actual de 24 combates.
+- Entre fases se insertan nodos `service` o `checkpoint` para mantener respiracion entre bloques sin romper la progresion lineal.
+- El objetivo de esta ampliacion es tensionar el loop con mas combinaciones de `water context`, cast y spawn antes de abrir mapas ricos o rutas ramificadas.
 
 ## Accionables inmediatos
 

@@ -83,6 +83,15 @@ func renderRunSummaryScreen(view presentation.RunSummaryView) string {
 	return clearSequence + strings.Join(sections, "\n\n") + "\n"
 }
 
+func renderRunNodeSummaryScreen(view presentation.RunNodeSummaryView) string {
+	sections := []string{
+		renderHeader(view.Title),
+		renderRunNodeSummarySection(view),
+	}
+
+	return clearSequence + strings.Join(sections, "\n\n") + "\n\n"
+}
+
 func renderFishDeckSelectionScreen(title string, presets []fishprofiles.FishDeckPreset, message string) string {
 	sections := []string{
 		renderHeader(title),
@@ -445,6 +454,33 @@ func renderRunSummarySection(view presentation.RunSummaryView) string {
 		fmt.Sprintf("  Hilo final : %d/%d", view.Thread, view.ThreadMax),
 		fmt.Sprintf("  Capturas   : %d", view.CaptureCount),
 	}, "\n")
+}
+
+func renderRunNodeSummarySection(view presentation.RunNodeSummaryView) string {
+	threadDeltaLabel := fmt.Sprintf("%d", view.ThreadDelta)
+	if view.ThreadDelta > 0 {
+		threadDeltaLabel = fmt.Sprintf("+%d", view.ThreadDelta)
+	}
+
+	lines := []string{
+		accent("Resumen del nodo"),
+		fmt.Sprintf("  Nodo       : %s", view.NodeLabel),
+		fmt.Sprintf("  Tipo       : %s", view.NodeKind),
+		fmt.Sprintf("  Resultado  : %s", view.OutcomeLabel),
+		fmt.Sprintf("  Hilo       : %d/%d (%s)", view.Thread, view.ThreadMax, threadDeltaLabel),
+		fmt.Sprintf("  Capturas   : %d", view.CaptureCount),
+	}
+	if view.LastCaptureLabel != "" {
+		lines = append(lines, "  Ultima     : "+view.LastCaptureLabel)
+	}
+	if view.NextNodeLabel != "" {
+		lines = append(lines, "  Siguiente  : "+view.NextNodeLabel)
+	}
+	if view.ContinuePromptLabel != "" {
+		lines = append(lines, "", "  "+view.ContinuePromptLabel)
+	}
+
+	return strings.Join(lines, "\n")
 }
 
 func renderFishDeckSelectionSection(presets []fishprofiles.FishDeckPreset) string {

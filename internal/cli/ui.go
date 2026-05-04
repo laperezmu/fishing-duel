@@ -309,6 +309,20 @@ func (ui *UI) ShowRunSummary(view presentation.RunSummaryView) error {
 	return err
 }
 
+func (ui *UI) ShowRunNodeSummary(view presentation.RunNodeSummaryView) error {
+	if _, err := io.WriteString(ui.out, renderRunNodeSummaryScreen(view)); err != nil {
+		return err
+	}
+	if !ui.scanner.Scan() {
+		if err := ui.scanner.Err(); err != nil {
+			return err
+		}
+		return fmt.Errorf("entrada finalizada")
+	}
+	_, err := io.WriteString(ui.out, clearSequence)
+	return err
+}
+
 func (ui *UI) ShowFishSpawn(_ string, spawn presentation.SpawnView) error {
 	resolvedSpawn := spawn
 	ui.spawn = &resolvedSpawn

@@ -144,6 +144,32 @@ func TestChooseAnglerProfile(t *testing.T) {
 	assert.Contains(t, out.String(), clearSequence)
 }
 
+func TestShowRunNodeSummaryWaitsForContinueInput(t *testing.T) {
+	var out bytes.Buffer
+	ui := NewUI(strings.NewReader("\n"), &out)
+
+	err := ui.ShowRunNodeSummary(presentation.RunNodeSummaryView{
+		Title:               "Pesca: run MVP",
+		NodeLabel:           "Punto de pesca fishing 1",
+		NodeKind:            "fishing",
+		OutcomeLabel:        "captura confirmada: Trucha",
+		Thread:              4,
+		ThreadMax:           5,
+		ThreadDelta:         0,
+		CaptureCount:        1,
+		LastCaptureLabel:    "Trucha",
+		NextNodeLabel:       "Punto de pesca fishing 2",
+		ContinuePromptLabel: "Pulsa Enter para continuar.",
+	})
+
+	require.NoError(t, err)
+	assert.Contains(t, out.String(), "Resumen del nodo")
+	assert.Contains(t, out.String(), "captura confirmada: Trucha")
+	assert.Contains(t, out.String(), "Siguiente  : Punto de pesca fishing 2")
+	assert.Contains(t, out.String(), "Pulsa Enter para continuar.")
+	assert.Contains(t, out.String(), clearSequence)
+}
+
 func TestChooseFishDeckPreset(t *testing.T) {
 	var out bytes.Buffer
 	ui := NewUI(strings.NewReader("2\ns\n"), &out)

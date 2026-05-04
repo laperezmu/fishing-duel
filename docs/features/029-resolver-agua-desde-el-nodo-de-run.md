@@ -13,6 +13,7 @@ En esta etapa no hace falta introducir todavia una generacion rica de aguas por 
 - El jugador sigue viendo los hints/senales del agua actual cuando entra al encounter.
 - `cmd/fishing-duel` conserva la eleccion manual de agua como sandbox de prototipo.
 - La ruta de run puede asociar un preset de agua por nodo, aunque sea fijo por ahora.
+- La ruta objetivo ya puede encadenar 8 cambios de agua a lo largo de la expedicion para probar combinaciones mas amplias.
 - El bootstrap de encounter soporta recibir un `water context` ya resuelto sin depender de `ChooseWaterContext(...)`.
 - Queda preparada la frontera para introducir reglas de agua con aleatoriedad controlada mas adelante.
 
@@ -37,6 +38,7 @@ En esta etapa no hace falta introducir todavia una generacion rica de aguas por 
 - La run resuelve ese preset antes de bootstrapear el encounter.
 - El encounter solo consume el `water context` y muestra sus hints.
 - La decision del jugador sigue estando en el cast y en el duelo, no en elegir el agua.
+- En la ampliacion actual, cada fase de 3 combates comparte preset de agua y el cambio ocurre al pasar a la fase siguiente.
 
 ## Implementacion propuesta
 

@@ -44,6 +44,20 @@ type RunSummaryView struct {
 	LastNodeLabel string
 }
 
+type RunNodeSummaryView struct {
+	Title               string
+	NodeLabel           string
+	NodeKind            run.NodeKind
+	OutcomeLabel        string
+	Thread              int
+	ThreadMax           int
+	ThreadDelta         int
+	CaptureCount        int
+	LastCaptureLabel    string
+	NextNodeLabel       string
+	ContinuePromptLabel string
+}
+
 type OpeningView struct {
 	WaterLabel      string
 	CastLabel       string

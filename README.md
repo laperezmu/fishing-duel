@@ -6,6 +6,7 @@ Motor de juego en Go para un duelo de pesca por rondas y una primera run MVP enc
 
 - El repo ofrece dos ejecutables CLI separados: un prototipo manual de encounter y una run MVP con secuencia fija de nodos.
 - La run MVP arranca eligiendo un `AnglerProfile`, que define baraja inicial, `rod`, aditamentos y hilo inicial.
+- La ruta actual de la run objetivo ya escala a 8 fases de agua, 24 combates totales y 1 boss cada 3 encuentros para probar mas combinaciones de pesca.
 - Cada pesca se abre con una lectura breve del agua y un minijuego de cast por timing que define la distancia inicial del duelo.
 - La `rod` separa limites de apertura del lance frente a limites de track que gobiernan el tablero y los escapes.
 - El pez aparece ahora segun el agua base, la apertura efectiva del lance y los habitats habilitados por el loadout.
@@ -38,8 +39,9 @@ Flujo actual de la run MVP:
 
 1. Elige un pescador inicial para la run.
 2. Recorre una ruta fija de nodos de expedicion.
-3. En los nodos de pesca y boss, la run fija el tipo de agua del punto y el jugador solo lee sus senales antes de resolver cast, spawn y duelo.
-4. El juego aplica el resultado del encounter a la run y avanza hasta el cierre.
+3. La ruta actual se organiza en 8 fases; cada fase cambia de agua y contiene 2 nodos de pesca mas 1 boss.
+4. En los nodos de pesca y boss, la run fija el tipo de agua del punto y el jugador solo lee sus senales antes de resolver cast, spawn y duelo.
+5. El juego aplica el resultado del encounter a la run y avanza hasta el cierre.
 
 Flujo del sandbox de encounter:
 
