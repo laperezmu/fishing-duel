@@ -9,6 +9,7 @@ import (
 	"pesca/internal/domain"
 	"pesca/internal/encounter"
 	"pesca/internal/match"
+	"pesca/internal/run"
 	"strings"
 )
 
@@ -157,6 +158,43 @@ func (p Presenter) Cast(context encounter.WaterContext, position, totalSlots, se
 	}
 }
 
+func (p Presenter) RunIntro(title string, state run.State, route []run.NodeState) RunIntroView {
+	routeLabels := make([]string, 0, len(route))
+	for _, node := range route {
+		routeLabels = append(routeLabels, p.runNodeLabel(node))
+	}
+
+	return RunIntroView{
+		Title:       title,
+		RouteLabels: routeLabels,
+		Thread:      state.Thread.Current,
+	}
+}
+
+func (p Presenter) RunNode(title string, state run.State) RunNodeView {
+	return RunNodeView{
+		Title:        title,
+		ZoneLabel:    p.runZoneLabel(state.Progress.Current.ZoneID),
+		NodeLabel:    p.runNodeLabel(state.Progress.Current),
+		NodeKind:     state.Progress.Current.Kind,
+		Thread:       state.Thread.Current,
+		ThreadMax:    state.Thread.Maximum,
+		CaptureCount: len(state.Captures),
+	}
+}
+
+func (p Presenter) RunSummary(title string, state run.State) RunSummaryView {
+	return RunSummaryView{
+		Title:         title,
+		Status:        state.Status,
+		StatusLabel:   p.runStatusLabel(state.Status),
+		Thread:        state.Thread.Current,
+		ThreadMax:     state.Thread.Maximum,
+		CaptureCount:  len(state.Captures),
+		LastNodeLabel: p.runNodeLabel(state.Progress.Current),
+	}
+}
+
 func (p Presenter) eventLabel(event encounter.Event) string {
 	if event.Kind == encounter.EventKindNone {
 		return ""
@@ -281,6 +319,52 @@ func (p Presenter) playerCardHint(moveState match.MoveResourceSnapshot) string {
 	}
 
 	return strings.Join(parts, " | ")
+}
+
+func (p Presenter) runStatusLabel(status run.Status) string {
+	switch status {
+	case run.StatusInProgress:
+		return "run en curso"
+	case run.StatusVictory:
+		return "run completada"
+	case run.StatusDefeat:
+		return "run perdida"
+	case run.StatusRetired:
+		return "run retirada"
+	default:
+		return string(status)
+	}
+}
+
+func (p Presenter) runNodeLabel(node run.NodeState) string {
+	suffix := strings.ReplaceAll(node.NodeID, "-", " ")
+	switch node.Kind {
+	case run.NodeKindStart:
+		return "Inicio de run"
+	case run.NodeKindFishing:
+		return "Punto de pesca " + suffix
+	case run.NodeKindService:
+		return "Servicio " + suffix
+	case run.NodeKindCheckpoint:
+		return "Checkpoint " + suffix
+	case run.NodeKindBoss:
+		return "Encuentro final " + suffix
+	case run.NodeKindEnd:
+		return "Cierre de run"
+	default:
+		return node.NodeID
+	}
+}
+
+func (p Presenter) runZoneLabel(zoneID string) string {
+	switch zoneID {
+	case "coast":
+		return "Costa cercana"
+	case "outer-bank":
+		return "Banco exterior"
+	default:
+		return zoneID
+	}
 }
 
 func (p Presenter) fishDiscardView(discard match.FishDiscardSnapshot) FishDiscardView {

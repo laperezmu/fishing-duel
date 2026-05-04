@@ -1,10 +1,11 @@
 # Pesca
 
-Motor de juego en Go para un duelo de pesca por rondas. El proyecto ya no es solo una base tecnica: hoy incluye un loop CLI jugable con presets de pez y jugador, cartas con efectos por fase y una arquitectura separada por dominio, runtime, contenido y presentacion.
+Motor de juego en Go para un duelo de pesca por rondas y una primera run MVP encadenada sobre ese runtime. El proyecto ya no es solo una base tecnica: hoy incluye un sandbox CLI de encounter, una run CLI minima, cartas con efectos por fase y una arquitectura separada por dominio, runtime, contenido y presentacion.
 
 ## Estado actual del juego
 
-- El jugador elige un preset de barajas propias, una `rod` base, un preset de aditamentos y una situacion de agua antes de empezar el encuentro.
+- El repo ofrece dos ejecutables CLI separados: un prototipo manual de encounter y una run MVP con secuencia fija de nodos.
+- El jugador elige un preset de barajas propias, una `rod` base y un preset de aditamentos al comienzo del flujo actual.
 - Cada pesca se abre con una lectura breve del agua y un minijuego de cast por timing que define la distancia inicial del duelo.
 - La `rod` separa limites de apertura del lance frente a limites de track que gobiernan el tablero y los escapes.
 - El pez aparece ahora segun el agua base, la apertura efectiva del lance y los habitats habilitados por el loadout.
@@ -21,20 +22,35 @@ Requisitos:
 
 - Go instalado.
 
-Ejecuta el juego desde la raiz del repo:
+Ejecuta la run MVP desde la raiz del repo:
+
+```bash
+go run ./cmd/fishing-run
+```
+
+Si quieres probar solo el encounter aislado y su setup manual de prototipo:
 
 ```bash
 go run ./cmd/fishing-duel
 ```
 
-Flujo actual del CLI:
+Flujo actual de la run MVP:
+
+1. Elige un preset del jugador.
+2. Elige una `rod` base.
+3. Elige un preset de aditamentos.
+4. Recorre una ruta fija de nodos de expedicion.
+5. En los nodos de pesca y boss, resuelve agua, cast, spawn y duelo.
+6. El juego aplica el resultado del encounter a la run y avanza hasta el cierre.
+
+Flujo del sandbox de encounter:
 
 1. Elige un preset del jugador.
 2. Elige una `rod` base.
 3. Elige un preset de aditamentos.
 4. Elige una situacion de agua y resuelve el cast inicial.
 5. El juego resuelve que pez aparece segun esa ventana de lanzamiento.
-6. Juega el duelo ronda a ronda desde la terminal.
+6. Juega un duelo aislado ronda a ronda desde la terminal.
 
 Tambien puedes validar el proyecto con:
 
@@ -96,7 +112,8 @@ Los perfiles del pez viven en `internal/content/fishprofiles/` y los del jugador
 
 ### Bootstrap y aplicacion
 
-- `cmd/fishing-duel/`: composition root del ejecutable CLI.
+- `cmd/fishing-duel/`: composition root del sandbox CLI de encounter.
+- `cmd/fishing-run/`: composition root del ejecutable CLI de run MVP.
 - `internal/app/`: coordinacion de la sesion y flujo general desacoplado de la UI.
 - `internal/cli/`: adaptador de terminal, seleccion de presets, render e input.
 - `internal/presentation/`: view models y catalogos de texto para la UI.

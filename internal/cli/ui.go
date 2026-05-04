@@ -249,6 +249,22 @@ func (ui *UI) ShowGameOver(view presentation.SummaryView) error {
 	return err
 }
 
+func (ui *UI) ShowRunIntro(view presentation.RunIntroView) error {
+	ui.intro = presentation.IntroView{Title: view.Title}
+	_, err := io.WriteString(ui.out, renderRunIntroScreen(view))
+	return err
+}
+
+func (ui *UI) ShowRunNode(view presentation.RunNodeView) error {
+	_, err := io.WriteString(ui.out, renderRunNodeScreen(view))
+	return err
+}
+
+func (ui *UI) ShowRunSummary(view presentation.RunSummaryView) error {
+	_, err := io.WriteString(ui.out, renderRunSummaryScreen(view))
+	return err
+}
+
 func (ui *UI) ShowFishSpawn(_ string, spawn presentation.SpawnView) error {
 	resolvedSpawn := spawn
 	ui.spawn = &resolvedSpawn

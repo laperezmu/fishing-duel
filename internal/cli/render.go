@@ -55,6 +55,33 @@ func renderGameOverScreen(title string, summary presentation.SummaryView, lastRo
 	return clearSequence + strings.Join(sections, "\n\n") + "\n"
 }
 
+func renderRunIntroScreen(view presentation.RunIntroView) string {
+	sections := []string{
+		renderHeader(view.Title),
+		renderRunIntroSection(view),
+	}
+
+	return clearSequence + strings.Join(sections, "\n\n") + "\n\n"
+}
+
+func renderRunNodeScreen(view presentation.RunNodeView) string {
+	sections := []string{
+		renderHeader(view.Title),
+		renderRunNodeSection(view),
+	}
+
+	return clearSequence + strings.Join(sections, "\n\n") + "\n\n"
+}
+
+func renderRunSummaryScreen(view presentation.RunSummaryView) string {
+	sections := []string{
+		renderHeader(view.Title),
+		renderRunSummarySection(view),
+	}
+
+	return clearSequence + strings.Join(sections, "\n\n") + "\n"
+}
+
 func renderFishDeckSelectionScreen(title string, presets []fishprofiles.FishDeckPreset, message string) string {
 	sections := []string{
 		renderHeader(title),
@@ -361,6 +388,37 @@ func renderGameOverSection(summary presentation.SummaryView) string {
 		fmt.Sprintf("  Distancia : %d", summary.FishDistance),
 		fmt.Sprintf("  Profundidad : %d", summary.FishDepth),
 		fmt.Sprintf("  Rondas    : %d | Jugador %d | Pez %d | Empates %d", summary.TotalRounds, summary.PlayerWins, summary.FishWins, summary.Draws),
+	}, "\n")
+}
+
+func renderRunIntroSection(view presentation.RunIntroView) string {
+	lines := []string{
+		accent("Run"),
+		fmt.Sprintf("  Hilo inicial : %d", view.Thread),
+		"  Ruta base    : " + strings.Join(view.RouteLabels, " -> "),
+	}
+
+	return strings.Join(lines, "\n")
+}
+
+func renderRunNodeSection(view presentation.RunNodeView) string {
+	return strings.Join([]string{
+		accent("Nodo actual"),
+		fmt.Sprintf("  Zona       : %s", view.ZoneLabel),
+		fmt.Sprintf("  Punto      : %s", view.NodeLabel),
+		fmt.Sprintf("  Tipo       : %s", view.NodeKind),
+		fmt.Sprintf("  Hilo       : %d/%d", view.Thread, view.ThreadMax),
+		fmt.Sprintf("  Capturas   : %d", view.CaptureCount),
+	}, "\n")
+}
+
+func renderRunSummarySection(view presentation.RunSummaryView) string {
+	return strings.Join([]string{
+		accent("Resumen de run"),
+		fmt.Sprintf("  Estado     : %s", view.StatusLabel),
+		fmt.Sprintf("  Ultimo nodo: %s", view.LastNodeLabel),
+		fmt.Sprintf("  Hilo final : %d/%d", view.Thread, view.ThreadMax),
+		fmt.Sprintf("  Capturas   : %d", view.CaptureCount),
 	}, "\n")
 }
 

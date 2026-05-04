@@ -3,7 +3,34 @@ package presentation
 import (
 	"pesca/internal/domain"
 	"pesca/internal/encounter"
+	"pesca/internal/run"
 )
+
+type RunIntroView struct {
+	Title       string
+	RouteLabels []string
+	Thread      int
+}
+
+type RunNodeView struct {
+	Title        string
+	ZoneLabel    string
+	NodeLabel    string
+	NodeKind     run.NodeKind
+	Thread       int
+	ThreadMax    int
+	CaptureCount int
+}
+
+type RunSummaryView struct {
+	Title         string
+	Status        run.Status
+	StatusLabel   string
+	Thread        int
+	ThreadMax     int
+	CaptureCount  int
+	LastNodeLabel string
+}
 
 type OpeningView struct {
 	WaterLabel      string

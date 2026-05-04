@@ -71,18 +71,20 @@ Este documento concentra el backlog activo y pendiente del proyecto. Las tareas 
 - **Prioridad**: Alta
 
 ### BL-035 Definir flujo minimo navegable de zona y nodos para el MVP
-- **Estado**: `pending`
+- **Estado**: `planned`
 - **Tipo**: Discovery
 - **Objetivo**: bajar la expedicion a una estructura minima jugable y secuencial, con el menor numero de nodos y transiciones necesario para validar una run completa sin entrar todavia en mapa rico.
 - **Resultado esperado**: flujo concreto tipo `inicio -> pesca -> pesca -> servicio -> boss -> cierre`, con taxonomia minima de nodos, reglas de avance y puntos donde se inyectan encounters, tienda y cierre de zona.
+- **Plan relacionado**: `docs/features/027-definir-flujo-minimo-de-zona-y-nodos-para-el-mvp.md`
 - **Dependencias**: `BL-001`
 - **Prioridad**: Alta
 
-### BL-036 Definir recursos globales de run y reglas del hilo del MVP
-- **Estado**: `pending`
+### BL-036 Definir recursos globales de run, reglas del hilo y `AnglerProfile` del MVP
+- **Estado**: `planned`
 - **Tipo**: Discovery
-- **Objetivo**: concretar que recursos globales arrastra una expedicion y como el hilo actua como condicion principal de supervivencia a lo largo de toda la sesion.
-- **Resultado esperado**: contrato de recursos de run con hilo, dinero y otros minimos necesarios; reglas de perdida, reparacion y daño provenientes de encounters o nodos; y criterios para no mezclar esos recursos con el runtime tactico.
+- **Objetivo**: concretar que recursos globales arrastra una expedicion, como el hilo actua como condicion principal de supervivencia a lo largo de toda la sesion y como el arranque de la run pasa a encapsularse dentro de un `AnglerProfile` seleccionable.
+- **Resultado esperado**: contrato de recursos de run con hilo, dinero y otros minimos necesarios; reglas de perdida, reparacion y dano provenientes de encounters o nodos; y definicion del paquete inicial de run via `AnglerProfile`, cubriendo mazo inicial, `rod`, aditamentos base y `thread` inicial sin mezclar esos recursos con el runtime tactico.
+- **Plan relacionado**: `docs/features/028-definir-recursos-globales-de-run-y-angler-profiles.md`
 - **Dependencias**: `BL-001`, `BL-035`
 - **Prioridad**: Alta
 
