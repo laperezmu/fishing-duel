@@ -14,6 +14,11 @@ type OpeningUI interface {
 	ShowEncounterOpening(title string, opening presentation.OpeningView) error
 }
 
+type OpeningRuntimeUI interface {
+	ResolveCast(title string, context encounter.WaterContext, presenter CastPresenter) (encounter.CastResult, error)
+	ShowEncounterOpening(title string, opening presentation.OpeningView) error
+}
+
 type OpeningPresenter interface {
 	CastPresenter
 	Opening(opening encounter.Opening) presentation.OpeningView
@@ -42,7 +47,21 @@ func ResolveEncounterOpening(title string, baseConfig encounter.Config, playerLo
 		return encounter.Opening{}, fmt.Errorf("choose water context: %w", err)
 	}
 
-	waterContext := selectedPreset.BuildContext()
+	return ResolveEncounterOpeningWithPreset(title, baseConfig, playerLoadout, selectedPreset, ui, presenter)
+}
+
+func ResolveEncounterOpeningWithPreset(title string, baseConfig encounter.Config, playerLoadout loadout.State, preset watercontexts.Preset, ui OpeningRuntimeUI, presenter OpeningPresenter) (encounter.Opening, error) {
+	if ui == nil {
+		return encounter.Opening{}, fmt.Errorf("opening ui is required")
+	}
+	if presenter == nil {
+		return encounter.Opening{}, fmt.Errorf("opening presenter is required")
+	}
+	if err := playerLoadout.Validate(); err != nil {
+		return encounter.Opening{}, fmt.Errorf("player loadout: %w", err)
+	}
+
+	waterContext := preset.BuildContext()
 	castResult, err := ui.ResolveCast(title, waterContext, presenter)
 	if err != nil {
 		return encounter.Opening{}, fmt.Errorf("resolve cast: %w", err)

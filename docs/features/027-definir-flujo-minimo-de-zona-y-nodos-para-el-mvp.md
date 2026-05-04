@@ -228,3 +228,10 @@ Si el nuevo binario reutiliza al principio partes del setup actual, deberia hace
 - Definir la ruta fija inicial del MVP.
 - Introducir el runner minimo de run en `internal/app/`.
 - Ajustar la documentacion de ejecucion para explicar ambos binarios.
+
+## Extension acordada despues del primer slice
+
+- En la run, el agua ya no debe elegirse manualmente.
+- Los nodos `fishing` y `boss` deben proveer o resolver su propio preset de agua.
+- El jugador solo recibe los hints del agua del nodo actual y luego resuelve el cast.
+- El sandbox `cmd/fishing-duel/` puede seguir conservando la eleccion manual para debugging.

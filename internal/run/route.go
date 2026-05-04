@@ -8,10 +8,10 @@ import (
 func DefaultRoute() []NodeState {
 	return []NodeState{
 		{ZoneID: "coast", NodeID: "start", Kind: NodeKindStart},
-		{ZoneID: "coast", NodeID: "fishing-1", Kind: NodeKindFishing},
-		{ZoneID: "coast", NodeID: "fishing-2", Kind: NodeKindFishing},
+		{ZoneID: "coast", NodeID: "fishing-1", Kind: NodeKindFishing, WaterPresetID: "shoreline-cove"},
+		{ZoneID: "coast", NodeID: "fishing-2", Kind: NodeKindFishing, WaterPresetID: "broken-current"},
 		{ZoneID: "coast", NodeID: "service-1", Kind: NodeKindService},
-		{ZoneID: "outer-bank", NodeID: "boss-1", Kind: NodeKindBoss},
+		{ZoneID: "outer-bank", NodeID: "boss-1", Kind: NodeKindBoss, WaterPresetID: "open-channel"},
 		{ZoneID: "outer-bank", NodeID: "end", Kind: NodeKindEnd},
 	}
 }

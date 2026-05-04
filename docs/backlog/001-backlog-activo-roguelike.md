@@ -76,6 +76,7 @@ Este documento concentra el backlog activo y pendiente del proyecto. Las tareas 
 - **Objetivo**: bajar la expedicion a una estructura minima jugable y secuencial, con el menor numero de nodos y transiciones necesario para validar una run completa sin entrar todavia en mapa rico.
 - **Resultado esperado**: flujo concreto tipo `inicio -> pesca -> pesca -> servicio -> boss -> cierre`, con taxonomia minima de nodos, reglas de avance y puntos donde se inyectan encounters, tienda y cierre de zona.
 - **Plan relacionado**: `docs/features/027-definir-flujo-minimo-de-zona-y-nodos-para-el-mvp.md`
+- **Follow-up relacionado**: `docs/features/029-resolver-agua-desde-el-nodo-de-run.md`
 - **Dependencias**: `BL-001`
 - **Prioridad**: Alta
 

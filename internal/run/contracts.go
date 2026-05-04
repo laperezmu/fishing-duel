@@ -2,6 +2,7 @@ package run
 
 import (
 	"fmt"
+	"pesca/internal/content/watercontexts"
 	"pesca/internal/encounter"
 	"pesca/internal/player/loadout"
 )
@@ -45,9 +46,10 @@ func (kind NodeKind) Validate() error {
 }
 
 type NodeState struct {
-	ZoneID string
-	NodeID string
-	Kind   NodeKind
+	ZoneID        string
+	NodeID        string
+	Kind          NodeKind
+	WaterPresetID string
 }
 
 func (node NodeState) Validate() error {
@@ -57,7 +59,22 @@ func (node NodeState) Validate() error {
 	if node.NodeID == "" {
 		return fmt.Errorf("run node id is required")
 	}
+	if node.WaterPresetID != "" {
+		if _, err := ResolveWaterPreset(node.WaterPresetID); err != nil {
+			return err
+		}
+	}
 	return node.Kind.Validate()
+}
+
+func ResolveWaterPreset(id string) (watercontexts.Preset, error) {
+	for _, preset := range watercontexts.DefaultPresets() {
+		if preset.ID == id {
+			return preset, nil
+		}
+	}
+
+	return watercontexts.Preset{}, fmt.Errorf("unknown water context preset %q", id)
 }
 
 type ProgressState struct {

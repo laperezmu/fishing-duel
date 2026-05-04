@@ -110,7 +110,14 @@ func (session *RunSession) advanceRunNode(state *run.State) error {
 
 func (session *RunSession) playEncounterNode(state *run.State, resolvedStart anglerprofiles.ResolvedStart) error {
 	title := fmt.Sprintf("%s - %s", session.title, state.Progress.Current.NodeID)
-	bootstrap, err := BootstrapEncounterForRun(title, session.rng, session.ui, session.presenter, resolvedStart.DeckPreset, state.Loadout, session.buildEncounterConfig(*state))
+	waterPreset, err := run.ResolveWaterPreset(state.Progress.Current.WaterPresetID)
+	if err != nil {
+		return fmt.Errorf("resolve node water preset: %w", err)
+	}
+	bootstrap, err := BootstrapEncounterForRun(title, session.rng, session.ui, session.ui, session.presenter, resolvedStart.DeckPreset, state.Loadout, RunEncounterBootstrapConfig{
+		Encounter: session.buildEncounterConfig(*state),
+		Water:     waterPreset,
+	})
 	if err != nil {
 		return fmt.Errorf("bootstrap encounter: %w", err)
 	}

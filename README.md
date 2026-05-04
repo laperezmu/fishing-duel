@@ -38,7 +38,7 @@ Flujo actual de la run MVP:
 
 1. Elige un pescador inicial para la run.
 2. Recorre una ruta fija de nodos de expedicion.
-3. En los nodos de pesca y boss, resuelve agua, cast, spawn y duelo.
+3. En los nodos de pesca y boss, la run fija el tipo de agua del punto y el jugador solo lee sus senales antes de resolver cast, spawn y duelo.
 4. El juego aplica el resultado del encounter a la run y avanza hasta el cierre.
 
 Flujo del sandbox de encounter:
