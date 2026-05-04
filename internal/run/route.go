@@ -5,8 +5,6 @@ import (
 	"pesca/internal/player/loadout"
 )
 
-const DefaultThreadMaximum = 3
-
 func DefaultRoute() []NodeState {
 	return []NodeState{
 		{ZoneID: "coast", NodeID: "start", Kind: NodeKindStart},

@@ -3,6 +3,7 @@ package cli
 import (
 	"bytes"
 	"pesca/internal/cards"
+	"pesca/internal/content/anglerprofiles"
 	"pesca/internal/content/fishprofiles"
 	"pesca/internal/content/habitats"
 	"pesca/internal/content/playerprofiles"
@@ -126,6 +127,20 @@ func TestChoosePlayerDeckPreset(t *testing.T) {
 	assert.Equal(t, "Apertura", preset.Name)
 	assert.Contains(t, out.String(), "Preset del jugador")
 	assert.Contains(t, out.String(), "Azul - Anzuelo tenso")
+	assert.Contains(t, out.String(), clearSequence)
+}
+
+func TestChooseAnglerProfile(t *testing.T) {
+	var out bytes.Buffer
+	ui := NewUI(strings.NewReader("2\ns\n"), &out)
+
+	profile, err := ui.ChooseAnglerProfile("Pesca: run MVP", sampleAnglerProfiles())
+
+	require.NoError(t, err)
+	assert.Equal(t, "Pescador de fondo", profile.Name)
+	assert.Contains(t, out.String(), "Pescador inicial")
+	assert.Contains(t, out.String(), "Confirmar pescador")
+	assert.Contains(t, out.String(), "Hilo inicial")
 	assert.Contains(t, out.String(), clearSequence)
 }
 
@@ -275,6 +290,10 @@ func samplePromptState(t *testing.T) match.State {
 			}},
 		},
 	}
+}
+
+func sampleAnglerProfiles() []anglerprofiles.Profile {
+	return anglerprofiles.DefaultUnlockedProfiles()
 }
 
 func mustSampleLoadout(t *testing.T, playerRod rod.State) loadout.State {

@@ -5,7 +5,7 @@ Punto de entrada del ejecutable principal de la run MVP.
 ## Responsabilidad
 
 - Componer la sesion de run.
-- Reutilizar el setup inicial del jugador una sola vez al comienzo de la expedicion.
+- Resolver una seleccion inicial de `AnglerProfile` una sola vez al comienzo de la expedicion.
 - Recorrer la secuencia fija de nodos del MVP.
 - Disparar encounters desde nodos de pesca y boss.
 - Mostrar el resumen final de la expedicion.

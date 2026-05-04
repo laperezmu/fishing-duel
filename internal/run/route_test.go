@@ -10,22 +10,24 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+const testThreadMaximum = 3
+
 func TestNewStateUsesFirstRouteNode(t *testing.T) {
 	t.Parallel()
 
-	state, err := NewState(mustBuildRouteLoadout(t), DefaultRoute(), DefaultThreadMaximum)
+	state, err := NewState(mustBuildRouteLoadout(t), DefaultRoute(), testThreadMaximum)
 	require.NoError(t, err)
 	assert.Equal(t, NodeKindStart, state.Progress.Current.Kind)
 	assert.NotNil(t, state.Progress.Next)
 	assert.Equal(t, NodeKindFishing, state.Progress.Next.Kind)
-	assert.Equal(t, DefaultThreadMaximum, state.Thread.Current)
+	assert.Equal(t, testThreadMaximum, state.Thread.Current)
 }
 
 func TestAdvanceMovesToNextNode(t *testing.T) {
 	t.Parallel()
 
 	route := DefaultRoute()
-	state, err := NewState(mustBuildRouteLoadout(t), route, DefaultThreadMaximum)
+	state, err := NewState(mustBuildRouteLoadout(t), route, testThreadMaximum)
 	require.NoError(t, err)
 
 	require.NoError(t, Advance(&state, route))
@@ -37,7 +39,7 @@ func TestAdvanceMovesToNextNode(t *testing.T) {
 func TestApplyEncounterResultUpdatesThreadAndCaptures(t *testing.T) {
 	t.Parallel()
 
-	state, err := NewState(mustBuildRouteLoadout(t), DefaultRoute(), DefaultThreadMaximum)
+	state, err := NewState(mustBuildRouteLoadout(t), DefaultRoute(), testThreadMaximum)
 	require.NoError(t, err)
 
 	err = ApplyEncounterResult(&state, EncounterResult{
@@ -67,14 +69,14 @@ func TestApplyEncounterResultUpdatesThreadAndCaptures(t *testing.T) {
 func TestApplyEncounterResultDefeatsRunWhenThreadReachesZero(t *testing.T) {
 	t.Parallel()
 
-	state, err := NewState(mustBuildRouteLoadout(t), DefaultRoute(), DefaultThreadMaximum)
+	state, err := NewState(mustBuildRouteLoadout(t), DefaultRoute(), testThreadMaximum)
 	require.NoError(t, err)
 
 	err = ApplyEncounterResult(&state, EncounterResult{
 		Outcome:       EncounterOutcomeEscaped,
 		Status:        encounter.StatusEscaped,
 		EndReason:     encounter.EndReasonTrackEscape,
-		ThreadDamage:  DefaultThreadMaximum,
+		ThreadDamage:  testThreadMaximum,
 		NodeResolved:  true,
 		FinishedMatch: true,
 	})

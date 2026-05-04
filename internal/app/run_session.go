@@ -2,15 +2,15 @@ package app
 
 import (
 	"fmt"
+	"pesca/internal/content/anglerprofiles"
 	"pesca/internal/content/fishprofiles"
-	"pesca/internal/content/playerprofiles"
-	"pesca/internal/player/loadout"
 	"pesca/internal/presentation"
 	"pesca/internal/run"
 )
 
 type RunUI interface {
 	EncounterBootstrapUI
+	RunSetupUI
 	UI
 	ShowRunIntro(presentation.RunIntroView) error
 	ShowRunNode(presentation.RunNodeView) error
@@ -45,18 +45,18 @@ func NewRunSession(title string, rng Randomizer, ui RunUI, presenter presentatio
 }
 
 func (session *RunSession) Run() error {
-	playerDeckPreset, playerLoadout, err := resolvePlayerSetup(session.title, session.ui)
+	resolvedStart, err := resolveRunSetup(session.title, session.ui)
 	if err != nil {
 		return err
 	}
 
-	state, err := session.initializeRunState(playerLoadout)
+	state, err := session.initializeRunState(resolvedStart)
 	if err != nil {
 		return err
 	}
 
 	for state.Status == run.StatusInProgress {
-		if err := session.playCurrentNode(&state, playerDeckPreset, playerLoadout); err != nil {
+		if err := session.playCurrentNode(&state, resolvedStart); err != nil {
 			return err
 		}
 	}
@@ -68,8 +68,8 @@ func (session *RunSession) Run() error {
 	return nil
 }
 
-func (session *RunSession) initializeRunState(playerLoadout loadout.State) (run.State, error) {
-	state, err := run.NewState(playerLoadout, session.route, run.DefaultThreadMaximum)
+func (session *RunSession) initializeRunState(resolvedStart anglerprofiles.ResolvedStart) (run.State, error) {
+	state, err := run.NewState(resolvedStart.Loadout, session.route, resolvedStart.StartingThread)
 	if err != nil {
 		return run.State{}, fmt.Errorf("initialize run state: %w", err)
 	}
@@ -80,7 +80,7 @@ func (session *RunSession) initializeRunState(playerLoadout loadout.State) (run.
 	return state, nil
 }
 
-func (session *RunSession) playCurrentNode(state *run.State, playerDeckPreset playerprofiles.DeckPreset, playerLoadout loadout.State) error {
+func (session *RunSession) playCurrentNode(state *run.State, resolvedStart anglerprofiles.ResolvedStart) error {
 	if err := session.ui.ShowRunNode(session.presenter.RunNode(session.title, *state)); err != nil {
 		return fmt.Errorf("show run node: %w", err)
 	}
@@ -89,7 +89,7 @@ func (session *RunSession) playCurrentNode(state *run.State, playerDeckPreset pl
 	case run.NodeKindStart, run.NodeKindService, run.NodeKindCheckpoint:
 		return session.advanceRunNode(state)
 	case run.NodeKindFishing, run.NodeKindBoss:
-		return session.playEncounterNode(state, playerDeckPreset, playerLoadout)
+		return session.playEncounterNode(state, resolvedStart)
 	case run.NodeKindEnd:
 		if err := run.Complete(state); err != nil {
 			return fmt.Errorf("complete run: %w", err)
@@ -108,9 +108,9 @@ func (session *RunSession) advanceRunNode(state *run.State) error {
 	return nil
 }
 
-func (session *RunSession) playEncounterNode(state *run.State, playerDeckPreset playerprofiles.DeckPreset, playerLoadout loadout.State) error {
+func (session *RunSession) playEncounterNode(state *run.State, resolvedStart anglerprofiles.ResolvedStart) error {
 	title := fmt.Sprintf("%s - %s", session.title, state.Progress.Current.NodeID)
-	bootstrap, err := BootstrapEncounterForRun(title, session.rng, session.ui, session.presenter, playerDeckPreset, playerLoadout, session.buildEncounterConfig(*state))
+	bootstrap, err := BootstrapEncounterForRun(title, session.rng, session.ui, session.presenter, resolvedStart.DeckPreset, state.Loadout, session.buildEncounterConfig(*state))
 	if err != nil {
 		return fmt.Errorf("bootstrap encounter: %w", err)
 	}

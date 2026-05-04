@@ -2,6 +2,7 @@ package cli
 
 import (
 	"fmt"
+	"pesca/internal/content/anglerprofiles"
 	"pesca/internal/content/attachmentpresets"
 	"pesca/internal/content/fishprofiles"
 	"pesca/internal/content/playerprofiles"
@@ -142,6 +143,18 @@ func renderWaterContextSelectionScreen(title string, presets []watercontexts.Pre
 	return clearSequence + strings.Join(sections, "\n\n") + "\n\n"
 }
 
+func renderAnglerProfileSelectionScreen(title string, profiles []anglerprofiles.Profile, message string) string {
+	sections := []string{
+		renderHeader(title),
+		renderAnglerProfileSelectionSection(profiles),
+	}
+	if message != "" {
+		sections = append(sections, accent("Aviso")+"\n  "+message)
+	}
+
+	return clearSequence + strings.Join(sections, "\n\n") + "\n\n"
+}
+
 func renderFishDeckConfirmationScreen(title string, preset fishprofiles.FishDeckPreset, message string) string {
 	sections := []string{
 		renderHeader(title),
@@ -194,6 +207,18 @@ func renderWaterContextConfirmationScreen(title string, preset watercontexts.Pre
 	sections := []string{
 		renderHeader(title),
 		renderWaterContextConfirmationSection(preset),
+	}
+	if message != "" {
+		sections = append(sections, accent("Aviso")+"\n  "+message)
+	}
+
+	return clearSequence + strings.Join(sections, "\n\n") + "\n\n"
+}
+
+func renderAnglerProfileConfirmationScreen(title string, profile presentation.AnglerProfileView, message string) string {
+	sections := []string{
+		renderHeader(title),
+		renderAnglerProfileConfirmationSection(profile),
 	}
 	if message != "" {
 		sections = append(sections, accent("Aviso")+"\n  "+message)
@@ -512,6 +537,24 @@ func renderPlayerDeckSelectionSection(presets []playerprofiles.DeckPreset) strin
 	return strings.Join(lines, "\n")
 }
 
+func renderAnglerProfileSelectionSection(profiles []anglerprofiles.Profile) string {
+	lines := []string{
+		accent("Pescador inicial"),
+		"  Elige el pescador que definira tu paquete inicial de run.",
+	}
+
+	for index, profile := range profiles {
+		lines = append(lines,
+			fmt.Sprintf("  %d) %s", index+1, profile.Name),
+			fmt.Sprintf("     %s", profile.Description),
+		)
+	}
+
+	lines = append(lines, "  Escribe el numero del pescador para seleccionarlo.")
+
+	return strings.Join(lines, "\n")
+}
+
 func renderWaterContextConfirmationSection(preset watercontexts.Preset) string {
 	lines := []string{
 		accent("Confirmar situacion de agua"),
@@ -590,6 +633,23 @@ func renderAttachmentConfirmationSection(preset attachmentpresets.Preset, previe
 	}
 	for _, attachment := range preset.Attachments {
 		lines = append(lines, "  * "+attachment.Name+": "+attachment.Description)
+	}
+
+	return strings.Join(lines, "\n")
+}
+
+func renderAnglerProfileConfirmationSection(profile presentation.AnglerProfileView) string {
+	lines := []string{
+		accent("Confirmar pescador"),
+		fmt.Sprintf("  Nombre          : %s", profile.Name),
+		fmt.Sprintf("  Resumen         : %s", profile.Description),
+		fmt.Sprintf("  Hilo inicial    : %d", profile.StartingThread),
+		fmt.Sprintf("  Baraja inicial  : %s", profile.DeckLabel),
+		fmt.Sprintf("  Rod inicial     : %s", profile.RodLabel),
+		fmt.Sprintf("  Aditamentos     : %s", profile.AttachmentLabel),
+	}
+	for _, detail := range profile.Details {
+		lines = append(lines, "  - "+detail)
 	}
 
 	return strings.Join(lines, "\n")

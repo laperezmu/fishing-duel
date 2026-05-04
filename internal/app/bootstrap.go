@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 	"pesca/internal/cards"
+	"pesca/internal/content/anglerprofiles"
 	"pesca/internal/content/attachmentpresets"
 	"pesca/internal/content/fishprofiles"
 	"pesca/internal/content/playerprofiles"
@@ -26,6 +27,10 @@ type SetupUI interface {
 	ChoosePlayerDeckPreset(title string, presets []playerprofiles.DeckPreset) (playerprofiles.DeckPreset, error)
 	ChooseRodPreset(title string, presets []rodpresets.Preset) (rodpresets.Preset, error)
 	ChooseAttachmentPreset(title string, baseRod rod.State, presets []attachmentpresets.Preset) (attachmentpresets.Preset, error)
+}
+
+type RunSetupUI interface {
+	ChooseAnglerProfile(title string, profiles []anglerprofiles.Profile) (anglerprofiles.Profile, error)
 }
 
 type EncounterBootstrapUI interface {
@@ -93,6 +98,19 @@ func resolvePlayerSetup(title string, ui SetupUI) (playerprofiles.DeckPreset, lo
 	}
 
 	return playerDeckPreset, playerLoadout, nil
+}
+
+func resolveRunSetup(title string, ui RunSetupUI) (anglerprofiles.ResolvedStart, error) {
+	profile, err := ui.ChooseAnglerProfile(title, anglerprofiles.DefaultUnlockedProfiles())
+	if err != nil {
+		return anglerprofiles.ResolvedStart{}, fmt.Errorf("choose angler profile: %w", err)
+	}
+	resolved, err := anglerprofiles.ResolveStart(profile)
+	if err != nil {
+		return anglerprofiles.ResolvedStart{}, fmt.Errorf("resolve angler profile: %w", err)
+	}
+
+	return resolved, nil
 }
 
 func resolveEncounterBootstrap(title string, playerLoadout loadout.State, ui EncounterBootstrapUI, presenter presentation.Presenter, rng Randomizer, config EncounterBootstrapConfig) (encounter.Opening, fishprofiles.Spawn, error) {

@@ -6,6 +6,18 @@ import (
 	"pesca/internal/run"
 )
 
+type AnglerProfileView struct {
+	ProfileID         string
+	Name              string
+	Description       string
+	Details           []string
+	StartingThread    int
+	DeckLabel         string
+	RodLabel          string
+	AttachmentLabel   string
+	UnlockedByDefault bool
+}
+
 type RunIntroView struct {
 	Title       string
 	RouteLabels []string

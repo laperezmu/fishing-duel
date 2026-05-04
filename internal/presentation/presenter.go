@@ -3,8 +3,12 @@ package presentation
 import (
 	"fmt"
 	"pesca/internal/cards"
+	"pesca/internal/content/anglerprofiles"
+	"pesca/internal/content/attachmentpresets"
 	"pesca/internal/content/fishprofiles"
 	"pesca/internal/content/habitats"
+	"pesca/internal/content/playerprofiles"
+	"pesca/internal/content/rodpresets"
 	"pesca/internal/content/waterpools"
 	"pesca/internal/domain"
 	"pesca/internal/encounter"
@@ -155,6 +159,20 @@ func (p Presenter) Cast(context encounter.WaterContext, position, totalSlots, se
 		Position:     position,
 		TotalSlots:   totalSlots,
 		SectionWidth: sectionWidth,
+	}
+}
+
+func (p Presenter) AnglerProfile(profile anglerprofiles.Profile) AnglerProfileView {
+	return AnglerProfileView{
+		ProfileID:         profile.ID,
+		Name:              profile.Name,
+		Description:       profile.Description,
+		Details:           append([]string(nil), profile.Details...),
+		StartingThread:    profile.StartingThread,
+		DeckLabel:         playerDeckPresetName(profile.DeckPresetID),
+		RodLabel:          rodPresetName(profile.RodPresetID),
+		AttachmentLabel:   attachmentPresetName(profile.AttachmentPresetID),
+		UnlockedByDefault: profile.UnlockedByDefault,
 	}
 }
 
@@ -365,6 +383,36 @@ func (p Presenter) runZoneLabel(zoneID string) string {
 	default:
 		return zoneID
 	}
+}
+
+func playerDeckPresetName(id string) string {
+	for _, preset := range playerprofiles.DefaultPresets() {
+		if preset.ID == id {
+			return preset.Name
+		}
+	}
+
+	return id
+}
+
+func rodPresetName(id string) string {
+	for _, preset := range rodpresets.DefaultPresets() {
+		if preset.ID == id {
+			return preset.Name
+		}
+	}
+
+	return id
+}
+
+func attachmentPresetName(id string) string {
+	for _, preset := range attachmentpresets.DefaultPresets() {
+		if preset.ID == id {
+			return preset.Name
+		}
+	}
+
+	return id
 }
 
 func (p Presenter) fishDiscardView(discard match.FishDiscardSnapshot) FishDiscardView {

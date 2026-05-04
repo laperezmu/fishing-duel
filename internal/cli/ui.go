@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"pesca/internal/content/anglerprofiles"
 	"pesca/internal/content/attachmentpresets"
 	"pesca/internal/content/fishprofiles"
 	"pesca/internal/content/playerprofiles"
@@ -80,6 +81,49 @@ func (ui *UI) ChoosePlayerDeckPreset(title string, presets []playerprofiles.Deck
 		}
 
 		message = "seleccion cancelada, elige otro preset"
+	}
+}
+
+func (ui *UI) ChooseAnglerProfile(title string, profiles []anglerprofiles.Profile) (anglerprofiles.Profile, error) {
+	if len(profiles) == 0 {
+		return anglerprofiles.Profile{}, fmt.Errorf("no hay pescadores iniciales disponibles")
+	}
+
+	message := ""
+	presenter := presentation.NewPresenter(presentation.DefaultCatalog())
+	for {
+		if _, err := io.WriteString(ui.out, renderAnglerProfileSelectionScreen(title, profiles, message)); err != nil {
+			return anglerprofiles.Profile{}, err
+		}
+		if _, err := fmt.Fprint(ui.out, "Elige un pescador inicial: "); err != nil {
+			return anglerprofiles.Profile{}, err
+		}
+		if !ui.scanner.Scan() {
+			if err := ui.scanner.Err(); err != nil {
+				return anglerprofiles.Profile{}, err
+			}
+			return anglerprofiles.Profile{}, fmt.Errorf("entrada finalizada")
+		}
+
+		selectedIndex, err := parsePresetChoice(ui.scanner.Text(), len(profiles))
+		if err != nil {
+			message = err.Error()
+			continue
+		}
+
+		selectedProfile := profiles[selectedIndex]
+		confirmed, err := ui.confirmAnglerProfile(title, presenter.AnglerProfile(selectedProfile))
+		if err != nil {
+			return anglerprofiles.Profile{}, err
+		}
+		if confirmed {
+			if _, err := io.WriteString(ui.out, clearSequence); err != nil {
+				return anglerprofiles.Profile{}, err
+			}
+			return selectedProfile, nil
+		}
+
+		message = "seleccion cancelada, elige otro pescador"
 	}
 }
 
@@ -278,6 +322,31 @@ func (ui *UI) confirmPlayerDeckPreset(title string, preset playerprofiles.DeckPr
 			return false, err
 		}
 		if _, err := fmt.Fprint(ui.out, "Confirmar preset del jugador? [s/n]: "); err != nil {
+			return false, err
+		}
+		if !ui.scanner.Scan() {
+			if err := ui.scanner.Err(); err != nil {
+				return false, err
+			}
+			return false, fmt.Errorf("entrada finalizada")
+		}
+
+		confirmed, err := parseConfirmation(ui.scanner.Text())
+		if err == nil {
+			return confirmed, nil
+		}
+
+		message = err.Error()
+	}
+}
+
+func (ui *UI) confirmAnglerProfile(title string, profile presentation.AnglerProfileView) (bool, error) {
+	message := ""
+	for {
+		if _, err := io.WriteString(ui.out, renderAnglerProfileConfirmationScreen(title, profile, message)); err != nil {
+			return false, err
+		}
+		if _, err := fmt.Fprint(ui.out, "Confirmar pescador? [s/n]: "); err != nil {
 			return false, err
 		}
 		if !ui.scanner.Scan() {
