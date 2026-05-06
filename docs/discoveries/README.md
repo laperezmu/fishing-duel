@@ -10,8 +10,8 @@ Esta carpeta contiene documentos legacy de discovery o investigacion creados ant
 ## Convencion
 
 - Usa un prefijo numerico alineado con la feature o iniciativa que origino el documento cuando aplique.
-- El plan activo de una feature vive en `docs/features/`.
-- El backlog sigue capturando ideas, prioridades y dependencias en `docs/backlog/`.
+- El plan activo de una feature vive en `specs/`.
+- El backlog activo se gestiona en GitHub Issues, no en `docs/`.
 - No se deben crear nuevos discoveries separados para features nuevas salvo que el usuario lo pida explicitamente.
 
 ## Documentos iniciales

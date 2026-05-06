@@ -169,11 +169,19 @@ En terminos de arquitectura, el proyecto hoy funciona como un monolito modular p
 2. Implementa una UI propia con los tipos de `internal/presentation/`.
 3. Usa un `presentation.Presenter` propio si quieres otro idioma, otro tono o otra lectura del estado.
 
+## Workflow de trabajo
+
+- Toda iniciativa no trivial empieza como GitHub Issue, no como documento en `docs/`.
+- GitHub Issues gestiona backlog, milestones, labels y prioridad.
+- `specs/` y `.specify/` contienen la definicion y planificacion activas.
+- El flujo oficial vive en `docs/workflow-github-issues-y-specify.md` y en `.specify/memory/constitution.md`.
+- El recorrido normal es: `issue -> /speckit.specify -> /speckit.clarify (si aplica) -> /speckit.plan -> /speckit.tasks -> implementacion -> validacion -> PR`.
+
 ## Documentacion util
 
-- `specs/`: fuente de verdad activa para nuevas features bajo spec-kit.
+- `docs/workflow-github-issues-y-specify.md`: guia operativa oficial del backlog y del flujo de delivery.
+- `specs/`: fuente de verdad activa para nuevas features bajo specify.
 - `.specify/memory/constitution.md`: principios y workflow oficiales del proyecto.
-- `docs/`: contexto historico del flujo previo; ya no recibe nuevas features activas.
 
 ## Convencion recomendada
 
