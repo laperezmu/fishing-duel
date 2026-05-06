@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Specify workflow
+    url: https://github.com/laperezmu/fishing-duel
+    about: Create specs in-repo before implementation for non-trivial work.

@@ -1,0 +1,106 @@
+name: Backlog item
+description: Create or migrate a backlog item aligned with specify and GitHub milestones.
+title: "[Milestone-XX] "
+labels:
+  - status:ready-for-spec
+body:
+  - type: input
+    id: item_id
+    attributes:
+      label: Ordered item ID
+      description: Use the milestone-based sequence, for example RMF-01 or GCP-03.
+      placeholder: RMF-01
+    validations:
+      required: true
+  - type: dropdown
+    id: stream
+    attributes:
+      label: Stream
+      options:
+        - roguelike
+        - gui
+        - platform
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - core-loop
+        - fish-encounters
+        - items-build
+        - economy-meta
+        - collection
+        - tech-ux
+        - graphics
+    validations:
+      required: true
+  - type: dropdown
+    id: work_type
+    attributes:
+      label: Work type
+      options:
+        - discovery
+        - delivery
+        - discovery+delivery
+        - quality
+        - infra
+        - quality+discovery
+        - infra+delivery
+    validations:
+      required: true
+  - type: textarea
+    id: objective
+    attributes:
+      label: Objective
+      description: What problem does this item solve?
+      placeholder: Describe the expected outcome in one paragraph.
+    validations:
+      required: true
+  - type: textarea
+    id: expected_result
+    attributes:
+      label: Expected result
+      description: Define the concrete deliverable or decision expected.
+      placeholder: List the output, contract, slice, or decision this item should produce.
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies
+      description: Reference ordered IDs or existing specs/issues.
+      placeholder: RMF-02, ZP-01, specs/001-example/spec.md
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - high
+        - medium
+        - low
+    validations:
+      required: true
+  - type: dropdown
+    id: spec_status
+    attributes:
+      label: Specify status
+      options:
+        - none
+        - spec
+        - plan
+        - tasks
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Source context
+      description: Link any legacy doc, feature plan, or repo path that provides historical context.
+      placeholder: docs/backlog/001-backlog-activo-roguelike.md
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Optional migration notes, open questions, or follow-up decisions.
