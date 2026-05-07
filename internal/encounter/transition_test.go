@@ -12,7 +12,6 @@ func TestApplyDelta(t *testing.T) {
 		title         string
 		initialState  State
 		delta         Delta
-		decider       SplashEscapeDecider
 		wantDistance  int
 		wantDepth     int
 		wantEvent     Event
@@ -38,25 +37,11 @@ func TestApplyDelta(t *testing.T) {
 			delta: Delta{
 				DepthShift: -2,
 			},
-			decider:       splashEscapeDeciderFunc(func(float64) bool { return false }),
 			wantDistance:  3,
 			wantDepth:     0,
 			wantEvent:     Event{Kind: EventKindSplash, Escaped: false},
 			wantStatus:    StatusOngoing,
 			wantEndReason: EndReasonNone,
-		},
-		{
-			title:        "triggers a splash escape when the decider resolves the fish slipping away",
-			initialState: newEncounterState(t),
-			delta: Delta{
-				DepthShift: -2,
-			},
-			decider:       splashEscapeDeciderFunc(func(float64) bool { return true }),
-			wantDistance:  3,
-			wantDepth:     0,
-			wantEvent:     Event{Kind: EventKindSplash, Escaped: true},
-			wantStatus:    StatusEscaped,
-			wantEndReason: EndReasonSplashEscape,
 		},
 	}
 
@@ -64,7 +49,7 @@ func TestApplyDelta(t *testing.T) {
 		t.Run(test.title, func(t *testing.T) {
 			state := test.initialState
 
-			ApplyDelta(&state, test.delta, test.decider)
+			ApplyDelta(&state, test.delta)
 
 			assert.Equal(t, test.wantDistance, state.Distance)
 			assert.Equal(t, test.wantDepth, state.Depth)
@@ -75,6 +60,26 @@ func TestApplyDelta(t *testing.T) {
 	}
 }
 
+func TestApplySplashResolution(t *testing.T) {
+	state := newEncounterState(t)
+	ApplyDelta(&state, Delta{DepthShift: -2})
+	require.NotNil(t, state.Splash)
+
+	ApplySplashResolution(&state, SplashResolution{SuccessfulJumps: 1})
+
+	assert.Nil(t, state.Splash)
+	assert.Equal(t, Event{Kind: EventKindSplash, Escaped: false}, state.LastEvent)
+	assert.Equal(t, StatusOngoing, state.Status)
+
+	state = newEncounterState(t)
+	ApplyDelta(&state, Delta{DepthShift: -2})
+	ApplySplashResolution(&state, SplashResolution{Escaped: true})
+	assert.Nil(t, state.Splash)
+	assert.Equal(t, Event{Kind: EventKindSplash, Escaped: true}, state.LastEvent)
+	assert.Equal(t, StatusEscaped, state.Status)
+	assert.Equal(t, EndReasonSplashEscape, state.EndReason)
+}
+
 func newEncounterState(t *testing.T) State {
 	t.Helper()
 
@@ -82,10 +87,4 @@ func newEncounterState(t *testing.T) State {
 	require.NoError(t, err)
 
 	return state
-}
-
-type splashEscapeDeciderFunc func(chance float64) bool
-
-func (decider splashEscapeDeciderFunc) ShouldEscape(chance float64) bool {
-	return decider(chance)
 }

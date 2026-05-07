@@ -3,25 +3,28 @@ package rod
 import "fmt"
 
 type Config struct {
-	OpeningMaxDistance int
-	OpeningMaxDepth    int
-	TrackMaxDistance   int
-	TrackMaxDepth      int
+	OpeningMaxDistance  int
+	OpeningMaxDepth     int
+	TrackMaxDistance    int
+	TrackMaxDepth       int
+	SplashBonusDistance int
 }
 
 type State struct {
-	OpeningMaxDistance int
-	OpeningMaxDepth    int
-	TrackMaxDistance   int
-	TrackMaxDepth      int
+	OpeningMaxDistance  int
+	OpeningMaxDepth     int
+	TrackMaxDistance    int
+	TrackMaxDepth       int
+	SplashBonusDistance int
 }
 
 func (state State) Validate() error {
 	return Config{
-		OpeningMaxDistance: state.OpeningMaxDistance,
-		OpeningMaxDepth:    state.OpeningMaxDepth,
-		TrackMaxDistance:   state.TrackMaxDistance,
-		TrackMaxDepth:      state.TrackMaxDepth,
+		OpeningMaxDistance:  state.OpeningMaxDistance,
+		OpeningMaxDepth:     state.OpeningMaxDepth,
+		TrackMaxDistance:    state.TrackMaxDistance,
+		TrackMaxDepth:       state.TrackMaxDepth,
+		SplashBonusDistance: state.SplashBonusDistance,
 	}.Validate()
 }
 
@@ -53,6 +56,9 @@ func (config Config) Validate() error {
 	if config.OpeningMaxDepth > config.TrackMaxDepth {
 		return fmt.Errorf("opening max depth must be less than or equal to track max depth")
 	}
+	if config.SplashBonusDistance < 0 {
+		return fmt.Errorf("splash bonus distance must be greater than or equal to 0")
+	}
 
 	return nil
 }
@@ -63,9 +69,10 @@ func NewState(config Config) (State, error) {
 	}
 
 	return State{
-		OpeningMaxDistance: config.OpeningMaxDistance,
-		OpeningMaxDepth:    config.OpeningMaxDepth,
-		TrackMaxDistance:   config.TrackMaxDistance,
-		TrackMaxDepth:      config.TrackMaxDepth,
+		OpeningMaxDistance:  config.OpeningMaxDistance,
+		OpeningMaxDepth:     config.OpeningMaxDepth,
+		TrackMaxDistance:    config.TrackMaxDistance,
+		TrackMaxDepth:       config.TrackMaxDepth,
+		SplashBonusDistance: config.SplashBonusDistance,
 	}, nil
 }

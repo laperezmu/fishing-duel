@@ -4,6 +4,7 @@ import (
 	"errors"
 	"pesca/internal/app"
 	"pesca/internal/domain"
+	"pesca/internal/encounter"
 	"pesca/internal/match"
 	"pesca/internal/presentation"
 	"testing"
@@ -87,6 +88,40 @@ func TestSessionRun(t *testing.T) {
 		fixture.engine.AssertExpectations(t)
 		fixture.ui.AssertExpectations(t)
 		fixture.presenter.AssertExpectations(t)
+	})
+
+	t.Run("resolves pending splash before showing the round", func(t *testing.T) {
+		fixture := newSessionFixture(t)
+		fixture.ongoingState.Player.Loadout = fixture.finishedState.Player.Loadout
+		fixture.roundResult.Encounter = match.EncounterEventSnapshot{
+			LastEvent: encounter.Event{Kind: encounter.EventKindSplash},
+			Splash: &match.SplashSnapshot{
+				TotalJumps:    1,
+				ResolvedJumps: 0,
+				CurrentJump:   1,
+				TimeLimit:     1_000_000_000,
+			},
+		}
+		splashView := presentation.SplashView{CurrentJump: 1, TotalJumps: 1}
+
+		fixture.engine.On("State").Return(fixture.ongoingState).Twice()
+		fixture.engine.On("PlayRound", domain.Blue).Return(fixture.roundResult, nil).Once()
+		fixture.engine.On("State").Return(fixture.ongoingState).Once()
+		fixture.presenter.On("Splash", fixture.roundResult.Encounter, fixture.ongoingState.Player.Loadout.SplashSuccessDistanceBonus()).Return(splashView).Once()
+		fixture.ui.On("ResolveSplash", splashView).Return(encounter.SplashResolution{SuccessfulJumps: 1}, nil).Once()
+		fixture.engine.On("ResolveSplash", encounter.SplashResolution{SuccessfulJumps: 1}).Return(nil).Once()
+		resolvedState := fixture.finishedState
+		resolvedState.Encounter.LastEvent = encounter.Event{Kind: encounter.EventKindSplash, Escaped: false}
+		fixture.engine.On("State").Return(resolvedState).Times(4)
+		fixture.ui.On("ShowIntro", fixture.intro).Return(nil).Once()
+		fixture.presenter.On("Status", fixture.statusSnapshot).Return(fixture.status).Once()
+		fixture.ui.On("ChooseMove", fixture.status, fixture.status.MoveOptions).Return(domain.Blue, nil).Once()
+		fixture.presenter.On("Round", mock.AnythingOfType("match.RoundSnapshot")).Return(fixture.round).Once()
+		fixture.ui.On("ShowRound", fixture.round).Return(nil).Once()
+		fixture.presenter.On("Summary", fixture.summarySnapshot).Return(fixture.summary).Once()
+		fixture.ui.On("ShowGameOver", fixture.summary).Return(nil).Once()
+
+		require.NoError(t, fixture.session.Run())
 	})
 
 	errorCases := []struct {
@@ -251,6 +286,10 @@ func (engine *mockEngine) PlayRound(move domain.Move) (match.RoundResult, error)
 	return args.Get(0).(match.RoundResult), args.Error(1)
 }
 
+func (engine *mockEngine) ResolveSplash(resolution encounter.SplashResolution) error {
+	return engine.Called(resolution).Error(0)
+}
+
 type mockUI struct {
 	mock.Mock
 }
@@ -268,6 +307,11 @@ func (ui *mockUI) ShowRound(view presentation.RoundView) error {
 	return ui.Called(view).Error(0)
 }
 
+func (ui *mockUI) ResolveSplash(view presentation.SplashView) (encounter.SplashResolution, error) {
+	args := ui.Called(view)
+	return args.Get(0).(encounter.SplashResolution), args.Error(1)
+}
+
 func (ui *mockUI) ShowGameOver(view presentation.SummaryView) error {
 	return ui.Called(view).Error(0)
 }
@@ -282,6 +326,10 @@ func (presenter *mockPresenter) Intro() presentation.IntroView {
 
 func (presenter *mockPresenter) Status(snapshot match.StatusSnapshot) presentation.StatusView {
 	return presenter.Called(snapshot).Get(0).(presentation.StatusView)
+}
+
+func (presenter *mockPresenter) Splash(snapshot match.EncounterEventSnapshot, rewardDistance int) presentation.SplashView {
+	return presenter.Called(snapshot, rewardDistance).Get(0).(presentation.SplashView)
 }
 
 func (presenter *mockPresenter) Round(snapshot match.RoundSnapshot) presentation.RoundView {

@@ -25,6 +25,14 @@ type EncounterSummarySnapshot struct {
 
 type EncounterEventSnapshot struct {
 	LastEvent encounter.Event
+	Splash    *SplashSnapshot
+}
+
+type SplashSnapshot struct {
+	TotalJumps    int
+	ResolvedJumps int
+	CurrentJump   int
+	TimeLimit     int64
 }
 
 type MoveResourceSnapshot struct {
@@ -107,6 +115,26 @@ func NewRoundSnapshot(result RoundResult) RoundSnapshot {
 		PlayerMove: result.PlayerMove,
 		FishMove:   result.FishMove,
 		Outcome:    result.Outcome,
+	}
+}
+
+func NewEncounterEventSnapshot(state encounter.State) EncounterEventSnapshot {
+	return EncounterEventSnapshot{
+		LastEvent: state.LastEvent,
+		Splash:    newSplashSnapshot(state.Splash),
+	}
+}
+
+func newSplashSnapshot(state *encounter.SplashState) *SplashSnapshot {
+	if state == nil {
+		return nil
+	}
+
+	return &SplashSnapshot{
+		TotalJumps:    state.TotalJumps,
+		ResolvedJumps: state.ResolvedJumps,
+		CurrentJump:   state.CurrentJump(),
+		TimeLimit:     int64(state.TimeLimit),
 	}
 }
 

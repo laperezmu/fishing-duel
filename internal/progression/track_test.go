@@ -94,9 +94,7 @@ func TestTrackPolicyApply(t *testing.T) {
 		{
 			title:        "triggers a splash event when a card raises the fish above the surface",
 			initialState: newMatchState,
-			policy: TrackPolicy{SplashEscapeDecider: SplashEscapeDeciderFunc(func(float64) bool {
-				return false
-			})},
+			policy:       TrackPolicy{},
 			round: match.ResolvedRound{
 				PlayerMove: domain.Blue,
 				FishCard:   cards.NewFishCard(domain.Red),
@@ -113,30 +111,6 @@ func TestTrackPolicyApply(t *testing.T) {
 				Kind:    encounter.EventKindSplash,
 				Escaped: false,
 			},
-		},
-		{
-			title:        "marks a splash escape when the decider resolves a slip",
-			initialState: newMatchState,
-			policy: TrackPolicy{SplashEscapeDecider: SplashEscapeDeciderFunc(func(float64) bool {
-				return true
-			})},
-			round: match.ResolvedRound{
-				PlayerMove: domain.Blue,
-				FishCard:   cards.NewFishCard(domain.Red),
-				OutcomeEffects: []cards.CardEffect{{
-					Trigger:    cards.TriggerOnOwnerLose,
-					DepthShift: -2,
-				}},
-				Outcome: domain.PlayerWin,
-			},
-			wantDistance:   2,
-			wantDepth:      0,
-			wantPlayerWins: 1,
-			wantEvent: encounter.Event{
-				Kind:    encounter.EventKindSplash,
-				Escaped: true,
-			},
-			wantEndReason: encounter.EndReasonSplashEscape,
 		},
 	}
 

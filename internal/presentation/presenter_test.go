@@ -85,7 +85,7 @@ func TestPresenterStatus(t *testing.T) {
 				SurfaceDepth:              0,
 				CaptureDistance:           0,
 				ExhaustionCaptureDistance: 2,
-				SplashEscapeChance:        0.5,
+				SplashProfile:             encounter.DefaultSplashProfile(),
 			},
 			Distance: 3,
 			Depth:    2,

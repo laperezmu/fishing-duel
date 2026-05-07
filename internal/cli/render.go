@@ -11,6 +11,7 @@ import (
 	"pesca/internal/player/loadout"
 	"pesca/internal/presentation"
 	"strings"
+	"time"
 )
 
 const clearSequence = ansiCursorHome + ansiClearScreen
@@ -709,6 +710,46 @@ func renderCastScreen(view presentation.CastView, message string) string {
 	}
 
 	return clearSequence + strings.Join(sections, "\n\n") + "\n\n"
+}
+
+func renderSplashScreen(view presentation.SplashView, position int, message string) string {
+	sections := []string{
+		renderHeader("Pesca: duelo contra el pez"),
+		renderSplashSection(view, position),
+	}
+	if message != "" {
+		sections = append(sections, accent("Aviso")+"\n  "+message)
+	}
+
+	return clearSequence + strings.Join(sections, "\n\n") + "\n\n"
+}
+
+func renderSplashSection(view presentation.SplashView, position int) string {
+	bar := make([]string, 0, view.TotalSlots)
+	for index := 0; index < view.TotalSlots; index++ {
+		marker := "-"
+		if index >= view.TargetStart && index < view.TargetStart+view.TargetWidth {
+			marker = "="
+		}
+		if index == position {
+			marker = "|"
+		}
+		bar = append(bar, marker)
+	}
+
+	lines := []string{
+		accent("Splash"),
+		fmt.Sprintf("  Evento     : %s", view.EventLabel),
+		fmt.Sprintf("  Salto      : %d/%d", view.CurrentJump, view.TotalJumps),
+		fmt.Sprintf("  Tiempo     : %s", view.TimeLimit.Round(time.Millisecond)),
+		fmt.Sprintf("  Barra      : [%s]", strings.Join(bar, "")),
+		"  Pulsa Enter para detener la barra dentro de la franja central.",
+	}
+	if view.SuccessRewardDistance > 0 {
+		lines = append(lines, fmt.Sprintf("  Recompensa : acerca al pez %d por salto ganado", view.SuccessRewardDistance))
+	}
+
+	return strings.Join(lines, "\n")
 }
 
 func renderCastSection(view presentation.CastView) string {

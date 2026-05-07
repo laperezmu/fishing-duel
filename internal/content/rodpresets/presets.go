@@ -17,10 +17,11 @@ var defaultPresets = []Preset{
 			"Pensada para aguas cerradas, lectura cercana y cierres rapidos.",
 		},
 		Config: rod.Config{
-			OpeningMaxDistance: 3,
-			OpeningMaxDepth:    1,
-			TrackMaxDistance:   5,
-			TrackMaxDepth:      2,
+			OpeningMaxDistance:  3,
+			OpeningMaxDepth:     1,
+			TrackMaxDistance:    5,
+			TrackMaxDepth:       2,
+			SplashBonusDistance: 1,
 		},
 	},
 	{

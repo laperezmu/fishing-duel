@@ -178,17 +178,20 @@ func buildEncounterEngine(rng Randomizer, playerDeckPreset playerprofiles.DeckPr
 		spawn.Profile.BuildPreset().BuildDeck(shuffler),
 		playerMoveController,
 		rules.NewClassicEvaluator(rules.NewFishCombatProfile()),
-		progression.TrackPolicy{SplashEscapeDecider: progression.SplashEscapeDeciderFunc(func(chance float64) bool {
-			return rng.Float64() < chance
-		})},
+		progression.TrackPolicy{},
 		endings.EncounterEndCondition{},
-		match.State{Encounter: encounterState, Player: match.PlayerState{Loadout: playerLoadout}},
+		match.State{Encounter: applySpawnSplashProfile(encounterState, spawn), Player: match.PlayerState{Loadout: playerLoadout}},
 	)
 	if err != nil {
 		return nil, fmt.Errorf("initialize game engine: %w", err)
 	}
 
 	return engine, nil
+}
+
+func applySpawnSplashProfile(state encounter.State, spawn fishprofiles.Spawn) encounter.State {
+	state.Config.SplashProfile = spawn.Profile.Splash.BuildEncounterProfile()
+	return state
 }
 
 type seededRandom struct{ *rand.Rand }

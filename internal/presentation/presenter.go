@@ -16,6 +16,7 @@ import (
 	"pesca/internal/match"
 	"pesca/internal/run"
 	"strings"
+	"time"
 )
 
 type Catalog struct {
@@ -161,6 +162,23 @@ func (p Presenter) Cast(context encounter.WaterContext, position, totalSlots, se
 		TotalSlots:   totalSlots,
 		SectionWidth: sectionWidth,
 	}
+}
+
+func (p Presenter) Splash(snapshot match.EncounterEventSnapshot, successRewardDistance int) SplashView {
+	view := SplashView{
+		EventLabel:            p.eventLabel(snapshot.LastEvent),
+		SuccessRewardDistance: successRewardDistance,
+		TotalSlots:            12,
+		TargetStart:           4,
+		TargetWidth:           4,
+	}
+	if snapshot.Splash != nil {
+		view.CurrentJump = snapshot.Splash.CurrentJump
+		view.TotalJumps = snapshot.Splash.TotalJumps
+		view.TimeLimit = time.Duration(snapshot.Splash.TimeLimit)
+	}
+
+	return view
 }
 
 func (p Presenter) AnglerProfile(profile anglerprofiles.Profile) AnglerProfileView {

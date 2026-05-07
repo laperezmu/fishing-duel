@@ -155,7 +155,9 @@ func (engine *Engine) PlayRound(playerMove domain.Move) (match.RoundResult, erro
 	engine.playerMoves.PrepareRound(&playerMoveRuntime)
 	endingState := engine.state.EndingState()
 	engine.endCondition.Apply(&endingState)
-	engine.resetRoundState()
+	if engine.state.Encounter.Splash == nil {
+		engine.resetRoundState()
+	}
 
 	return match.RoundResult{
 		Round:      engine.state.Round.Number,
@@ -165,8 +167,24 @@ func (engine *Engine) PlayRound(playerMove domain.Move) (match.RoundResult, erro
 		FishCard:   fishCard,
 		Outcome:    roundOutcome,
 		Status:     match.NewStatusSnapshot(engine.state),
-		Encounter:  match.EncounterEventSnapshot{LastEvent: engine.state.Encounter.LastEvent},
+		Encounter:  match.NewEncounterEventSnapshot(engine.state.Encounter),
 	}, nil
+}
+
+func (engine *Engine) ResolveSplash(resolution encounter.SplashResolution) error {
+	if engine.state.Lifecycle.Finished {
+		return ErrGameFinished
+	}
+
+	encounter.ApplySplashResolution(&engine.state.Encounter, resolution)
+	engine.refreshState()
+	endingState := engine.state.EndingState()
+	engine.endCondition.Apply(&endingState)
+	if engine.state.Encounter.Splash == nil {
+		engine.resetRoundState()
+	}
+
+	return nil
 }
 
 func (engine *Engine) refreshState() {

@@ -10,6 +10,7 @@ import (
 	"pesca/internal/content/playerprofiles"
 	"pesca/internal/content/rodpresets"
 	"pesca/internal/domain"
+	"pesca/internal/encounter"
 	"pesca/internal/player/loadout"
 	"pesca/internal/player/rod"
 	"pesca/internal/presentation"
@@ -120,6 +121,68 @@ func (ui *UI) ShowRound(view presentation.RoundView) error {
 	round := view
 	ui.lastRound = &round
 	return nil
+}
+
+func (ui *UI) ResolveSplash(view presentation.SplashView) (encounter.SplashResolution, error) {
+	positions := ui.castFrames
+	if len(positions) == 0 {
+		positions = buildSplashPositions(view.TotalSlots)
+	}
+
+	inputCh, errCh := ui.startSplashInputWatcher()
+
+	currentPosition := 0
+	for _, position := range positions {
+		currentPosition = position
+		if _, err := io.WriteString(ui.out, renderSplashScreen(view, currentPosition, "")); err != nil {
+			return encounter.SplashResolution{}, err
+		}
+
+		select {
+		case err := <-errCh:
+			return encounter.SplashResolution{}, err
+		case <-inputCh:
+			return ui.resolveSplashStop(view, currentPosition)
+		default:
+		}
+
+		time.Sleep(ui.castDelay)
+	}
+
+	if _, err := io.WriteString(ui.out, clearSequence); err != nil {
+		return encounter.SplashResolution{}, err
+	}
+
+	return encounter.SplashResolution{Escaped: true}, nil
+}
+
+func (ui *UI) startSplashInputWatcher() (<-chan struct{}, <-chan error) {
+	inputCh := make(chan struct{}, 1)
+	errCh := make(chan error, 1)
+	go func() {
+		if !ui.scanner.Scan() {
+			if err := ui.scanner.Err(); err != nil {
+				errCh <- err
+				return
+			}
+			errCh <- fmt.Errorf("entrada finalizada")
+			return
+		}
+		inputCh <- struct{}{}
+	}()
+
+	return inputCh, errCh
+}
+
+func (ui *UI) resolveSplashStop(view presentation.SplashView, currentPosition int) (encounter.SplashResolution, error) {
+	if _, err := io.WriteString(ui.out, clearSequence); err != nil {
+		return encounter.SplashResolution{}, err
+	}
+	if currentPosition >= view.TargetStart && currentPosition < view.TargetStart+view.TargetWidth {
+		return encounter.SplashResolution{SuccessfulJumps: 1}, nil
+	}
+
+	return encounter.SplashResolution{Escaped: true}, nil
 }
 
 func (ui *UI) ShowGameOver(view presentation.SummaryView) error {
@@ -270,6 +333,22 @@ func confirmSelectionWithError(ui *UI, render func(string) (string, error), prom
 
 		message = err.Error()
 	}
+}
+
+func buildSplashPositions(totalSlots int) []int {
+	if totalSlots <= 1 {
+		return []int{0}
+	}
+
+	positions := make([]int, 0, totalSlots*2-1)
+	for position := 0; position < totalSlots; position++ {
+		positions = append(positions, position)
+	}
+	for position := totalSlots - 2; position >= 0; position-- {
+		positions = append(positions, position)
+	}
+
+	return positions
 }
 
 func parseMove(input string, options []presentation.MoveOption) (domain.Move, error) {

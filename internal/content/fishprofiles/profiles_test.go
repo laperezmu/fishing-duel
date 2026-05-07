@@ -47,4 +47,11 @@ func TestDefaultProfiles(t *testing.T) {
 	require.Len(t, profiles[1].Cards, 4)
 	assert.Equal(t, "Tiron de apertura", profiles[1].Cards[0].Name)
 	assert.Equal(t, cards.DiscardVisibilityMoveOnly, profiles[4].Cards[1].DiscardVisibility)
+	assert.Equal(t, 1, profiles[0].Splash.BuildEncounterProfile().JumpCount)
+}
+
+func TestSplashProfileBuildEncounterProfileUsesDefaultsAndOverrides(t *testing.T) {
+	assert.Equal(t, 1, (SplashProfile{}).BuildEncounterProfile().JumpCount)
+	assert.Equal(t, 3, (SplashProfile{JumpCount: 3, TimeLimitMillis: 1500}).BuildEncounterProfile().JumpCount)
+	assert.Equal(t, 1500, int((SplashProfile{JumpCount: 3, TimeLimitMillis: 1500}).BuildEncounterProfile().TimeLimit.Milliseconds()))
 }

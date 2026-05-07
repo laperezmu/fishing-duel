@@ -1,10 +1,6 @@
 package encounter
 
-type SplashEscapeDecider interface {
-	ShouldEscape(chance float64) bool
-}
-
-func ApplyDelta(state *State, delta Delta, splashEscapeDecider SplashEscapeDecider) {
+func ApplyDelta(state *State, delta Delta) {
 	state.Distance += delta.DistanceShift
 	state.LastEvent = Event{}
 
@@ -15,22 +11,46 @@ func ApplyDelta(state *State, delta Delta, splashEscapeDecider SplashEscapeDecid
 	targetDepth := state.Depth + delta.DepthShift
 	if targetDepth < state.Config.SurfaceDepth {
 		state.Depth = state.Config.SurfaceDepth
-		escaped := false
-		if splashEscapeDecider != nil {
-			escaped = splashEscapeDecider.ShouldEscape(state.Config.SplashEscapeChance)
-		}
-
 		state.LastEvent = Event{
 			Kind:    EventKindSplash,
-			Escaped: escaped,
+			Escaped: false,
 		}
-		if escaped {
-			state.Status = StatusEscaped
-			state.EndReason = EndReasonSplashEscape
+		profile := state.Config.SplashProfile.WithDefaults()
+		state.Splash = &SplashState{
+			TotalJumps:    profile.JumpCount,
+			ResolvedJumps: 0,
+			TimeLimit:     profile.TimeLimit,
 		}
 
 		return
 	}
 
 	state.Depth = targetDepth
+}
+
+func ApplySplashResolution(state *State, resolution SplashResolution) {
+	if state.Splash == nil {
+		return
+	}
+
+	if resolution.Escaped {
+		state.LastEvent = Event{Kind: EventKindSplash, Escaped: true}
+		state.Status = StatusEscaped
+		state.EndReason = EndReasonSplashEscape
+		state.Splash = nil
+		return
+	}
+
+	if resolution.SuccessfulJumps > 0 {
+		state.Splash.ResolvedJumps += resolution.SuccessfulJumps
+		state.Distance -= resolution.DistanceRewardApplied
+		if state.Distance < 0 {
+			state.Distance = 0
+		}
+	}
+
+	state.LastEvent = Event{Kind: EventKindSplash, Escaped: false}
+	if !state.Splash.Pending() {
+		state.Splash = nil
+	}
 }
