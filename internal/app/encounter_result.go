@@ -24,7 +24,7 @@ func ResolveEncounterResult(state match.State, spawn fishprofiles.Spawn) (run.En
 		result.Outcome = run.EncounterOutcomeCaptured
 		result.NodeResolved = true
 		result.Capture = &run.CaptureRecord{
-			FishID:   spawn.Profile.ID,
+			FishID:   string(spawn.Profile.ID),
 			FishName: spawn.Profile.Name,
 		}
 	case encounter.StatusEscaped:

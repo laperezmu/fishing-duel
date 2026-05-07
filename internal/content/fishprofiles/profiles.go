@@ -6,6 +6,8 @@ import (
 	"pesca/internal/domain"
 )
 
+type ProfileID string
+
 type CardPattern struct {
 	Name              string
 	Summary           string
@@ -30,7 +32,7 @@ func (pattern CardPattern) BuildCard() cards.FishCard {
 }
 
 type Profile struct {
-	ID            string
+	ID            ProfileID
 	ArchetypeID   ArchetypeID
 	Name          string
 	Description   string
@@ -41,9 +43,17 @@ type Profile struct {
 	Shuffle       bool
 }
 
+func (id ProfileID) Validate() error {
+	if id == "" {
+		return fmt.Errorf("profile id is required")
+	}
+
+	return nil
+}
+
 func (profile Profile) Validate() error {
 	if profile.ID == "" {
-		return fmt.Errorf("profile id is required")
+		return profile.ID.Validate()
 	}
 	if profile.Name == "" {
 		return fmt.Errorf("profile name is required")

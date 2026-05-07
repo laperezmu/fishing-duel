@@ -12,26 +12,26 @@ import (
 func TestDefaultCatalogResolvesClosedPool(t *testing.T) {
 	catalog := DefaultCatalog()
 
-	profiles, err := catalog.ResolvePool("shoreline-basics")
+	profiles, err := catalog.ResolvePool(PoolID("shoreline-basics"))
 
 	require.NoError(t, err)
 	require.Len(t, profiles, 4)
-	assert.Equal(t, "classic", profiles[0].ID)
-	assert.Equal(t, "deck-exhaustion", profiles[3].ID)
+	assert.Equal(t, ProfileID("classic"), profiles[0].ID)
+	assert.Equal(t, ProfileID("deck-exhaustion"), profiles[3].ID)
 }
 
 func TestDefaultCatalogResolvesWeightedPoolEntries(t *testing.T) {
 	catalog := DefaultCatalog()
 
-	profiles, err := catalog.ResolvePool("shoreline-weighted")
+	profiles, err := catalog.ResolvePool(PoolID("shoreline-weighted"))
 
 	require.NoError(t, err)
 	require.Len(t, profiles, 6)
-	assert.Equal(t, "classic", profiles[0].ID)
-	assert.Equal(t, "classic", profiles[1].ID)
-	assert.Equal(t, "classic", profiles[2].ID)
-	assert.Equal(t, "surface-control", profiles[4].ID)
-	assert.Equal(t, "deck-exhaustion", profiles[5].ID)
+	assert.Equal(t, ProfileID("classic"), profiles[0].ID)
+	assert.Equal(t, ProfileID("classic"), profiles[1].ID)
+	assert.Equal(t, ProfileID("classic"), profiles[2].ID)
+	assert.Equal(t, ProfileID("surface-control"), profiles[4].ID)
+	assert.Equal(t, ProfileID("deck-exhaustion"), profiles[5].ID)
 }
 
 func TestLoadCatalogRejectsUnknownPoolProfileReference(t *testing.T) {
@@ -116,7 +116,7 @@ func TestLoadCatalogRejectsInvalidPoolWeight(t *testing.T) {
 
 func TestResolveSpawnCanUseClosedPoolSubset(t *testing.T) {
 	catalog := DefaultCatalog()
-	profiles, err := catalog.ResolvePool("shoreline-basics")
+	profiles, err := catalog.ResolvePool(PoolID("shoreline-basics"))
 	require.NoError(t, err)
 
 	spawn, err := ResolveSpawn(profiles, SpawnContext{
@@ -127,6 +127,6 @@ func TestResolveSpawnCanUseClosedPoolSubset(t *testing.T) {
 	})
 
 	require.NoError(t, err)
-	assert.Equal(t, "surface-control", spawn.Profile.ID)
+	assert.Equal(t, ProfileID("surface-control"), spawn.Profile.ID)
 	assert.Equal(t, 3, spawn.CandidateCount)
 }

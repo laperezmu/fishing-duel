@@ -46,10 +46,10 @@ func (kind NodeKind) Validate() error {
 }
 
 type NodeState struct {
-	ZoneID        string
+	ZoneID        watercontexts.ID
 	NodeID        string
 	Kind          NodeKind
-	WaterPresetID string
+	WaterPresetID watercontexts.ID
 }
 
 func (node NodeState) Validate() error {
@@ -67,14 +67,8 @@ func (node NodeState) Validate() error {
 	return node.Kind.Validate()
 }
 
-func ResolveWaterPreset(id string) (watercontexts.Preset, error) {
-	for _, preset := range watercontexts.DefaultPresets() {
-		if preset.ID == id {
-			return preset, nil
-		}
-	}
-
-	return watercontexts.Preset{}, fmt.Errorf("unknown water context preset %q", id)
+func ResolveWaterPreset(id watercontexts.ID) (watercontexts.Preset, error) {
+	return watercontexts.ResolveDefaultPreset(id)
 }
 
 type ProgressState struct {

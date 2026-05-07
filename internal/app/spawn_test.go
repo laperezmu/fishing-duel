@@ -38,7 +38,7 @@ func TestResolveFishSpawn(t *testing.T) {
 	spawn, err := app.ResolveFishSpawn("Pesca", opening, playerLoadout, fishprofiles.DefaultProfiles(), ui, presenter)
 
 	require.NoError(t, err)
-	assert.Equal(t, "surface-control", spawn.Profile.ID)
+	assert.Equal(t, fishprofiles.ProfileID("surface-control"), spawn.Profile.ID)
 	ui.AssertExpectations(t)
 }
 
@@ -64,7 +64,7 @@ func TestBootstrapEncounterWithConfigUsesClosedFishPool(t *testing.T) {
 
 	engine, err := app.BootstrapEncounterWithConfig("Pesca", rng, ui, app.EncounterBootstrapConfig{
 		FishCatalog: catalog,
-		FishPoolID:  "shoreline-basics",
+		FishPoolID:  fishprofiles.PoolID("shoreline-basics"),
 	})
 
 	require.NoError(t, err)
@@ -88,7 +88,7 @@ func TestBootstrapEncounterWithConfigReturnsPoolErrors(t *testing.T) {
 	ui.On("ResolveCast", "Pesca", mock.Anything, mock.Anything).Return(encounter.CastResult{Band: encounter.CastBandShort}, nil).Once()
 	ui.On("ShowEncounterOpening", "Pesca", mock.Anything).Return(nil).Once()
 
-	_, err := app.BootstrapEncounterWithConfig("Pesca", rng, ui, app.EncounterBootstrapConfig{FishPoolID: "missing-pool"})
+	_, err := app.BootstrapEncounterWithConfig("Pesca", rng, ui, app.EncounterBootstrapConfig{FishPoolID: fishprofiles.PoolID("missing-pool")})
 
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "resolve encounter fish pool: unknown fish pool id missing-pool")

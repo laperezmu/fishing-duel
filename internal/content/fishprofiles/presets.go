@@ -6,7 +6,7 @@ import (
 )
 
 type FishDeckPreset struct {
-	ID            string
+	ID            ProfileID
 	ArchetypeID   ArchetypeID
 	Name          string
 	Description   string

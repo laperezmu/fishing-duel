@@ -22,7 +22,7 @@ func TestResolveSpawnFallsBackToGenericProfileWithoutHabitats(t *testing.T) {
 	spawn, err := ResolveSpawn(DefaultProfiles(), context)
 
 	require.NoError(t, err)
-	assert.Equal(t, "classic", spawn.Profile.ID)
+	assert.Equal(t, ProfileID("classic"), spawn.Profile.ID)
 	assert.Equal(t, 1, spawn.CandidateCount)
 	assert.Equal(t, waterpools.Shoreline, spawn.Context.WaterPoolTag)
 }
@@ -39,7 +39,7 @@ func TestResolveSpawnPrefersSpecificHabitatMatch(t *testing.T) {
 	spawn, err := ResolveSpawn(DefaultProfiles(), context)
 
 	require.NoError(t, err)
-	assert.Equal(t, "surface-control", spawn.Profile.ID)
+	assert.Equal(t, ProfileID("surface-control"), spawn.Profile.ID)
 	assert.GreaterOrEqual(t, spawn.CandidateCount, 2)
 }
 
@@ -51,7 +51,7 @@ func TestResolveSpawnWithRandomizerVariesWithinTopScoreTies(t *testing.T) {
 	}
 	profiles := []Profile{
 		{
-			ID:          "tie-first",
+			ID:          ProfileID("tie-first"),
 			ArchetypeID: ArchetypeBaselineCycle,
 			Name:        "Tie First",
 			Appearance: Appearance{
@@ -63,7 +63,7 @@ func TestResolveSpawnWithRandomizerVariesWithinTopScoreTies(t *testing.T) {
 			},
 		},
 		{
-			ID:          "tie-second",
+			ID:          ProfileID("tie-second"),
 			ArchetypeID: ArchetypeBaselineCycle,
 			Name:        "Tie Second",
 			Appearance: Appearance{
@@ -79,7 +79,7 @@ func TestResolveSpawnWithRandomizerVariesWithinTopScoreTies(t *testing.T) {
 	spawn, err := ResolveSpawnWithRandomizer(profiles, context, fixedSpawnRandomizer{value: 1})
 
 	require.NoError(t, err)
-	assert.Equal(t, "tie-second", spawn.Profile.ID)
+	assert.Equal(t, ProfileID("tie-second"), spawn.Profile.ID)
 	assert.Equal(t, 2, spawn.CandidateCount)
 }
 
@@ -91,7 +91,7 @@ func TestResolveSpawnWithoutRandomizerRemainsStableForTies(t *testing.T) {
 	}
 	profiles := []Profile{
 		{
-			ID:          "tie-first",
+			ID:          ProfileID("tie-first"),
 			ArchetypeID: ArchetypeBaselineCycle,
 			Name:        "Tie First",
 			Appearance: Appearance{
@@ -103,7 +103,7 @@ func TestResolveSpawnWithoutRandomizerRemainsStableForTies(t *testing.T) {
 			},
 		},
 		{
-			ID:          "tie-second",
+			ID:          ProfileID("tie-second"),
 			ArchetypeID: ArchetypeBaselineCycle,
 			Name:        "Tie Second",
 			Appearance: Appearance{
@@ -119,7 +119,7 @@ func TestResolveSpawnWithoutRandomizerRemainsStableForTies(t *testing.T) {
 	spawn, err := ResolveSpawn(profiles, context)
 
 	require.NoError(t, err)
-	assert.Equal(t, "tie-first", spawn.Profile.ID)
+	assert.Equal(t, ProfileID("tie-first"), spawn.Profile.ID)
 }
 
 func TestResolveSpawnReturnsErrorWhenNoProfileMatches(t *testing.T) {

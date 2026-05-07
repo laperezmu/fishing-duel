@@ -1,6 +1,7 @@
 package run
 
 import (
+	"pesca/internal/content/watercontexts"
 	"pesca/internal/encounter"
 	"pesca/internal/player/loadout"
 	"pesca/internal/player/rod"
@@ -42,8 +43,8 @@ func TestDefaultRouteUsesEightWaterPhasesAndTwentyFourCombats(t *testing.T) {
 	route := DefaultRoute()
 	combatCount := 0
 	bossCount := 0
-	phasePresets := make([]string, 0, 8)
-	lastZoneID := ""
+	phasePresets := make([]watercontexts.ID, 0, 8)
+	var lastZoneID watercontexts.ID
 	combatsInPhase := 0
 
 	for _, node := range route {
@@ -80,15 +81,15 @@ func TestDefaultRouteUsesEightWaterPhasesAndTwentyFourCombats(t *testing.T) {
 	assert.Equal(t, 24, combatCount)
 	assert.Equal(t, 8, bossCount)
 	assert.Equal(t, 3, combatsInPhase)
-	assert.Equal(t, []string{
-		"shoreline-cove",
-		"open-channel",
-		"broken-current",
-		"reef-shadow",
-		"tidal-gate",
-		"weed-pocket",
-		"stone-drop",
-		"deep-ledge",
+	assert.Equal(t, []watercontexts.ID{
+		watercontexts.ShorelineCove,
+		watercontexts.OpenChannel,
+		watercontexts.BrokenCurrent,
+		watercontexts.ReefShadow,
+		watercontexts.TidalGate,
+		watercontexts.WeedPocket,
+		watercontexts.StoneDrop,
+		watercontexts.DeepLedge,
 	}, phasePresets)
 }
 

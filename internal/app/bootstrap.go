@@ -47,7 +47,7 @@ type Randomizer interface {
 
 type EncounterBootstrapConfig struct {
 	FishCatalog fishprofiles.Catalog
-	FishPoolID  string
+	FishPoolID  fishprofiles.PoolID
 }
 
 func BootstrapEncounter(title string, rng Randomizer, ui EncounterBootstrapUI) (*game.Engine, error) {
@@ -135,16 +135,21 @@ func resolveEncounterFishProfiles(config EncounterBootstrapConfig) ([]fishprofil
 	if len(catalog.Profiles()) == 0 {
 		catalog = fishprofiles.DefaultCatalog()
 	}
-	poolID := config.FishPoolID
-	if poolID == "" {
-		poolID = fishprofiles.DefaultEncounterFishPoolID
-	}
+	poolID := resolveEncounterFishPoolID(config)
 	profiles, err := catalog.ResolvePool(poolID)
 	if err != nil {
 		return nil, fmt.Errorf("resolve encounter fish pool: %w", err)
 	}
 
 	return profiles, nil
+}
+
+func resolveEncounterFishPoolID(config EncounterBootstrapConfig) fishprofiles.PoolID {
+	if config.FishPoolID == "" {
+		return fishprofiles.DefaultEncounterFishPoolID
+	}
+
+	return config.FishPoolID
 }
 
 func buildEncounterEngine(rng Randomizer, playerDeckPreset playerprofiles.DeckPreset, playerLoadout loadout.State, opening encounter.Opening, spawn fishprofiles.Spawn) (*game.Engine, error) {

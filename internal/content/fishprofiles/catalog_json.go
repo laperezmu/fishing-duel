@@ -18,7 +18,7 @@ type poolCatalogDocument struct {
 }
 
 type profileRecord struct {
-	ID            string              `json:"id"`
+	ID            ProfileID           `json:"id"`
 	ArchetypeID   ArchetypeID         `json:"archetype_id"`
 	Name          string              `json:"name"`
 	Description   string              `json:"description"`
@@ -56,16 +56,16 @@ type cardEffectRecord struct {
 }
 
 type poolRecord struct {
-	ID          string            `json:"id"`
+	ID          PoolID            `json:"id"`
 	Name        string            `json:"name"`
 	Description string            `json:"description"`
-	ProfileIDs  []string          `json:"profile_ids,omitempty"`
+	ProfileIDs  []ProfileID       `json:"profile_ids,omitempty"`
 	Entries     []poolEntryRecord `json:"entries,omitempty"`
 }
 
 type poolEntryRecord struct {
-	ProfileID string `json:"profile_id"`
-	Weight    *int   `json:"weight,omitempty"`
+	ProfileID ProfileID `json:"profile_id"`
+	Weight    *int      `json:"weight,omitempty"`
 }
 
 func LoadCatalog(profileData []byte, poolData []byte) (Catalog, error) {

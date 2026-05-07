@@ -9,6 +9,7 @@ import (
 	"pesca/internal/content/habitats"
 	"pesca/internal/content/playerprofiles"
 	"pesca/internal/content/rodpresets"
+	"pesca/internal/content/watercontexts"
 	"pesca/internal/content/waterpools"
 	"pesca/internal/domain"
 	"pesca/internal/encounter"
@@ -164,7 +165,7 @@ func (p Presenter) Cast(context encounter.WaterContext, position, totalSlots, se
 
 func (p Presenter) AnglerProfile(profile anglerprofiles.Profile) AnglerProfileView {
 	return AnglerProfileView{
-		ProfileID:         profile.ID,
+		ProfileID:         string(profile.ID),
 		Name:              profile.Name,
 		Description:       profile.Description,
 		Details:           append([]string(nil), profile.Details...),
@@ -417,54 +418,32 @@ func (p Presenter) runNodeLabel(node run.NodeState) string {
 	}
 }
 
-func (p Presenter) runZoneLabel(zoneID string) string {
-	switch zoneID {
-	case "shoreline-cove":
-		return "Fase 1 - Ensenada cercana"
-	case "open-channel":
-		return "Fase 2 - Canal abierto"
-	case "broken-current":
-		return "Fase 3 - Corriente irregular"
-	case "reef-shadow":
-		return "Fase 4 - Sombra de arrecife"
-	case "tidal-gate":
-		return "Fase 5 - Paso de marea"
-	case "weed-pocket":
-		return "Fase 6 - Bolsillo de maleza"
-	case "stone-drop":
-		return "Fase 7 - Caida de piedra"
-	case "deep-ledge":
-		return "Fase 8 - Cornisa profunda"
-	default:
-		return zoneID
-	}
+func (p Presenter) runZoneLabel(zoneID watercontexts.ID) string {
+	return watercontexts.DefaultPhaseLabel(zoneID)
 }
 
 func playerDeckPresetName(id string) string {
-	for _, preset := range playerprofiles.DefaultPresets() {
-		if preset.ID == id {
-			return preset.Name
-		}
+	preset, err := playerprofiles.ResolveDefaultPreset(id)
+	if err == nil {
+		return preset.Name
 	}
 
 	return id
 }
 
 func rodPresetName(id string) string {
-	for _, preset := range rodpresets.DefaultPresets() {
-		if preset.ID == id {
-			return preset.Name
-		}
+	preset, err := rodpresets.ResolveDefaultPreset(id)
+	if err == nil {
+		return preset.Name
 	}
 
 	return id
 }
 
 func attachmentPresetName(id string) string {
-	for _, preset := range attachmentpresets.DefaultPresets() {
-		if preset.ID == id {
-			return preset.Name
-		}
+	preset, err := attachmentpresets.ResolveDefaultPreset(id)
+	if err == nil {
+		return preset.Name
 	}
 
 	return id
@@ -507,12 +486,18 @@ func (p Presenter) fishDiscardEntryLabel(entry match.FishDiscardEntryState) stri
 		return p.fishMoveLabel(entry.Move)
 	case cards.DiscardVisibilityHidden:
 		return ""
-	case cards.DiscardVisibilityFull, "":
+	case cards.DiscardVisibilityFull:
 		if entry.Name != "" {
 			return entry.Name
 		}
 		return p.fishMoveLabel(entry.Move)
 	default:
+		if cards.NormalizeDiscardVisibility(entry.Visibility) == cards.DiscardVisibilityFull {
+			if entry.Name != "" {
+				return entry.Name
+			}
+			return p.fishMoveLabel(entry.Move)
+		}
 		if entry.Name != "" {
 			return entry.Name
 		}

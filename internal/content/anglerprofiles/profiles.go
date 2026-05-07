@@ -148,31 +148,13 @@ func ResolveStart(profile Profile) (ResolvedStart, error) {
 }
 
 func resolveDeckPreset(id string) (playerprofiles.DeckPreset, error) {
-	for _, preset := range playerprofiles.DefaultPresets() {
-		if preset.ID == id {
-			return preset, nil
-		}
-	}
-
-	return playerprofiles.DeckPreset{}, fmt.Errorf("unknown player deck preset %q", id)
+	return playerprofiles.ResolveDefaultPreset(id)
 }
 
 func resolveRodPreset(id string) (rodpresets.Preset, error) {
-	for _, preset := range rodpresets.DefaultPresets() {
-		if preset.ID == id {
-			return preset, nil
-		}
-	}
-
-	return rodpresets.Preset{}, fmt.Errorf("unknown rod preset %q", id)
+	return rodpresets.ResolveDefaultPreset(id)
 }
 
 func resolveAttachmentPreset(id string) (attachmentpresets.Preset, error) {
-	for _, preset := range attachmentpresets.DefaultPresets() {
-		if preset.ID == id {
-			return preset, nil
-		}
-	}
-
-	return attachmentpresets.Preset{}, fmt.Errorf("unknown attachment preset %q", id)
+	return attachmentpresets.ResolveDefaultPreset(id)
 }

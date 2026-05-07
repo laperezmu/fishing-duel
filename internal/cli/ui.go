@@ -47,41 +47,7 @@ func (ui *UI) ChoosePlayerDeckPreset(title string, presets []playerprofiles.Deck
 		return playerprofiles.DeckPreset{}, fmt.Errorf("no hay presets de baraja del jugador disponibles")
 	}
 
-	message := ""
-	for {
-		if _, err := io.WriteString(ui.out, renderPlayerDeckSelectionScreen(title, presets, message)); err != nil {
-			return playerprofiles.DeckPreset{}, err
-		}
-		if _, err := fmt.Fprint(ui.out, "Elige un preset del jugador: "); err != nil {
-			return playerprofiles.DeckPreset{}, err
-		}
-		if !ui.scanner.Scan() {
-			if err := ui.scanner.Err(); err != nil {
-				return playerprofiles.DeckPreset{}, err
-			}
-			return playerprofiles.DeckPreset{}, fmt.Errorf("entrada finalizada")
-		}
-
-		selectedIndex, err := parsePresetChoice(ui.scanner.Text(), len(presets))
-		if err != nil {
-			message = err.Error()
-			continue
-		}
-
-		selectedPreset := presets[selectedIndex]
-		confirmed, err := ui.confirmPlayerDeckPreset(title, selectedPreset)
-		if err != nil {
-			return playerprofiles.DeckPreset{}, err
-		}
-		if confirmed {
-			if _, err := io.WriteString(ui.out, clearSequence); err != nil {
-				return playerprofiles.DeckPreset{}, err
-			}
-			return selectedPreset, nil
-		}
-
-		message = "seleccion cancelada, elige otro preset"
-	}
+	return choosePreset(ui, title, presets, renderPlayerDeckSelectionScreen, "Elige un preset del jugador: ", ui.confirmPlayerDeckPreset, "seleccion cancelada, elige otro preset")
 }
 
 func (ui *UI) ChooseAnglerProfile(title string, profiles []anglerprofiles.Profile) (anglerprofiles.Profile, error) {
@@ -89,42 +55,10 @@ func (ui *UI) ChooseAnglerProfile(title string, profiles []anglerprofiles.Profil
 		return anglerprofiles.Profile{}, fmt.Errorf("no hay pescadores iniciales disponibles")
 	}
 
-	message := ""
 	presenter := presentation.NewPresenter(presentation.DefaultCatalog())
-	for {
-		if _, err := io.WriteString(ui.out, renderAnglerProfileSelectionScreen(title, profiles, message)); err != nil {
-			return anglerprofiles.Profile{}, err
-		}
-		if _, err := fmt.Fprint(ui.out, "Elige un pescador inicial: "); err != nil {
-			return anglerprofiles.Profile{}, err
-		}
-		if !ui.scanner.Scan() {
-			if err := ui.scanner.Err(); err != nil {
-				return anglerprofiles.Profile{}, err
-			}
-			return anglerprofiles.Profile{}, fmt.Errorf("entrada finalizada")
-		}
-
-		selectedIndex, err := parsePresetChoice(ui.scanner.Text(), len(profiles))
-		if err != nil {
-			message = err.Error()
-			continue
-		}
-
-		selectedProfile := profiles[selectedIndex]
-		confirmed, err := ui.confirmAnglerProfile(title, presenter.AnglerProfile(selectedProfile))
-		if err != nil {
-			return anglerprofiles.Profile{}, err
-		}
-		if confirmed {
-			if _, err := io.WriteString(ui.out, clearSequence); err != nil {
-				return anglerprofiles.Profile{}, err
-			}
-			return selectedProfile, nil
-		}
-
-		message = "seleccion cancelada, elige otro pescador"
-	}
+	return choosePreset(ui, title, profiles, renderAnglerProfileSelectionScreen, "Elige un pescador inicial: ", func(title string, profile anglerprofiles.Profile) (bool, error) {
+		return ui.confirmAnglerProfile(title, presenter.AnglerProfile(profile))
+	}, "seleccion cancelada, elige otro pescador")
 }
 
 func (ui *UI) ChooseFishDeckPreset(title string, presets []fishprofiles.FishDeckPreset) (fishprofiles.FishDeckPreset, error) {
@@ -132,41 +66,7 @@ func (ui *UI) ChooseFishDeckPreset(title string, presets []fishprofiles.FishDeck
 		return fishprofiles.FishDeckPreset{}, fmt.Errorf("no hay presets de baraja disponibles")
 	}
 
-	message := ""
-	for {
-		if _, err := io.WriteString(ui.out, renderFishDeckSelectionScreen(title, presets, message)); err != nil {
-			return fishprofiles.FishDeckPreset{}, err
-		}
-		if _, err := fmt.Fprint(ui.out, "Elige un preset del pez: "); err != nil {
-			return fishprofiles.FishDeckPreset{}, err
-		}
-		if !ui.scanner.Scan() {
-			if err := ui.scanner.Err(); err != nil {
-				return fishprofiles.FishDeckPreset{}, err
-			}
-			return fishprofiles.FishDeckPreset{}, fmt.Errorf("entrada finalizada")
-		}
-
-		selectedIndex, err := parsePresetChoice(ui.scanner.Text(), len(presets))
-		if err != nil {
-			message = err.Error()
-			continue
-		}
-
-		selectedPreset := presets[selectedIndex]
-		confirmed, err := ui.confirmFishDeckPreset(title, selectedPreset)
-		if err != nil {
-			return fishprofiles.FishDeckPreset{}, err
-		}
-		if confirmed {
-			if _, err := io.WriteString(ui.out, clearSequence); err != nil {
-				return fishprofiles.FishDeckPreset{}, err
-			}
-			return selectedPreset, nil
-		}
-
-		message = "seleccion cancelada, elige otro preset"
-	}
+	return choosePreset(ui, title, presets, renderFishDeckSelectionScreen, "Elige un preset del pez: ", ui.confirmFishDeckPreset, "seleccion cancelada, elige otro preset")
 }
 
 func (ui *UI) ChooseRodPreset(title string, presets []rodpresets.Preset) (rodpresets.Preset, error) {
@@ -174,41 +74,7 @@ func (ui *UI) ChooseRodPreset(title string, presets []rodpresets.Preset) (rodpre
 		return rodpresets.Preset{}, fmt.Errorf("no hay presets de cana disponibles")
 	}
 
-	message := ""
-	for {
-		if _, err := io.WriteString(ui.out, renderRodSelectionScreen(title, presets, message)); err != nil {
-			return rodpresets.Preset{}, err
-		}
-		if _, err := fmt.Fprint(ui.out, "Elige una cana del jugador: "); err != nil {
-			return rodpresets.Preset{}, err
-		}
-		if !ui.scanner.Scan() {
-			if err := ui.scanner.Err(); err != nil {
-				return rodpresets.Preset{}, err
-			}
-			return rodpresets.Preset{}, fmt.Errorf("entrada finalizada")
-		}
-
-		selectedIndex, err := parsePresetChoice(ui.scanner.Text(), len(presets))
-		if err != nil {
-			message = err.Error()
-			continue
-		}
-
-		selectedPreset := presets[selectedIndex]
-		confirmed, err := ui.confirmRodPreset(title, selectedPreset)
-		if err != nil {
-			return rodpresets.Preset{}, err
-		}
-		if confirmed {
-			if _, err := io.WriteString(ui.out, clearSequence); err != nil {
-				return rodpresets.Preset{}, err
-			}
-			return selectedPreset, nil
-		}
-
-		message = "seleccion cancelada, elige otra cana"
-	}
+	return choosePreset(ui, title, presets, renderRodSelectionScreen, "Elige una cana del jugador: ", ui.confirmRodPreset, "seleccion cancelada, elige otra cana")
 }
 
 func (ui *UI) ChooseAttachmentPreset(title string, baseRod rod.State, presets []attachmentpresets.Preset) (attachmentpresets.Preset, error) {
@@ -216,41 +82,9 @@ func (ui *UI) ChooseAttachmentPreset(title string, baseRod rod.State, presets []
 		return attachmentpresets.Preset{}, fmt.Errorf("no hay presets de aditamentos disponibles")
 	}
 
-	message := ""
-	for {
-		if _, err := io.WriteString(ui.out, renderAttachmentSelectionScreen(title, presets, message)); err != nil {
-			return attachmentpresets.Preset{}, err
-		}
-		if _, err := fmt.Fprint(ui.out, "Elige un preset de aditamentos: "); err != nil {
-			return attachmentpresets.Preset{}, err
-		}
-		if !ui.scanner.Scan() {
-			if err := ui.scanner.Err(); err != nil {
-				return attachmentpresets.Preset{}, err
-			}
-			return attachmentpresets.Preset{}, fmt.Errorf("entrada finalizada")
-		}
-
-		selectedIndex, err := parsePresetChoice(ui.scanner.Text(), len(presets))
-		if err != nil {
-			message = err.Error()
-			continue
-		}
-
-		selectedPreset := presets[selectedIndex]
-		confirmed, err := ui.confirmAttachmentPreset(title, baseRod, selectedPreset)
-		if err != nil {
-			return attachmentpresets.Preset{}, err
-		}
-		if confirmed {
-			if _, err := io.WriteString(ui.out, clearSequence); err != nil {
-				return attachmentpresets.Preset{}, err
-			}
-			return selectedPreset, nil
-		}
-
-		message = "seleccion cancelada, elige otros aditamentos"
-	}
+	return choosePreset(ui, title, presets, renderAttachmentSelectionScreen, "Elige un preset de aditamentos: ", func(title string, preset attachmentpresets.Preset) (bool, error) {
+		return ui.confirmAttachmentPreset(title, baseRod, preset)
+	}, "seleccion cancelada, elige otros aditamentos")
 }
 
 func (ui *UI) ChooseMove(status presentation.StatusView, options []presentation.MoveOption) (domain.Move, error) {
@@ -330,116 +164,96 @@ func (ui *UI) ShowFishSpawn(_ string, spawn presentation.SpawnView) error {
 }
 
 func (ui *UI) confirmPlayerDeckPreset(title string, preset playerprofiles.DeckPreset) (bool, error) {
-	message := ""
-	for {
-		if _, err := io.WriteString(ui.out, renderPlayerDeckConfirmationScreen(title, preset, message)); err != nil {
-			return false, err
-		}
-		if _, err := fmt.Fprint(ui.out, "Confirmar preset del jugador? [s/n]: "); err != nil {
-			return false, err
-		}
-		if !ui.scanner.Scan() {
-			if err := ui.scanner.Err(); err != nil {
-				return false, err
-			}
-			return false, fmt.Errorf("entrada finalizada")
-		}
-
-		confirmed, err := parseConfirmation(ui.scanner.Text())
-		if err == nil {
-			return confirmed, nil
-		}
-
-		message = err.Error()
-	}
+	return confirmSelection(ui, func(message string) string {
+		return renderPlayerDeckConfirmationScreen(title, preset, message)
+	}, "Confirmar preset del jugador? [s/n]: ")
 }
 
 func (ui *UI) confirmAnglerProfile(title string, profile presentation.AnglerProfileView) (bool, error) {
-	message := ""
-	for {
-		if _, err := io.WriteString(ui.out, renderAnglerProfileConfirmationScreen(title, profile, message)); err != nil {
-			return false, err
-		}
-		if _, err := fmt.Fprint(ui.out, "Confirmar pescador? [s/n]: "); err != nil {
-			return false, err
-		}
-		if !ui.scanner.Scan() {
-			if err := ui.scanner.Err(); err != nil {
-				return false, err
-			}
-			return false, fmt.Errorf("entrada finalizada")
-		}
-
-		confirmed, err := parseConfirmation(ui.scanner.Text())
-		if err == nil {
-			return confirmed, nil
-		}
-
-		message = err.Error()
-	}
+	return confirmSelection(ui, func(message string) string {
+		return renderAnglerProfileConfirmationScreen(title, profile, message)
+	}, "Confirmar pescador? [s/n]: ")
 }
 
 func (ui *UI) confirmFishDeckPreset(title string, preset fishprofiles.FishDeckPreset) (bool, error) {
-	message := ""
-	for {
-		if _, err := io.WriteString(ui.out, renderFishDeckConfirmationScreen(title, preset, message)); err != nil {
-			return false, err
-		}
-		if _, err := fmt.Fprint(ui.out, "Confirmar preset del pez? [s/n]: "); err != nil {
-			return false, err
-		}
-		if !ui.scanner.Scan() {
-			if err := ui.scanner.Err(); err != nil {
-				return false, err
-			}
-			return false, fmt.Errorf("entrada finalizada")
-		}
-
-		confirmed, err := parseConfirmation(ui.scanner.Text())
-		if err == nil {
-			return confirmed, nil
-		}
-
-		message = err.Error()
-	}
+	return confirmSelection(ui, func(message string) string {
+		return renderFishDeckConfirmationScreen(title, preset, message)
+	}, "Confirmar preset del pez? [s/n]: ")
 }
 
 func (ui *UI) confirmRodPreset(title string, preset rodpresets.Preset) (bool, error) {
-	message := ""
-	for {
-		if _, err := io.WriteString(ui.out, renderRodConfirmationScreen(title, preset, message)); err != nil {
-			return false, err
-		}
-		if _, err := fmt.Fprint(ui.out, "Confirmar cana? [s/n]: "); err != nil {
-			return false, err
-		}
-		if !ui.scanner.Scan() {
-			if err := ui.scanner.Err(); err != nil {
-				return false, err
-			}
-			return false, fmt.Errorf("entrada finalizada")
-		}
-
-		confirmed, err := parseConfirmation(ui.scanner.Text())
-		if err == nil {
-			return confirmed, nil
-		}
-
-		message = err.Error()
-	}
+	return confirmSelection(ui, func(message string) string {
+		return renderRodConfirmationScreen(title, preset, message)
+	}, "Confirmar cana? [s/n]: ")
 }
 
 func (ui *UI) confirmAttachmentPreset(title string, baseRod rod.State, preset attachmentpresets.Preset) (bool, error) {
+	return confirmSelectionWithError(ui, func(message string) (string, error) {
+		previewLoadout, err := loadout.NewState(baseRod, preset.BuildAttachments())
+		if err != nil {
+			return "", err
+		}
+
+		return renderAttachmentConfirmationScreen(title, preset, previewLoadout, message), nil
+	}, "Confirmar aditamentos? [s/n]: ")
+}
+
+func choosePreset[T any](ui *UI, title string, options []T, render func(string, []T, string) string, prompt string, confirm func(string, T) (bool, error), cancelledMessage string) (T, error) {
+	var zero T
 	message := ""
 	for {
-		previewLoadout, err := loadout.NewState(baseRod, preset.BuildAttachments())
+		if _, err := io.WriteString(ui.out, render(title, options, message)); err != nil {
+			return zero, err
+		}
+		if _, err := fmt.Fprint(ui.out, prompt); err != nil {
+			return zero, err
+		}
+		if !ui.scanner.Scan() {
+			if err := ui.scanner.Err(); err != nil {
+				return zero, err
+			}
+			return zero, fmt.Errorf("entrada finalizada")
+		}
+
+		selectedIndex, err := parsePresetChoice(ui.scanner.Text(), len(options))
+		if err != nil {
+			message = err.Error()
+			continue
+		}
+
+		selected := options[selectedIndex]
+		confirmed, err := confirm(title, selected)
+		if err != nil {
+			return zero, err
+		}
+		if confirmed {
+			if _, err := io.WriteString(ui.out, clearSequence); err != nil {
+				return zero, err
+			}
+			return selected, nil
+		}
+
+		message = cancelledMessage
+	}
+}
+
+func confirmSelection(ui *UI, render func(string) string, prompt string) (bool, error) {
+	return confirmSelectionWithError(ui, func(message string) (string, error) {
+		return render(message), nil
+	}, prompt)
+}
+
+func confirmSelectionWithError(ui *UI, render func(string) (string, error), prompt string) (bool, error) {
+	message := ""
+	for {
+		screen, err := render(message)
 		if err != nil {
 			return false, err
 		}
-		if _, err := io.WriteString(ui.out, renderAttachmentConfirmationScreen(title, preset, previewLoadout, message)); err != nil {
+		if _, err := io.WriteString(ui.out, screen); err != nil {
 			return false, err
 		}
-		if _, err := fmt.Fprint(ui.out, "Confirmar aditamentos? [s/n]: "); err != nil {
+		if _, err := fmt.Fprint(ui.out, prompt); err != nil {
 			return false, err
 		}
 		if !ui.scanner.Scan() {

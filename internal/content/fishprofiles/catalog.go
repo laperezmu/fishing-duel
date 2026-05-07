@@ -7,21 +7,31 @@ import (
 	"pesca/internal/content/waterpools"
 )
 
+type PoolID string
+
+func (id PoolID) Validate() error {
+	if id == "" {
+		return fmt.Errorf("pool id is required")
+	}
+
+	return nil
+}
+
 type Pool struct {
-	ID          string
+	ID          PoolID
 	Name        string
 	Description string
 	Entries     []PoolEntry
 }
 
 type PoolEntry struct {
-	ProfileID string
+	ProfileID ProfileID
 	Weight    int
 }
 
 func (pool Pool) Validate() error {
 	if pool.ID == "" {
-		return fmt.Errorf("pool id is required")
+		return pool.ID.Validate()
 	}
 	if pool.Name == "" {
 		return fmt.Errorf("pool name is required")
@@ -29,7 +39,7 @@ func (pool Pool) Validate() error {
 	if len(pool.Entries) == 0 {
 		return fmt.Errorf("pool %s must reference at least one profile id", pool.ID)
 	}
-	seenProfileIDs := make(map[string]struct{}, len(pool.Entries))
+	seenProfileIDs := make(map[ProfileID]struct{}, len(pool.Entries))
 	for _, entry := range pool.Entries {
 		if entry.ProfileID == "" {
 			return fmt.Errorf("pool %s has an empty profile id reference", pool.ID)
@@ -47,8 +57,10 @@ func (pool Pool) Validate() error {
 }
 
 type Catalog struct {
-	profiles []Profile
-	pools    []Pool
+	profiles     []Profile
+	pools        []Pool
+	profileIndex map[ProfileID]Profile
+	poolIndex    map[PoolID]Pool
 }
 
 func NewCatalog(profiles []Profile, pools []Pool) (Catalog, error) {
@@ -56,8 +68,9 @@ func NewCatalog(profiles []Profile, pools []Pool) (Catalog, error) {
 		return Catalog{}, fmt.Errorf("catalog requires at least one fish profile")
 	}
 
-	seenProfileIDs := make(map[string]struct{}, len(profiles))
+	seenProfileIDs := make(map[ProfileID]struct{}, len(profiles))
 	clonedProfiles := make([]Profile, 0, len(profiles))
+	profileIndex := make(map[ProfileID]Profile, len(profiles))
 	for _, profile := range profiles {
 		if err := profile.Validate(); err != nil {
 			return Catalog{}, fmt.Errorf("profile %s: %w", profile.ID, err)
@@ -66,11 +79,14 @@ func NewCatalog(profiles []Profile, pools []Pool) (Catalog, error) {
 			return Catalog{}, fmt.Errorf("duplicated fish profile id %s", profile.ID)
 		}
 		seenProfileIDs[profile.ID] = struct{}{}
-		clonedProfiles = append(clonedProfiles, cloneProfile(profile))
+		clonedProfile := cloneProfile(profile)
+		clonedProfiles = append(clonedProfiles, clonedProfile)
+		profileIndex[profile.ID] = clonedProfile
 	}
 
-	seenPoolIDs := make(map[string]struct{}, len(pools))
+	seenPoolIDs := make(map[PoolID]struct{}, len(pools))
 	clonedPools := make([]Pool, 0, len(pools))
+	poolIndex := make(map[PoolID]Pool, len(pools))
 	for _, pool := range pools {
 		if err := pool.Validate(); err != nil {
 			return Catalog{}, err
@@ -84,10 +100,12 @@ func NewCatalog(profiles []Profile, pools []Pool) (Catalog, error) {
 			}
 		}
 		seenPoolIDs[pool.ID] = struct{}{}
-		clonedPools = append(clonedPools, clonePool(pool))
+		clonedPool := clonePool(pool)
+		clonedPools = append(clonedPools, clonedPool)
+		poolIndex[pool.ID] = clonedPool
 	}
 
-	return Catalog{profiles: clonedProfiles, pools: clonedPools}, nil
+	return Catalog{profiles: clonedProfiles, pools: clonedPools, profileIndex: profileIndex, poolIndex: poolIndex}, nil
 }
 
 func (catalog Catalog) Profiles() []Profile {
@@ -108,37 +126,42 @@ func (catalog Catalog) Pools() []Pool {
 	return pools
 }
 
-func (catalog Catalog) ResolvePool(poolID string) ([]Profile, error) {
-	for _, pool := range catalog.pools {
-		if pool.ID != poolID {
-			continue
-		}
-
-		profiles := make([]Profile, 0, resolvedPoolProfileCount(pool))
-		for _, entry := range pool.Entries {
-			profile, err := catalog.profileByID(entry.ProfileID)
-			if err != nil {
-				return nil, fmt.Errorf("resolve fish pool %s: %w", poolID, err)
-			}
-			for range entry.Weight {
-				profiles = append(profiles, cloneProfile(profile))
-			}
-		}
-
-		return profiles, nil
+func (catalog Catalog) ResolvePool(poolID PoolID) ([]Profile, error) {
+	pool, err := catalog.PoolByID(poolID)
+	if err != nil {
+		return nil, err
 	}
 
-	return nil, fmt.Errorf("unknown fish pool id %s", poolID)
+	profiles := make([]Profile, 0, resolvedPoolProfileCount(pool))
+	for _, entry := range pool.Entries {
+		profile, err := catalog.ProfileByID(entry.ProfileID)
+		if err != nil {
+			return nil, fmt.Errorf("resolve fish pool %s: %w", poolID, err)
+		}
+		for range entry.Weight {
+			profiles = append(profiles, cloneProfile(profile))
+		}
+	}
+
+	return profiles, nil
 }
 
-func (catalog Catalog) profileByID(profileID string) (Profile, error) {
-	for _, profile := range catalog.profiles {
-		if profile.ID == profileID {
-			return profile, nil
-		}
+func (catalog Catalog) ProfileByID(profileID ProfileID) (Profile, error) {
+	profile, ok := catalog.profileIndex[profileID]
+	if !ok {
+		return Profile{}, fmt.Errorf("unknown fish profile id %s", profileID)
 	}
 
-	return Profile{}, fmt.Errorf("unknown fish profile id %s", profileID)
+	return cloneProfile(profile), nil
+}
+
+func (catalog Catalog) PoolByID(poolID PoolID) (Pool, error) {
+	pool, ok := catalog.poolIndex[poolID]
+	if !ok {
+		return Pool{}, fmt.Errorf("unknown fish pool id %s", poolID)
+	}
+
+	return clonePool(pool), nil
 }
 
 func cloneProfile(profile Profile) Profile {

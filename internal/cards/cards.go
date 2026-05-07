@@ -166,13 +166,17 @@ func (effect CardEffect) appliesOnRoundDraw(context EffectContext) bool {
 }
 
 func (card FishCard) effectiveDiscardVisibility() DiscardVisibility {
-	if card.DiscardVisibility == "" {
-		return DiscardVisibilityFull
-	}
-
-	return card.DiscardVisibility
+	return NormalizeDiscardVisibility(card.DiscardVisibility)
 }
 
 func (card FishCard) EffectiveDiscardVisibility() DiscardVisibility {
 	return card.effectiveDiscardVisibility()
+}
+
+func NormalizeDiscardVisibility(visibility DiscardVisibility) DiscardVisibility {
+	if visibility == "" {
+		return DiscardVisibilityFull
+	}
+
+	return visibility
 }
