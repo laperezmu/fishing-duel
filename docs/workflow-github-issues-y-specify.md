@@ -76,6 +76,7 @@ Cada issue debe capturar:
 - Toda idea no trivial nace como GitHub Issue.
 - Se asignan milestone, labels y ID nuevo, por ejemplo `[RMF-06] ...`.
 - El estado inicial normal es `status:ready-for-spec`.
+- Para acelerar la clasificacion, se puede usar el comando interactivo `.opencode/command/github.issue.create.md`.
 
 ### 2. Curado
 
@@ -138,6 +139,11 @@ gh issue edit <numero> --remove-label "status:ready-for-spec"
 gh issue edit <numero> --milestone "Run MVP Foundation"
 gh issue list --milestone "Run MVP Foundation"
 ```
+
+## Comando interactivo del repo
+
+- `.opencode/command/github.issue.create.md` crea issues nuevas a partir de contexto libre y una breve serie de preguntas.
+- `scripts/github_issue_next_id.py` calcula el siguiente ID disponible para un prefijo de milestone.
 
 ## Primer item recomendado
 
