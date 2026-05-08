@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"pesca/internal/app"
 	"pesca/internal/content/anglerprofiles"
 	"pesca/internal/content/attachmentpresets"
 	"pesca/internal/content/fishprofiles"
@@ -68,6 +69,22 @@ func (ui *UI) ChooseFishDeckPreset(title string, presets []fishprofiles.FishDeck
 	}
 
 	return choosePreset(ui, title, presets, renderFishDeckSelectionScreen, "Elige un preset del pez: ", ui.confirmFishDeckPreset, "seleccion cancelada, elige otro preset")
+}
+
+func (ui *UI) ChooseSandboxMode(title string, modes []app.SandboxModeOption) (app.SandboxModeOption, error) {
+	if len(modes) == 0 {
+		return app.SandboxModeOption{}, fmt.Errorf("no hay modos de sandbox disponibles")
+	}
+
+	return choosePreset(ui, title, modes, renderSandboxModeSelectionScreen, "Elige un modo de sandbox: ", ui.confirmSandboxMode, "seleccion cancelada, elige otro modo")
+}
+
+func (ui *UI) ChooseSandboxScenario(title string, scenarios []app.SandboxScenario) (app.SandboxScenario, error) {
+	if len(scenarios) == 0 {
+		return app.SandboxScenario{}, fmt.Errorf("no hay escenarios de sandbox disponibles")
+	}
+
+	return choosePreset(ui, title, scenarios, renderSandboxScenarioSelectionScreen, "Elige un escenario: ", ui.confirmSandboxScenario, "seleccion cancelada, elige otro escenario")
 }
 
 func (ui *UI) ChooseRodPreset(title string, presets []rodpresets.Preset) (rodpresets.Preset, error) {
@@ -254,6 +271,18 @@ func (ui *UI) confirmFishDeckPreset(title string, preset fishprofiles.FishDeckPr
 	return confirmSelection(ui, func(message string) string {
 		return renderFishDeckConfirmationScreen(title, preset, message)
 	}, "Confirmar preset del pez? [s/n]: ")
+}
+
+func (ui *UI) confirmSandboxMode(title string, mode app.SandboxModeOption) (bool, error) {
+	return confirmSelection(ui, func(message string) string {
+		return renderSandboxModeConfirmationScreen(title, mode, message)
+	}, "Confirmar modo? [s/n]: ")
+}
+
+func (ui *UI) confirmSandboxScenario(title string, scenario app.SandboxScenario) (bool, error) {
+	return confirmSelection(ui, func(message string) string {
+		return renderSandboxScenarioConfirmationScreen(title, scenario, message)
+	}, "Confirmar escenario? [s/n]: ")
 }
 
 func (ui *UI) confirmRodPreset(title string, preset rodpresets.Preset) (bool, error) {

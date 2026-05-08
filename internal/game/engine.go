@@ -115,6 +115,7 @@ func (engine *Engine) PlayRound(playerMove domain.Move) (match.RoundResult, erro
 	}
 
 	engine.state.Round.Number++
+	beforeRoundState := engine.state
 	drawEffects := cards.OrderOwnedEffects(cards.FilterOwnedEffects(playerCard.Effects, cards.EffectContext{
 		Owner:    cards.OwnerPlayer,
 		Phase:    cards.PhaseDraw,
@@ -189,6 +190,7 @@ func (engine *Engine) PlayRound(playerMove domain.Move) (match.RoundResult, erro
 		FishCard:        fishCard,
 		Outcome:         roundOutcome,
 		ResolvedEffects: append(buildResolvedEffectStates(orderedDrawOwned), buildResolvedEffectStates(orderedOutcomeOwned)...),
+		Trace:           match.NewResolutionTraceSnapshot(beforeRoundState, engine.state, append(buildResolvedEffectStates(orderedDrawOwned), buildResolvedEffectStates(orderedOutcomeOwned)...)),
 		Status:          match.NewStatusSnapshot(engine.state),
 		Encounter:       match.NewEncounterEventSnapshot(engine.state.Encounter),
 	}, nil

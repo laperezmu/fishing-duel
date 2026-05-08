@@ -2,6 +2,7 @@ package cli
 
 import (
 	"fmt"
+	"pesca/internal/app"
 	"pesca/internal/content/anglerprofiles"
 	"pesca/internal/content/attachmentpresets"
 	"pesca/internal/content/fishprofiles"
@@ -165,6 +166,30 @@ func renderAnglerProfileSelectionScreen(title string, profiles []anglerprofiles.
 	return clearSequence + strings.Join(sections, "\n\n") + "\n\n"
 }
 
+func renderSandboxModeSelectionScreen(title string, modes []app.SandboxModeOption, message string) string {
+	sections := []string{
+		renderHeader(title),
+		renderSandboxModeSelectionSection(modes),
+	}
+	if message != "" {
+		sections = append(sections, accent("Aviso")+"\n  "+message)
+	}
+
+	return clearSequence + strings.Join(sections, "\n\n") + "\n\n"
+}
+
+func renderSandboxScenarioSelectionScreen(title string, scenarios []app.SandboxScenario, message string) string {
+	sections := []string{
+		renderHeader(title),
+		renderSandboxScenarioSelectionSection(scenarios),
+	}
+	if message != "" {
+		sections = append(sections, accent("Aviso")+"\n  "+message)
+	}
+
+	return clearSequence + strings.Join(sections, "\n\n") + "\n\n"
+}
+
 func renderFishDeckConfirmationScreen(title string, preset fishprofiles.FishDeckPreset, message string) string {
 	sections := []string{
 		renderHeader(title),
@@ -229,6 +254,30 @@ func renderAnglerProfileConfirmationScreen(title string, profile presentation.An
 	sections := []string{
 		renderHeader(title),
 		renderAnglerProfileConfirmationSection(profile),
+	}
+	if message != "" {
+		sections = append(sections, accent("Aviso")+"\n  "+message)
+	}
+
+	return clearSequence + strings.Join(sections, "\n\n") + "\n\n"
+}
+
+func renderSandboxModeConfirmationScreen(title string, mode app.SandboxModeOption, message string) string {
+	sections := []string{
+		renderHeader(title),
+		renderSandboxModeConfirmationSection(mode),
+	}
+	if message != "" {
+		sections = append(sections, accent("Aviso")+"\n  "+message)
+	}
+
+	return clearSequence + strings.Join(sections, "\n\n") + "\n\n"
+}
+
+func renderSandboxScenarioConfirmationScreen(title string, scenario app.SandboxScenario, message string) string {
+	sections := []string{
+		renderHeader(title),
+		renderSandboxScenarioConfirmationSection(scenario),
 	}
 	if message != "" {
 		sections = append(sections, accent("Aviso")+"\n  "+message)
@@ -374,6 +423,9 @@ func renderLastRoundSection(view presentation.RoundView) string {
 	}
 	if len(view.Resolved) > 0 {
 		lines = append(lines, "  Efectos   : "+strings.Join(view.Resolved, " -> "))
+	}
+	if len(view.TraceSummary) > 0 {
+		lines = append(lines, "  Traza     : "+strings.Join(view.TraceSummary, " | "))
 	}
 
 	return strings.Join(lines, "\n")
@@ -595,6 +647,38 @@ func renderAnglerProfileSelectionSection(profiles []anglerprofiles.Profile) stri
 	return strings.Join(lines, "\n")
 }
 
+func renderSandboxModeSelectionSection(modes []app.SandboxModeOption) string {
+	lines := []string{
+		accent("Modo del sandbox"),
+		"  Elige como quieres preparar el encounter sandbox.",
+	}
+	for index, mode := range modes {
+		lines = append(lines,
+			fmt.Sprintf("  %d) %s", index+1, mode.Name),
+			fmt.Sprintf("     %s", mode.Description),
+		)
+	}
+	lines = append(lines, "  Escribe el numero del modo para seleccionarlo.")
+
+	return strings.Join(lines, "\n")
+}
+
+func renderSandboxScenarioSelectionSection(scenarios []app.SandboxScenario) string {
+	lines := []string{
+		accent("Escenarios"),
+		"  Elige un replay de QA con seed fija.",
+	}
+	for index, scenario := range scenarios {
+		lines = append(lines,
+			fmt.Sprintf("  %d) %s", index+1, scenario.Name),
+			fmt.Sprintf("     %s", scenario.Description),
+		)
+	}
+	lines = append(lines, "  Escribe el numero del escenario para seleccionarlo.")
+
+	return strings.Join(lines, "\n")
+}
+
 func renderWaterContextConfirmationSection(preset watercontexts.Preset) string {
 	lines := []string{
 		accent("Confirmar situacion de agua"),
@@ -695,6 +779,30 @@ func renderAnglerProfileConfirmationSection(profile presentation.AnglerProfileVi
 	return strings.Join(lines, "\n")
 }
 
+func renderSandboxModeConfirmationSection(mode app.SandboxModeOption) string {
+	return strings.Join([]string{
+		accent("Confirmar modo"),
+		fmt.Sprintf("  Modo        : %s", mode.Name),
+		fmt.Sprintf("  Resumen     : %s", mode.Description),
+	}, "\n")
+}
+
+func renderSandboxScenarioConfirmationSection(scenario app.SandboxScenario) string {
+	seedLabel := "aleatoria"
+	if scenario.Seed != nil {
+		seedLabel = fmt.Sprintf("%d", *scenario.Seed)
+	}
+	return strings.Join([]string{
+		accent("Confirmar escenario"),
+		fmt.Sprintf("  Nombre      : %s", scenario.Name),
+		fmt.Sprintf("  ID          : %s", scenario.ID),
+		fmt.Sprintf("  Resumen     : %s", scenario.Description),
+		fmt.Sprintf("  Seed        : %s", seedLabel),
+		fmt.Sprintf("  Preset pez  : %s", scenario.FishPresetID),
+		fmt.Sprintf("  Agua        : %s", scenario.WaterContextID),
+	}, "\n")
+}
+
 func renderFishDeckOrder(preset fishprofiles.FishDeckPreset) string {
 	if preset.Shuffle {
 		return "barajada"
@@ -705,7 +813,7 @@ func renderFishDeckOrder(preset fishprofiles.FishDeckPreset) string {
 
 func renderCastScreen(view presentation.CastView, message string) string {
 	sections := []string{
-		renderHeader("Pesca: duelo contra el pez"),
+		renderHeader(view.Title),
 		renderCastSection(view),
 	}
 	if message != "" {
@@ -717,7 +825,7 @@ func renderCastScreen(view presentation.CastView, message string) string {
 
 func renderSplashScreen(view presentation.SplashView, position int, message string) string {
 	sections := []string{
-		renderHeader("Pesca: duelo contra el pez"),
+		renderHeader(view.Title),
 		renderSplashSection(view, position),
 	}
 	if message != "" {

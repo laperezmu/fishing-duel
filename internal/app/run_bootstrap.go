@@ -44,7 +44,7 @@ func BootstrapEncounterForRun(title string, rng Randomizer, openingUI OpeningRun
 	if err != nil {
 		return EncounterBootstrapRuntime{}, err
 	}
-	engine, err := buildEncounterEngine(rng, playerDeckPreset, playerLoadout, opening, spawn)
+	engine, err := buildEncounterEngine(rng, playerDeckPreset, playerLoadout, opening, spawn, SandboxStateOverrides{})
 	if err != nil {
 		return EncounterBootstrapRuntime{}, err
 	}

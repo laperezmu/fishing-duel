@@ -52,16 +52,16 @@ Como tester o balanceador, quiero ver con claridad que triggers se activaron, qu
 
 ### User Story 3 - Reproducir escenarios y ejecutar pruebas de QA con baja friccion (Priority: P3)
 
-Como QA o desarrollador, quiero lanzar escenarios guardados o configuraciones no interactivas para repetir bugs, smoke tests y pruebas de regresion de manera rapida y compartible.
+Como QA o desarrollador, quiero lanzar escenarios guardados con seed fija para repetir bugs, smoke tests y pruebas de regresion de manera rapida y compartible.
 
 **Why this priority**: El sandbox gana mucho valor cuando puede reutilizarse fuera del flujo manual. Esto habilita pruebas repetibles, colaboracion y validacion sistematica de casos complejos.
 
-**Independent Test**: Puede probarse ejecutando un escenario guardado o una configuracion no interactiva y verificando que el sandbox levanta el encounter esperado y produce una salida reproducible y util para inspeccion.
+**Independent Test**: Puede probarse ejecutando un escenario guardado con seed fija y verificando que el sandbox levanta el encounter esperado y produce una salida reproducible y util para inspeccion.
 
 **Acceptance Scenarios**:
 
 1. **Given** un escenario predefinido de QA, **When** el usuario lo ejecuta, **Then** el sandbox aplica la configuracion completa sin requerir seleccion manual adicional.
-2. **Given** una configuracion no interactiva compartida entre miembros del equipo, **When** dos usuarios la ejecutan con la misma seed, **Then** ambos obtienen el mismo comportamiento observable del encounter.
+2. **Given** un escenario compartido entre miembros del equipo, **When** dos usuarios lo ejecutan con la misma seed, **Then** ambos obtienen el mismo comportamiento observable del encounter.
 3. **Given** una prueba de regresion sobre triggers, splash o agotamiento, **When** el usuario exporta o consulta la salida del sandbox, **Then** dispone de evidencia suficiente para comparar resultados entre ejecuciones.
 
 ---
@@ -72,7 +72,7 @@ Como QA o desarrollador, quiero lanzar escenarios guardados o configuraciones no
 - Como responde el sandbox cuando una override manual contradice un valor derivado del preset base.
 - Como se comporta la vista de depuracion cuando una ronda no activa ningun efecto.
 - Que salida se genera cuando un escenario guardado referencia un preset inexistente o retirado.
-- Como se evita que el modo no interactivo dependa de pasos de UI ocultos o selecciones intermedias.
+- Como se evita que la ejecucion de escenarios reutilizables dependa de pasos de UI ocultos o selecciones intermedias.
 - Como se mantiene legibilidad cuando el encounter produce multiples efectos, reshuffle, splash y cierre de partida en una misma secuencia.
 
 ## Requirements *(mandatory)*
@@ -86,8 +86,8 @@ Como QA o desarrollador, quiero lanzar escenarios guardados o configuraciones no
 - **FR-004**: El sandbox MUST permitir fijar una seed reproducible para repetir la misma configuracion derivada y el mismo comportamiento observable bajo las mismas entradas.
 - **FR-005**: El sandbox MUST permitir definir o sobrescribir al menos el resultado de apertura o cast band, la distancia inicial y la profundidad inicial del encounter.
 - **FR-006**: El sandbox MUST permitir controlar si las barajas relevantes usan orden fijo o barajado cuando el escenario de prueba lo requiera.
-- **FR-007**: El sandbox MUST permitir configurar o sobrescribir estados de prueba relevantes, incluyendo al menos thresholds del round, recycle count, exhaustion state, visibilidad de descarte y estado previo al splash.
-- **FR-007-MVP**: Como subconjunto MVP de FR-007, el sandbox MUST permitir sobrescribir: (a) distancia inicial y profundidad inicial del encounter, (b) capture distance base del Config, y (c) recycle count del deck. Otros overrides de estado (exhaustion capture distance, visibilidad de descarte, estado previo a splash) quedan fuera del alcance inicial y pueden añadirse en iteraciones futuras.
+- **FR-007**: El sandbox MUST definir un contrato de overrides de estado de prueba para encounter y deck que permita crecer de forma controlada sin mezclar reglas de runtime con presentation o CLI.
+- **FR-007-MVP**: Como subconjunto MVP de FR-007, el sandbox MUST permitir sobrescribir solo: (a) distancia inicial del encounter, (b) profundidad inicial del encounter, (c) `CaptureDistance` base del `encounter.Config`, y (d) recycle count del deck. `ExhaustionCaptureDistance` se hereda del `encounter.Config` resuelto y no se sobrescribe en esta iteracion. Overrides de exhaustion state, visibilidad de descarte y estado previo a splash quedan diferidos.
 - **FR-007a**: El sandbox MUST permitir que la seleccion manual de cartas concretas conviva con presets base y overrides, indicando claramente cuando una carta fue tomada del preset, reemplazada manualmente o definida por escenario.
 - **FR-008**: El sandbox MUST validar las combinaciones seleccionadas y comunicar de forma clara cuando una configuracion manual sea incompatible o invalida.
 - **FR-009**: El sandbox MUST mostrar la traza de resolucion de cada ronda con triggers activados, efectos resueltos, prioridad y desempates aplicados.
@@ -95,8 +95,8 @@ Como QA o desarrollador, quiero lanzar escenarios guardados o configuraciones no
 - **FR-011**: La salida mas detallada MUST mostrar suficiente contexto para comparar estado antes y despues de la resolucion sin trasladar reglas de negocio a la UI.
 - **FR-012**: El sandbox MUST permitir ejecutar escenarios guardados o configuraciones reutilizables para QA y regresion.
 - **FR-012a**: Los escenarios guardados MUST poder fijar cartas concretas del jugador y del pez cuando la prueba requiera validar triggers, efectos o combinaciones puntuales.
-- **FR-013**: El sandbox MUST ofrecer al menos un camino no interactivo o semi-reproducible para lanzar una configuracion completa sin recorrer prompts manuales.
-- **FR-013-MVP**: Como subconjunto MVP de FR-013, el sandbox DEBE soportar escenarios reutilizables con seed fija (semi-reproducble) como camino baseline, permitiendo que un QA ejecute la misma configuracion多次 y obtenga el mismo resultado. El modo no interactivo (sin prompts) puede diferirse a una iteracion futura.
+- **FR-013**: El sandbox MUST ofrecer un camino reproducible basado en escenarios reutilizables con seed fija para lanzar una configuracion completa sin reconfigurar manualmente cada ejecucion.
+- **FR-013-MVP**: Como subconjunto MVP de FR-013, el sandbox MUST soportar escenarios reutilizables con seed fija como baseline semi-reproducible, permitiendo que un QA ejecute la misma configuracion varias veces y obtenga el mismo resultado observable. El modo totalmente no interactivo (sin prompts) puede diferirse a una iteracion futura.
 - **FR-014**: El sandbox MUST permitir exportar o presentar una evidencia util de ejecucion para debugging o comparacion, como resumen textual estructurado o snapshot estructurado.
 - **FR-015**: El sistema MUST mantener la separacion actual de responsabilidades entre runtime, contenido, presentacion y CLI.
 - **FR-016**: El sistema MUST mantener `fishing-run` como flujo jugable diferenciado del sandbox y evitar mezclar sus objetivos de uso.
@@ -110,7 +110,7 @@ Como QA o desarrollador, quiero lanzar escenarios guardados o configuraciones no
 - **Sandbox Override**: Valor manual que reemplaza o ajusta parte del estado derivado de un preset o escenario base.
 - **Sandbox Scenario**: Configuracion guardada o reutilizable que describe una prueba reproducible del sandbox.
 - **Resolution Trace**: Evidencia observable de una ronda que lista triggers activados, efectos resueltos, prioridades, desempates y resultados.
-- **Sandbox Mode**: Forma de operar el sandbox, como guiado, manual o no interactivo.
+- **Sandbox Mode**: Forma de operar el sandbox, como guiado, manual o replay de escenario reutilizable.
 
 ## Success Criteria *(mandatory)*
 
@@ -119,7 +119,7 @@ Como QA o desarrollador, quiero lanzar escenarios guardados o configuraciones no
 - **SC-001**: Un usuario puede configurar manualmente un encounter completo con jugador, pez, contexto y seed en menos de 3 minutos sin editar archivos ni codigo.
 - **SC-002**: El 100% de los escenarios iniciales de QA definidos para la feature pueden ejecutarse de forma reproducible al menos dos veces con el mismo resultado observable.
 - **SC-003**: Un tester puede identificar el orden de resolucion y el desempate aplicado en el 100% de 5 escenarios representativos sin revisar el codigo fuente.
-- **SC-004**: El equipo puede lanzar una configuracion no interactiva o semi-reproducible compartida entre dos personas y obtener el mismo comportamiento observable en ambos casos.
+- **SC-004**: El equipo puede lanzar un escenario reutilizable con seed fija compartido entre dos personas y obtener el mismo comportamiento observable en ambos casos.
 
 ## Assumptions
 

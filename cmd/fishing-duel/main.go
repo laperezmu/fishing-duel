@@ -9,19 +9,23 @@ import (
 )
 
 func main() {
+	title := "Pesca: sandbox de encounters"
 	ui := cli.NewUI(os.Stdin, os.Stdout)
-	engine, err := app.BootstrapEncounter("Pesca: duelo contra el pez", app.DefaultRandomizer(), ui)
+	catalog := presentation.DefaultCatalog()
+	catalog.Title = title
+	presenter := presentation.NewPresenter(catalog)
+	sandbox, err := app.NewSandboxSession(title, app.DefaultRandomizer(), ui, presenter)
 	if err != nil {
-		exitWithError("error preparando encuentro", err)
+		exitWithError("error inicializando sandbox", err)
 	}
-
-	presenter := presentation.NewPresenter(presentation.DefaultCatalog())
-	session, err := app.NewSession(engine, ui, presenter)
-	if err != nil {
-		exitWithError("error inicializando partida", err)
+	if len(os.Args) > 2 && os.Args[1] == "--scenario" {
+		if err := sandbox.RunScenarioByID(os.Args[2]); err != nil {
+			exitWithError("error ejecutando escenario", err)
+		}
+		return
 	}
-	if err := session.Run(); err != nil {
-		exitWithError("error ejecutando partida", err)
+	if err := sandbox.Run(); err != nil {
+		exitWithError("error ejecutando sandbox", err)
 	}
 }
 

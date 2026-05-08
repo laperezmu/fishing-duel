@@ -130,8 +130,8 @@ func (r *defaultNodeRenderer) ShowSummary(title string, state run.State) error {
 
 type noopLoopCallbacks struct{}
 
-func (c *noopLoopCallbacks) OnNodeStart(node run.NodeState, state *run.State) error { return nil }
-func (c *noopLoopCallbacks) OnNodeComplete(node run.NodeState, result run.EncounterResult, state *run.State) error {
+func (c *noopLoopCallbacks) OnNodeStart(_ run.NodeState, _ *run.State) error { return nil }
+func (c *noopLoopCallbacks) OnNodeComplete(_ run.NodeState, _ run.EncounterResult, _ *run.State) error {
 	return nil
 }
-func (c *noopLoopCallbacks) OnRunComplete(state run.State) error { return nil }
+func (c *noopLoopCallbacks) OnRunComplete(_ run.State) error { return nil }

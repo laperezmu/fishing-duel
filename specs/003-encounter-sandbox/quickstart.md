@@ -50,7 +50,7 @@ Verificar:
 1. El usuario puede elegir preset de pez manualmente.
 2. El usuario puede fijar cartas concretas del jugador y del pez.
 3. El usuario puede fijar seed y reproducir el mismo comportamiento observable.
-4. Los overrides de apertura o estado soportados se reflejan sin romper el runtime.
+4. Los overrides MVP soportados (distancia inicial, profundidad inicial, `CaptureDistance` y recycle count) se reflejan sin romper el runtime.
 
 ### 3. Compatibilidad de run
 

@@ -149,6 +149,11 @@ func TestPresenterRound(t *testing.T) {
 			Type:     cards.EffectTypeLegacyCaptureWindow,
 			Priority: 60,
 		}},
+		Trace: match.NewResolutionTraceSnapshot(match.State{Encounter: encounter.State{Distance: 3, Depth: 2, Config: encounter.DefaultConfig()}}, match.State{Encounter: encounterState}, []match.ResolvedEffectState{{
+			Owner:    cards.OwnerFish,
+			Type:     cards.EffectTypeLegacyCaptureWindow,
+			Priority: 60,
+		}}),
 		Status:    match.NewStatusSnapshot(match.State{Encounter: encounterState}),
 		Encounter: match.EncounterEventSnapshot{LastEvent: encounterState.LastEvent},
 	}))
@@ -160,6 +165,7 @@ func TestPresenterRound(t *testing.T) {
 	assert.Equal(t, "chapotea: sigue enganchado", round.EventLabel)
 	require.Len(t, round.Resolved, 1)
 	assert.Equal(t, "pez | ventana captura | p60", round.Resolved[0])
+	assert.Contains(t, round.TraceSummary[0], "antes dist")
 }
 
 func TestPresenterSummary(t *testing.T) {

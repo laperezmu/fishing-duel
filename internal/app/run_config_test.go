@@ -2,13 +2,14 @@ package app
 
 import (
 	"errors"
+	"testing"
+
 	"pesca/internal/content/fishprofiles"
 	"pesca/internal/content/playerprofiles"
 	"pesca/internal/player/loadout"
 	"pesca/internal/player/rod"
 	"pesca/internal/presentation"
 	"pesca/internal/run"
-	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -108,7 +109,7 @@ func TestRunSessionSetLoopConfigAllowsInjection(t *testing.T) {
 	assert.Nil(t, session.loopConfig)
 }
 
-func TestMockEncounterHandlerSignature(t *testing.T) {
+func TestMockEncounterHandlerSignature(_ *testing.T) {
 	_ = errors.New
 	_ = fishprofiles.Spawn{}
 }

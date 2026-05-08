@@ -111,6 +111,8 @@ func (p Presenter) Status(snapshot match.StatusSnapshot) StatusView {
 func (p Presenter) Round(snapshot match.RoundSnapshot) RoundView {
 	return RoundView{
 		Status:       p.Status(snapshot.Status),
+		BeforeStatus: p.Status(snapshot.Trace.Before),
+		AfterStatus:  p.Status(snapshot.Trace.After),
 		PlayerMove:   snapshot.PlayerMove,
 		FishMove:     snapshot.FishMove,
 		PlayerLabel:  p.playerMoveLabel(snapshot.PlayerMove),
@@ -119,6 +121,7 @@ func (p Presenter) Round(snapshot match.RoundSnapshot) RoundView {
 		OutcomeLabel: p.roundOutcomeLabel(snapshot.Outcome),
 		EventLabel:   p.eventLabel(snapshot.Encounter.LastEvent),
 		Resolved:     p.resolvedEffectLabels(snapshot.ResolvedEffects),
+		TraceSummary: p.traceSummary(snapshot.Trace),
 	}
 }
 
@@ -158,6 +161,7 @@ func (p Presenter) Spawn(spawn fishprofiles.Spawn) SpawnView {
 
 func (p Presenter) Cast(context encounter.WaterContext, position, totalSlots, sectionWidth int) CastView {
 	return CastView{
+		Title:        p.catalog.Title,
 		WaterLabel:   context.Name,
 		Position:     position,
 		TotalSlots:   totalSlots,
@@ -167,6 +171,7 @@ func (p Presenter) Cast(context encounter.WaterContext, position, totalSlots, se
 
 func (p Presenter) Splash(snapshot match.EncounterEventSnapshot, successRewardDistance int) SplashView {
 	view := SplashView{
+		Title:                 p.catalog.Title,
 		EventLabel:            p.eventLabel(snapshot.LastEvent),
 		SuccessRewardDistance: successRewardDistance,
 		TotalSlots:            12,
@@ -365,6 +370,18 @@ func (p Presenter) playerCardHint(moveState match.MoveResourceSnapshot) string {
 	}
 
 	return strings.Join(parts, " | ")
+}
+
+func (p Presenter) traceSummary(trace match.ResolutionTraceSnapshot) []string {
+	if trace.Before.RoundNumber == 0 && trace.After.RoundNumber == 0 {
+		return nil
+	}
+
+	return []string{
+		fmt.Sprintf("antes dist %d prof %d", trace.Before.Track.Distance, trace.Before.Track.Depth),
+		fmt.Sprintf("despues dist %d prof %d", trace.After.Track.Distance, trace.After.Track.Depth),
+		fmt.Sprintf("umbral capt %d -> %d", trace.Before.Track.CaptureDistance, trace.After.Track.CaptureDistance),
+	}
 }
 
 func effectImpactParts(effect cards.CardEffect) []string {

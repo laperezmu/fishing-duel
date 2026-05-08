@@ -72,6 +72,89 @@ func TestBootstrapEncounterWithConfigUsesClosedFishPool(t *testing.T) {
 	ui.AssertExpectations(t)
 }
 
+func TestBootstrapEncounterWithConfigUsesDirectFishPreset(t *testing.T) {
+	ui := &bootstrapSpawnUI{}
+	rng := app.NewSeededRandom(7)
+
+	deckPreset := samplePlayerDeckPreset()
+	rodPreset := sampleRodPreset()
+	attachmentPreset := sampleAttachmentPreset()
+	waterPreset := sampleWaterContextPreset()
+
+	ui.On("ChoosePlayerDeckPreset", "Pesca", mock.Anything).Return(deckPreset, nil).Once()
+	ui.On("ChooseRodPreset", "Pesca", mock.Anything).Return(rodPreset, nil).Once()
+	ui.On("ChooseAttachmentPreset", "Pesca", mock.Anything, mock.Anything).Return(attachmentPreset, nil).Once()
+	ui.On("ChooseWaterContext", "Pesca", mock.Anything).Return(waterPreset, nil).Once()
+	ui.On("ResolveCast", "Pesca", mock.Anything, mock.Anything).Return(encounter.CastResult{Band: encounter.CastBandShort}, nil).Once()
+	ui.On("ShowEncounterOpening", "Pesca", mock.Anything).Return(nil).Once()
+	ui.On("ShowFishSpawn", "Pesca", mock.MatchedBy(func(spawn presentation.SpawnView) bool {
+		return spawn.ProfileLabel == "Clasico"
+	})).Return(nil).Once()
+
+	engine, err := app.BootstrapEncounterWithConfig("Pesca", rng, ui, app.EncounterBootstrapConfig{FishPresetID: fishprofiles.ProfileID("classic")})
+
+	require.NoError(t, err)
+	require.NotNil(t, engine)
+	ui.AssertExpectations(t)
+}
+
+func TestBootstrapEncounterWithConfigUsesPresetIDsWithoutSelectionPrompts(t *testing.T) {
+	ui := &bootstrapSpawnUI{}
+	rng := app.NewSeededRandom(7)
+
+	ui.On("ResolveCast", "Pesca", mock.Anything, mock.Anything).Return(encounter.CastResult{Band: encounter.CastBandShort}, nil).Once()
+	ui.On("ShowEncounterOpening", "Pesca", mock.Anything).Return(nil).Once()
+	ui.On("ShowFishSpawn", "Pesca", mock.Anything).Return(nil).Once()
+
+	engine, err := app.BootstrapEncounterWithConfig("Pesca", rng, ui, app.EncounterBootstrapConfig{
+		PlayerDeckPresetID: samplePlayerDeckPreset().ID,
+		RodPresetID:        sampleRodPreset().ID,
+		AttachmentPresetID: sampleAttachmentPreset().ID,
+		WaterContextID:     sampleWaterContextPreset().ID,
+		FishPresetID:       fishprofiles.ProfileID("classic"),
+	})
+
+	require.NoError(t, err)
+	require.NotNil(t, engine)
+	ui.AssertExpectations(t)
+}
+
+func TestBootstrapEncounterWithConfigAppliesStateOverrides(t *testing.T) {
+	ui := &bootstrapSpawnUI{}
+	rng := app.NewSeededRandom(7)
+
+	initialDistance := 2
+	initialDepth := 0
+	captureDistance := 1
+	recycleCount := 3
+
+	ui.On("ResolveCast", "Pesca", mock.Anything, mock.Anything).Return(encounter.CastResult{Band: encounter.CastBandShort}, nil).Once()
+	ui.On("ShowEncounterOpening", "Pesca", mock.Anything).Return(nil).Once()
+	ui.On("ShowFishSpawn", "Pesca", mock.Anything).Return(nil).Once()
+
+	engine, err := app.BootstrapEncounterWithConfig("Pesca", rng, ui, app.EncounterBootstrapConfig{
+		PlayerDeckPresetID: samplePlayerDeckPreset().ID,
+		RodPresetID:        sampleRodPreset().ID,
+		AttachmentPresetID: sampleAttachmentPreset().ID,
+		WaterContextID:     sampleWaterContextPreset().ID,
+		FishPresetID:       fishprofiles.ProfileID("classic"),
+		StateOverrides: app.SandboxStateOverrides{
+			InitialDistance: &initialDistance,
+			InitialDepth:    &initialDepth,
+			CaptureDistance: &captureDistance,
+			RecycleCount:    &recycleCount,
+		},
+	})
+
+	require.NoError(t, err)
+	state := engine.State()
+	assert.Equal(t, 2, state.Encounter.Distance)
+	assert.Equal(t, 0, state.Encounter.Depth)
+	assert.Equal(t, 1, state.Encounter.Config.CaptureDistance)
+	assert.Equal(t, 3, state.Deck.RecycleCount)
+	ui.AssertExpectations(t)
+}
+
 func TestBootstrapEncounterWithConfigReturnsPoolErrors(t *testing.T) {
 	ui := &bootstrapSpawnUI{}
 	rng := app.NewSeededRandom(7)

@@ -13,17 +13,17 @@
 
 ## Phase 1: Setup
 
-- [ ] T001 Review `specs/003-encounter-sandbox/spec.md`, `specs/003-encounter-sandbox/plan.md`, `specs/003-encounter-sandbox/research.md`, and current sandbox-facing packages under `cmd/` and `internal/`
-- [ ] T002 Review current encounter bootstrap seams in `internal/app/bootstrap.go`, `internal/app/opening.go`, `internal/app/spawn.go`, `cmd/fishing-duel/main.go`, and `cmd/fishing-run/main.go`
-- [ ] T002a [P] Verify baseline coverage on packages that will be modified, record current percentages in `specs/003-encounter-sandbox/checklists/coverage-baseline.md`
+- [X] T001 Review `specs/003-encounter-sandbox/spec.md`, `specs/003-encounter-sandbox/plan.md`, `specs/003-encounter-sandbox/research.md`, and current sandbox-facing packages under `cmd/` and `internal/`
+- [X] T002 Review current encounter bootstrap seams in `internal/app/bootstrap.go`, `internal/app/opening.go`, `internal/app/spawn.go`, `cmd/fishing-duel/main.go`, and `cmd/fishing-run/main.go`
+- [X] T002a [P] Verify baseline coverage on packages that will be modified, record current percentages in `specs/003-encounter-sandbox/checklists/coverage-baseline.md`
 
 ---
 
 ## Phase 2: Foundations
 
-- [ ] T003 Define shared sandbox configuration, scenario, override, and card-selection contracts in `internal/app` and `internal/match` with minimal UI-agnostic supporting types
-- [ ] T004 [P] Add or update preset lookup helpers, fixture data, and scenario seed support in `internal/content/playerprofiles`, `internal/content/fishprofiles`, and `internal/content/watercontexts`
-- [ ] T005 [P] Add or update baseline tests that guard sandbox contracts, run isolation, and coverage-sensitive seams in `internal/app/*_test.go`, `internal/content/*/*_test.go`, and `internal/match/*_test.go`
+- [X] T003 Define shared sandbox configuration, scenario, override, and card-selection contracts in `internal/app` and `internal/match` with minimal UI-agnostic supporting types
+- [X] T004 [P] Add or update preset lookup helpers, fixture data, and scenario seed support in `internal/content/playerprofiles`, `internal/content/fishprofiles`, and `internal/content/watercontexts`
+- [X] T005 [P] Add or update baseline tests that guard sandbox contracts, run isolation, and coverage-sensitive seams in `internal/app/*_test.go`, `internal/content/*/*_test.go`, and `internal/match/*_test.go`
 
 **Checkpoint**: shared foundations are ready and story work can proceed safely
 
@@ -35,10 +35,11 @@
 
 **Independent Test**: Iniciar el sandbox, recorrer modo guiado y modo manual, seleccionar preset de jugador, preset de pez, cartas concretas, cana, aditamentos y contexto, y verificar que el encounter arranca con esa configuracion exacta.
 
-- [ ] T006 [P] [US1] Add focused tests for sandbox setup resolution, seed reproducibility, and manual fish/card selection in `internal/app/bootstrap_test.go`, `internal/app/opening_test.go`, `internal/app/spawn_test.go`, and `internal/content/*/*_test.go`
-- [ ] T007 [P] [US1] Implement sandbox configuration and setup resolution flow in `internal/app/bootstrap.go`, `internal/app/opening.go`, `internal/app/spawn.go`, and new supporting files under `internal/app`
-- [ ] T008 [US1] Implement manual preset and card-selection support in `internal/content/playerprofiles`, `internal/content/fishprofiles`, and any supporting files under `internal/content/watercontexts`
-- [ ] T009 [US1] Update CLI sandbox setup prompts and command framing in `cmd/fishing-duel/main.go`, `internal/cli/ui.go`, and related CLI setup files under `internal/cli`
+- [X] T006 [P] [US1] Add focused tests for sandbox setup resolution, seed reproducibility, and manual fish/card selection in `internal/app/bootstrap_test.go`, `internal/app/opening_test.go`, `internal/app/spawn_test.go`, and `internal/content/*/*_test.go`
+- [X] T007 [P] [US1] Implement sandbox configuration and setup resolution flow, including MVP state overrides for initial distance, initial depth, `CaptureDistance`, opening result, and recycle count, in `internal/app/bootstrap.go`, `internal/app/opening.go`, `internal/app/spawn.go`, and new supporting files under `internal/app`
+- [X] T008 [US1] Implement manual preset and card-selection support with stable `card_ref` lookup and explicit ambiguity errors in `internal/content/playerprofiles`, `internal/content/fishprofiles`, and any supporting files under `internal/content/watercontexts`
+- [X] T009 [US1] Update CLI sandbox setup prompts and command framing in `cmd/fishing-duel/main.go`, `internal/cli/ui.go`, and related CLI setup files under `internal/cli`
+- [X] T009a [US0] Update `fishing-duel` help text, headings, and prompt copy to frame the command as an encounter sandbox without renaming the binary
 
 **Checkpoint**: User Story 1 works independently
 
@@ -50,10 +51,10 @@
 
 **Independent Test**: Ejecutar una ronda con efectos simultaneos y comprobar en la salida del sandbox que la traza de runtime muestra activaciones, orden, desempates y estado derivado de forma consistente con el engine.
 
-- [ ] T010 [P] [US2] Add focused tests for detailed traces, snapshot enrichment, and debug-mode presentation in `internal/game/*_test.go`, `internal/match/*_test.go`, `internal/presentation/*_test.go`, and `internal/cli/*_test.go`
-- [ ] T011 [P] [US2] Enrich runtime trace and sandbox-oriented snapshots with BEFORE and AFTER state snapshots in `internal/game`, `internal/match`, `internal/encounter`, and `internal/progression` only where strictly required by the feature
-- [ ] T011a [P] [US2] Ensure trace includes trigger activations, effect resolution order, priority ties, tie-breakers, and explicit before/after state for debugging
-- [ ] T012 [US2] Integrate sandbox output modes and trace rendering in `internal/presentation/presenter.go`, `internal/presentation/views.go`, `internal/cli/render.go`, and related CLI flow files under `internal/cli`
+- [X] T010 [P] [US2] Add focused tests for detailed traces, snapshot enrichment, and debug-mode presentation in `internal/game/*_test.go`, `internal/match/*_test.go`, `internal/presentation/*_test.go`, and `internal/cli/*_test.go`
+- [X] T011 [P] [US2] Enrich runtime trace and sandbox-oriented snapshots with BEFORE and AFTER state snapshots in `internal/game`, `internal/match`, `internal/encounter`, and `internal/progression` only where strictly required by the feature
+- [X] T011a [P] [US2] Ensure trace includes trigger activations, effect resolution order, priority ties, tie-breakers, and explicit before/after state for debugging
+- [X] T012 [US2] Integrate sandbox output modes and trace rendering in `internal/presentation/presenter.go`, `internal/presentation/views.go`, `internal/cli/render.go`, and related CLI flow files under `internal/cli`
 
 **Checkpoint**: User Stories 1 and 2 both work independently
 
@@ -61,14 +62,13 @@
 
 ## Phase 5: User Story 3 - Reproducir escenarios y ejecutar pruebas de QA con baja friccion (Priority: P3)
 
-**Goal**: Permitir ejecutar escenarios guardados y configuraciones no interactivas o semi-reproducibles para QA y regresion, manteniendo aislado el flujo de `fishing-run`.
+**Goal**: Permitir ejecutar escenarios guardados con seed fija como camino semi-reproducible de QA y regresion, manteniendo aislado el flujo de `fishing-run`.
 
-**Independent Test**: Ejecutar un escenario QA predefinido o una configuracion reproducible, validar que el sandbox aplica el setup completo y confirmar que `fishing-run` sigue operativo sin prompts ni conceptos del sandbox.
+**Independent Test**: Ejecutar un escenario QA predefinido con seed fija, validar que el sandbox aplica el setup completo y confirmar que `fishing-run` sigue operativo sin prompts ni conceptos del sandbox.
 
-- [ ] T013 [P] [US3] Add focused tests for reusable scenarios, non-interactive setup, and run-flow isolation in `internal/app/*_test.go`, `internal/cli/*_test.go`, and `internal/run/*_test.go` where applicable
-- [ ] T014 [P] [US3] Implement reusable scenario loading, scenario-driven card selection, and seed-aware replay setup in `internal/app`, `internal/content/fishprofiles`, `internal/content/playerprofiles`, and new scenario-supporting files under `internal/content` or `internal/app`
-- [ ] T014a [US3] Integrate semi-reproducible sandbox execution (seed-fixed scenarios) as the MVP baseline for non-interactive QA execution paths in `cmd/fishing-duel/main.go`, `internal/cli`, `internal/app/run_bootstrap.go`
-- [ ] T015 [US3] Integrate non-interactive or semi-reproducible sandbox execution and verify `fishing-run` remains untouched in `cmd/fishing-duel/main.go`, `internal/cli`, `internal/app/run_bootstrap.go`, and `cmd/fishing-run/main.go`
+- [X] T013 [P] [US3] Add focused tests for reusable scenarios, seed-fixed replay, and run-flow isolation in `internal/app/*_test.go`, `internal/cli/*_test.go`, and `internal/run/*_test.go` where applicable
+- [X] T014 [P] [US3] Implement reusable scenario loading, scenario-driven card selection, and seed-aware replay setup in `internal/app`, `internal/content/fishprofiles`, `internal/content/playerprofiles`, and new scenario-supporting files under `internal/content` or `internal/app`
+- [X] T015 [US3] Integrate seed-fixed scenario replay as the MVP semi-reproducible execution path and verify `fishing-run` remains untouched in `cmd/fishing-duel/main.go`, `internal/cli`, `internal/app/run_bootstrap.go`, and `cmd/fishing-run/main.go`
 
 **Checkpoint**: User Stories 1, 2, and 3 all work independently
 
@@ -76,9 +76,9 @@
 
 ## Final Phase: Validation and Finish
 
-- [ ] T016 [P] Update sandbox documentation and scenario references in `specs/003-encounter-sandbox/quickstart.md`, `specs/003-encounter-sandbox/contracts/sandbox-cli-contract.md`, and any touched CLI README or command help text
-- [ ] T017 Run agreed automated validation commands from `specs/003-encounter-sandbox/quickstart.md`
-- [ ] T017a [P] Run coverage verification and update `specs/003-encounter-sandbox/checklists/coverage-baseline.md` with final percentages; ensure packages touched meet >=90% target
+- [X] T016 [P] Update sandbox documentation and scenario references in `specs/003-encounter-sandbox/quickstart.md`, `specs/003-encounter-sandbox/contracts/sandbox-cli-contract.md`, and any touched CLI README or command help text
+- [X] T017 Run agreed automated validation commands from `specs/003-encounter-sandbox/quickstart.md`
+- [X] T017a [P] Run coverage verification and update `specs/003-encounter-sandbox/checklists/coverage-baseline.md` with final percentages; ensure packages touched meet >=90% target
 - [ ] T018 Run the manual verification path from `specs/003-encounter-sandbox/quickstart.md` for guided sandbox, manual sandbox, and `fishing-run`
 - [ ] T019 Prepare PR notes linked to `specs/003-encounter-sandbox/spec.md`, `specs/003-encounter-sandbox/plan.md`, and completed sandbox scope in `specs/003-encounter-sandbox/tasks.md`
 
@@ -86,7 +86,7 @@
 
 ## Dependencies & Execution Order
 
-- Setup first: `T001-T002`
+- Setup first: `T001-T002a`
 - Foundations block all story work: `T003-T005`
 - `US1` starts after foundations: `T006-T009`
 - `US2` depends on `US1` because trace visibility and richer output need the final sandbox setup and stable manual configuration flow: `T010-T012`

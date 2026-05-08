@@ -4,7 +4,7 @@
 
 - Purpose: Representa la configuracion completa que arranca un encounter de sandbox.
 - Key fields:
-  - `mode`: guiado, manual o no interactivo.
+  - `mode`: guiado, manual o escenario reutilizable.
   - `player_deck_preset_id`: preset base del jugador.
   - `rod_preset_id`: preset de cana.
   - `attachment_preset_id`: preset de aditamentos.
@@ -26,9 +26,10 @@
 - Key fields:
   - `owner_scope`: jugador o pez.
   - `source_preset_id`: preset o perfil base del que se parte.
-  - `selected_cards`: lista de identificadores de cartas concretos.
+  - `selected_cards`: lista de referencias estables de cartas concretas.
   - `selection_mode`: mantener preset, reemplazar parcialmente o definir escenario completo.
-- Card identity mechanism: Cada carta se identifica por su efecto(s) y tipo de trigger. Por ejemplo, una carta de "avance horizontal 2" o "avance vertical 1 con reshuffle". El lookup busca en el catalogo de perfiles del preset las cartas que coincidan con los efectos y triggers especificados. Si no existe coincidencia exacta, se devuelve un error claro indicando que la carta solicitada no existe en el preset base.
+- Card identity mechanism: Cada carta se identifica por una referencia estable compuesta por `owner_scope`, `source_preset_id` y un `card_ref` catalogado dentro del preset base. `card_ref` debe ser unico dentro del preset y permanecer estable para soportar replay de escenarios. Si el contenido actual aun no expone un ID explicito por carta, el contrato del sandbox debe introducir uno derivado del catalogo cargado en memoria y persistirlo en escenarios.
+- Tie-breaking rule: Si dos cartas comparten nombre, trigger o forma de efecto, el sandbox no debe resolver por coincidencia difusa. Solo acepta una `card_ref` unica; si la referencia no existe o es ambigua, devuelve un error explicito.
 - Source tracking: Cada carta debe indicar su origen: preset_base, manual_replacement, o scenario_defined.
 - Validation rules:
   - Debe conservar consistencia con el dominio del owner correspondiente.
@@ -39,10 +40,10 @@
 - Purpose: Ajusta parte del estado derivado para una prueba de QA o debugging.
 - Key fields:
   - `opening_override`: cast band, distancia inicial, profundidad inicial.
-  - `round_threshold_overrides`: thresholds efectivos del round.
+  - `round_threshold_overrides`: reservado para futuras iteraciones, fuera del MVP actual.
   - `deck_state_overrides`: recycle count, exhaustion state, visibilidad de descarte.
   - `encounter_state_overrides`: estado previo al splash u otras condiciones iniciales soportadas.
-- MVP scope (FR-007-MVP): En la primera iteracion, solo se soportan overrides de distancia inicial, profundidad inicial, capture distance base del Config, initial round thresholds (CaptureDistanceBonus, ExhaustionCaptureDistanceBonus, SurfaceDepthBonus), y recycle count. Los overrides de exhaustion capture distance, visibilidad de descarte y estado previo a splash se diferiran a iteraciones futuras.
+- MVP scope (FR-007-MVP): En la primera iteracion, solo se soportan overrides de distancia inicial, profundidad inicial, `CaptureDistance` base del `encounter.Config` y recycle count. `ExhaustionCaptureDistance` se hereda del config resuelto y no es configurable en el MVP. Los overrides de thresholds de round, exhaustion state, visibilidad de descarte y estado previo a splash se diferiran a iteraciones futuras.
 - Validation rules:
   - Debe respetar limites del sandbox para evitar estados imposibles o incoherentes.
   - Debe generar mensajes claros cuando contradiga una combinacion base invalida.
@@ -59,7 +60,7 @@
   - `seed`: semilla fija opcional.
   - `expected_observables`: resultados o trazas esperadas para comparacion.
 - Validation rules:
-  - Debe poder ejecutarse sin prompts adicionales si se invoca en modo no interactivo.
+  - Debe poder ejecutarse desde una ruta de replay de escenarios sin reconfigurar manualmente cada parametro del setup.
   - Debe ser compartible y reproducible entre usuarios.
 
 ## Resolution Trace

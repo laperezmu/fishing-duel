@@ -87,7 +87,7 @@ internal/
 
 1. Extraer un flujo de sandbox formal en `internal/app` con configuracion propia, manteniendo un modo guiado compatible y agregando un modo manual para elegir presets, preset de pez, cartas concretas, seed y overrides de apertura sin tocar el loop de `fishing-run`.
 2. Extender `internal/content/*`, `internal/presentation` y `internal/cli` para soportar seleccion manual de cartas, escenarios reutilizables, modos de salida y trazas de runtime mas ricas, preservando boundaries UI-agnostic y minimizando cambios sobre engine.
-3. Incorporar solo las seams estrictamente necesarias en `internal/game`, `internal/match`, `internal/encounter` y `internal/progression` para aceptar configuracion semilla del sandbox y exponer evidencia estructurada, cerrando con tests unitarios actualizados y cobertura >=90% en paquetes impactados.
+3. Incorporar solo las seams estrictamente necesarias en `internal/game`, `internal/match`, `internal/encounter` y `internal/progression` para aceptar configuracion de escenario reutilizable con seed fija y exponer evidencia estructurada, cerrando con tests unitarios actualizados y cobertura >=90% en paquetes impactados.
 
 ## Validation Plan
 
@@ -97,7 +97,7 @@ internal/
 
 ## Risks / Tradeoffs
 
-- El override de estado avanzado puede forzar seams nuevas sobre deck o encounter; para mantener cambios minimos conviene limitar el primer alcance a overrides de apertura y estado previo estrictamente validado.
+- El override de estado avanzado puede forzar seams nuevas sobre deck o encounter; para mantener cambios minimos, el primer alcance se limita a distancia inicial, profundidad inicial, `CaptureDistance` base y recycle count. `ExhaustionCaptureDistance`, visibilidad de descarte y estado previo a splash quedan fuera del MVP.
 - Exponer demasiada configuracion en un solo flujo CLI puede degradar UX; separar guiado y manual reduce ese riesgo sin duplicar reglas.
 - El objetivo de cobertura >=90% en paquetes tocados puede requerir redistribuir logica fuera de handlers de CLI para hacerla mas testeable, lo cual es positivo pero debe mantenerse acotado.
 - Reusar `cmd/fishing-duel` como base reduce costo, pero el renombre y el nuevo framing exigen cuidar rutas, textos y referencias sin romper scripts o habitos existentes durante la transicion.
