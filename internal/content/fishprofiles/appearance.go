@@ -35,6 +35,12 @@ type Spawn struct {
 	CandidateCount int
 }
 
+type spawnCandidate struct {
+	profile Profile
+	score   int
+	index   int
+}
+
 func NewSpawnContext(opening encounter.Opening, habitatTags []habitats.Tag) (SpawnContext, error) {
 	context := SpawnContext{
 		WaterPoolTag:    opening.WaterContext.PoolTag,
@@ -152,13 +158,7 @@ func resolveSpawn(profiles []Profile, context SpawnContext, randomizer SpawnRand
 		return Spawn{}, fmt.Errorf("at least one fish profile is required")
 	}
 
-	type candidate struct {
-		profile Profile
-		score   int
-		index   int
-	}
-
-	candidates := make([]candidate, 0, len(profiles))
+	candidates := make([]spawnCandidate, 0, len(profiles))
 	for index, profile := range profiles {
 		if err := profile.Validate(); err != nil {
 			return Spawn{}, fmt.Errorf("profile %s: %w", profile.ID, err)
@@ -167,14 +167,18 @@ func resolveSpawn(profiles []Profile, context SpawnContext, randomizer SpawnRand
 			continue
 		}
 
-		candidates = append(candidates, candidate{
+		candidates = append(candidates, spawnCandidate{
 			profile: profile,
 			score:   profile.Appearance.MatchScore(context),
 			index:   index,
 		})
 	}
 	if len(candidates) == 0 {
-		return Spawn{}, fmt.Errorf("no fish profile matches water %s at distance %d and depth %d with habitats [%s]", context.WaterPoolTag, context.InitialDistance, context.InitialDepth, strings.Join(habitats.Strings(context.HabitatTags), ", "))
+		fallbackCandidates := relaxedCandidates(profiles, context)
+		if len(fallbackCandidates) == 0 {
+			return Spawn{}, fmt.Errorf("no fish profile matches water %s at distance %d and depth %d with habitats [%s]", context.WaterPoolTag, context.InitialDistance, context.InitialDepth, strings.Join(habitats.Strings(context.HabitatTags), ", "))
+		}
+		candidates = fallbackCandidates
 	}
 
 	sort.SliceStable(candidates, func(left int, right int) bool {
@@ -198,6 +202,83 @@ func resolveSpawn(profiles []Profile, context SpawnContext, randomizer SpawnRand
 		Context:        context,
 		CandidateCount: len(candidates),
 	}, nil
+}
+
+func relaxedCandidates(profiles []Profile, context SpawnContext) []spawnCandidate {
+	bestPenalty := -1
+	fallbacks := make([]spawnCandidate, 0, len(profiles))
+	for index, profile := range profiles {
+		if !containsWaterPool(profile.Appearance.WaterPoolTags, context.WaterPoolTag) {
+			continue
+		}
+		if len(profile.Appearance.RequiredHabitatTags) > 0 && !sharesAnyHabitatTag(profile.Appearance.RequiredHabitatTags, context.HabitatTags) {
+			continue
+		}
+		penalty := distancePenalty(profile.Appearance, context)
+		if bestPenalty == -1 || penalty < bestPenalty {
+			bestPenalty = penalty
+			fallbacks = fallbacks[:0]
+		}
+		if penalty == bestPenalty {
+			fallbacks = append(fallbacks, spawnCandidate{profile: profile, score: profile.Appearance.MatchScore(clampContext(profile.Appearance, context)), index: index})
+		}
+	}
+
+	if len(fallbacks) > 0 {
+		return fallbacks
+	}
+
+	for index, profile := range profiles {
+		if !containsWaterPool(profile.Appearance.WaterPoolTags, context.WaterPoolTag) {
+			continue
+		}
+		penalty := distancePenalty(profile.Appearance, context)
+		if bestPenalty == -1 || penalty < bestPenalty {
+			bestPenalty = penalty
+			fallbacks = fallbacks[:0]
+		}
+		if penalty == bestPenalty {
+			fallbacks = append(fallbacks, spawnCandidate{profile: profile, score: profile.Appearance.MatchScore(clampContext(profile.Appearance, context)), index: index})
+		}
+	}
+
+	return fallbacks
+}
+
+func distancePenalty(appearance Appearance, context SpawnContext) int {
+	penalty := 0
+	if context.InitialDistance < appearance.MinInitialDistance {
+		penalty += appearance.MinInitialDistance - context.InitialDistance
+	}
+	if context.InitialDistance > appearance.MaxInitialDistance {
+		penalty += context.InitialDistance - appearance.MaxInitialDistance
+	}
+	if context.InitialDepth < appearance.MinInitialDepth {
+		penalty += appearance.MinInitialDepth - context.InitialDepth
+	}
+	if context.InitialDepth > appearance.MaxInitialDepth {
+		penalty += context.InitialDepth - appearance.MaxInitialDepth
+	}
+
+	return penalty
+}
+
+func clampContext(appearance Appearance, context SpawnContext) SpawnContext {
+	clamped := context
+	if clamped.InitialDistance < appearance.MinInitialDistance {
+		clamped.InitialDistance = appearance.MinInitialDistance
+	}
+	if clamped.InitialDistance > appearance.MaxInitialDistance {
+		clamped.InitialDistance = appearance.MaxInitialDistance
+	}
+	if clamped.InitialDepth < appearance.MinInitialDepth {
+		clamped.InitialDepth = appearance.MinInitialDepth
+	}
+	if clamped.InitialDepth > appearance.MaxInitialDepth {
+		clamped.InitialDepth = appearance.MaxInitialDepth
+	}
+
+	return clamped
 }
 
 func containsWaterPool(values []waterpools.ID, target waterpools.ID) bool {

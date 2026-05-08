@@ -124,7 +124,7 @@ func TestResolveSpawnWithoutRandomizerRemainsStableForTies(t *testing.T) {
 
 func TestResolveSpawnReturnsErrorWhenNoProfileMatches(t *testing.T) {
 	context := SpawnContext{
-		WaterPoolTag:    waterpools.Offshore,
+		WaterPoolTag:    waterpools.ID("invalid"),
 		InitialDistance: 5,
 		InitialDepth:    4,
 	}
@@ -132,7 +132,22 @@ func TestResolveSpawnReturnsErrorWhenNoProfileMatches(t *testing.T) {
 	_, err := ResolveSpawn(DefaultProfiles(), context)
 
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "no fish profile matches water offshore")
+	assert.Contains(t, err.Error(), "unknown water pool \"invalid\"")
+}
+
+func TestResolveSpawnFallsBackToNearestProfileWhenDistanceExceedsCatalog(t *testing.T) {
+	context := SpawnContext{
+		WaterPoolTag:    waterpools.Offshore,
+		InitialDistance: 6,
+		InitialDepth:    2,
+		HabitatTags:     []habitats.Tag{habitats.OpenWater, habitats.Surface},
+	}
+
+	spawn, err := ResolveSpawn(DefaultProfiles(), context)
+
+	require.NoError(t, err)
+	assert.Equal(t, ProfileID("horizontal-pressure"), spawn.Profile.ID)
+	assert.GreaterOrEqual(t, spawn.CandidateCount, 1)
 }
 
 func TestProfileBuildPreset(t *testing.T) {

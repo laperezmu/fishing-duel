@@ -189,7 +189,7 @@ func TestResolveFishSpawnWrapsErrors(t *testing.T) {
 	t.Run("returns an error when no profile matches", func(t *testing.T) {
 		ui := &mockSpawnUI{}
 		opening := encounter.Opening{
-			WaterContext:    encounter.WaterContext{PoolTag: waterpools.Offshore},
+			WaterContext:    encounter.WaterContext{PoolTag: waterpools.ID("invalid")},
 			InitialDistance: 5,
 			InitialDepth:    4,
 		}
@@ -197,7 +197,7 @@ func TestResolveFishSpawnWrapsErrors(t *testing.T) {
 		_, err := app.ResolveFishSpawn("Pesca", opening, sampleLoadout(t), fishprofiles.DefaultProfiles(), ui, presentation.NewPresenter(presentation.DefaultCatalog()))
 
 		require.Error(t, err)
-		assert.Contains(t, err.Error(), "resolve fish spawn: no fish profile matches water offshore")
+		assert.Contains(t, err.Error(), "spawn context: unknown water pool \"invalid\"")
 	})
 
 	t.Run("wraps ui errors", func(t *testing.T) {
