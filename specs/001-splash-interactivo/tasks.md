@@ -91,7 +91,7 @@
 - [X] T031 [P] Update feature documentation references in `specs/001-splash-interactivo/quickstart.md` and any touched package README files if the final behavior differs from the current description
 - [X] T032 Run automated validation commands from `specs/001-splash-interactivo/quickstart.md`
 - [X] T033 Run manual verification with `go run ./cmd/fishing-duel` and `go run ./cmd/fishing-run` following `specs/001-splash-interactivo/quickstart.md`
-- [ ] T034 Prepare PR notes linked to `specs/001-splash-interactivo/spec.md` and the completed splash scope in `specs/001-splash-interactivo/tasks.md`
+- [X] T034 Prepare PR notes linked to `specs/001-splash-interactivo/spec.md` and the completed splash scope in `specs/001-splash-interactivo/tasks.md`
 
 ---
 
