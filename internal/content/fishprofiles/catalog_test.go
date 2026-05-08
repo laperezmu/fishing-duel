@@ -187,3 +187,42 @@ func TestDefaultCatalogJSONUsesExplicitEffectMetadata(t *testing.T) {
 		}
 	}
 }
+
+func TestPoolIDValidate(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name    string
+		id      PoolID
+		wantErr bool
+	}{
+		{"valid pool id", PoolID("test-pool"), false},
+		{"empty pool id is invalid", PoolID(""), true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			err := tt.id.Validate()
+			if tt.wantErr {
+				require.Error(t, err)
+				assert.Contains(t, err.Error(), "pool id is required")
+			} else {
+				require.NoError(t, err)
+			}
+		})
+	}
+}
+
+func TestPoolPools(t *testing.T) {
+	t.Parallel()
+
+	catalog := DefaultCatalog()
+	pools := catalog.Pools()
+
+	assert.NotEmpty(t, pools)
+	for _, pool := range pools {
+		assert.NotEmpty(t, pool.ID)
+	}
+}

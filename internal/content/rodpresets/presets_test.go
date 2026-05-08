@@ -50,3 +50,32 @@ func TestBuildLoadoutWithAttachments(t *testing.T) {
 	assert.Equal(t, 6, loadoutState.TrackMaxDistance())
 	assert.Len(t, loadoutState.Attachments, 1)
 }
+
+func TestResolveDefaultPreset(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name      string
+		id        string
+		wantFound bool
+	}{
+		{"coastal control", "coastal-control", true},
+		{"versatile standard", "versatile-standard", true},
+		{"bottom pressure", "bottom-pressure", true},
+		{"invalid id", "invalid-id", false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			preset, err := ResolveDefaultPreset(tt.id)
+			if tt.wantFound {
+				require.NoError(t, err)
+				assert.Equal(t, tt.id, preset.ID)
+			} else {
+				require.Error(t, err)
+			}
+		})
+	}
+}

@@ -2,11 +2,15 @@ package presentation
 
 import (
 	"pesca/internal/cards"
+	"pesca/internal/content/attachmentpresets"
+	"pesca/internal/content/playerprofiles"
+	"pesca/internal/content/rodpresets"
 	"pesca/internal/domain"
 	"pesca/internal/encounter"
 	"pesca/internal/match"
 	"pesca/internal/player/loadout"
 	"pesca/internal/player/rod"
+	"pesca/internal/run"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -219,4 +223,172 @@ func newCapturedEncounterState(t *testing.T) encounter.State {
 	state.EndReason = encounter.EndReasonDeckCapture
 
 	return state
+}
+
+func TestPresenterRoundWithDifferentOutcomes(t *testing.T) {
+	presenter := NewPresenter(DefaultCatalog())
+
+	t.Run("renders fish win outcome", func(t *testing.T) {
+		round := presenter.Round(match.NewRoundSnapshot(match.RoundResult{
+			PlayerMove: domain.Blue,
+			FishMove:   domain.Red,
+			Outcome:    domain.FishWin,
+			Status:     match.NewStatusSnapshot(match.State{}),
+		}))
+
+		assert.Equal(t, "gana el pez", round.OutcomeLabel)
+	})
+
+	t.Run("renders draw outcome", func(t *testing.T) {
+		round := presenter.Round(match.NewRoundSnapshot(match.RoundResult{
+			PlayerMove: domain.Blue,
+			FishMove:   domain.Red,
+			Outcome:    domain.Draw,
+			Status:     match.NewStatusSnapshot(match.State{}),
+		}))
+
+		assert.Equal(t, "empate", round.OutcomeLabel)
+	})
+}
+
+func TestPresenterSummaryWithEscaped(t *testing.T) {
+	presenter := NewPresenter(DefaultCatalog())
+	state, err := encounter.NewState(encounter.DefaultConfig())
+	require.NoError(t, err)
+	state.Status = encounter.StatusEscaped
+	state.EndReason = encounter.EndReasonSplashEscape
+
+	summary := presenter.Summary(match.NewSummarySnapshot(match.State{Encounter: state}))
+
+	assert.Equal(t, encounter.StatusEscaped, summary.EncounterStatus)
+	assert.Equal(t, "pez escapado", summary.OutcomeLabel)
+}
+
+func TestPresenterSummaryWithTrackCapture(t *testing.T) {
+	presenter := NewPresenter(DefaultCatalog())
+	state, err := encounter.NewState(encounter.DefaultConfig())
+	require.NoError(t, err)
+	state.Status = encounter.StatusCaptured
+	state.EndReason = encounter.EndReasonTrackCapture
+
+	summary := presenter.Summary(match.NewSummarySnapshot(match.State{Encounter: state}))
+
+	assert.Equal(t, "captura por acercarlo a la orilla y subirlo a la superficie", summary.EndReasonLabel)
+}
+
+func TestPresenterSummaryWithTrackEscape(t *testing.T) {
+	presenter := NewPresenter(DefaultCatalog())
+	state, err := encounter.NewState(encounter.DefaultConfig())
+	require.NoError(t, err)
+	state.Status = encounter.StatusEscaped
+	state.EndReason = encounter.EndReasonTrackEscape
+
+	summary := presenter.Summary(match.NewSummarySnapshot(match.State{Encounter: state}))
+
+	assert.Equal(t, "escape por superar la distancia maxima alcanzable", summary.EndReasonLabel)
+}
+
+func TestPresenterSummaryWithDepthEscape(t *testing.T) {
+	presenter := NewPresenter(DefaultCatalog())
+	state, err := encounter.NewState(encounter.DefaultConfig())
+	require.NoError(t, err)
+	state.Status = encounter.StatusEscaped
+	state.EndReason = encounter.EndReasonDepthEscape
+
+	summary := presenter.Summary(match.NewSummarySnapshot(match.State{Encounter: state}))
+
+	assert.Equal(t, "escape por bajar mas alla de la profundidad alcanzable", summary.EndReasonLabel)
+}
+
+func TestPresenterSplashWithEscaped(t *testing.T) {
+	presenter := NewPresenter(DefaultCatalog())
+	snapshot := match.EncounterEventSnapshot{
+		LastEvent: encounter.Event{
+			Kind:    encounter.EventKindSplash,
+			Escaped: true,
+		},
+	}
+
+	view := presenter.Splash(snapshot, 2)
+
+	assert.Contains(t, view.EventLabel, "chapotea")
+	assert.Contains(t, view.EventLabel, "se suelta")
+}
+
+func TestPresenterPrivateLabelsAndHints(t *testing.T) {
+	presenter := NewPresenter(DefaultCatalog())
+
+	t.Run("player card hint renders normalized effects", func(t *testing.T) {
+		hint := presenter.playerCardHint(match.MoveResourceSnapshot{
+			HasTopCard: true,
+			TopCard: cards.PlayerCard{Effects: []cards.CardEffect{{
+				Trigger:                        cards.TriggerOnDraw,
+				DistanceShift:                  1,
+				DepthShift:                     -1,
+				CaptureDistanceBonus:           2,
+				SurfaceDepthBonus:              1,
+				ExhaustionCaptureDistanceBonus: 3,
+				Type:                           cards.EffectTypeHideDiscardTemporary,
+			}}},
+		})
+
+		assert.Contains(t, hint, "draw")
+		assert.Contains(t, hint, "dist +1")
+		assert.Contains(t, hint, "prof -1")
+		assert.Contains(t, hint, "capt +2")
+		assert.Contains(t, hint, "sup +1")
+		assert.Contains(t, hint, "baraja +3")
+	})
+
+	t.Run("effect impact parts include special effects", func(t *testing.T) {
+		parts := effectImpactParts(cards.CardEffect{Type: cards.EffectTypeSuccessfulSplashApproach})
+		assert.Contains(t, parts, "splash acerca")
+	})
+
+	t.Run("helper labels cover defaults", func(t *testing.T) {
+		assert.Equal(t, "Tirar", presenter.playerMoveLabel(domain.Blue))
+		assert.Equal(t, "unknown", presenter.playerMoveLabel(domain.Move(999)))
+		assert.Equal(t, "Embestir", presenter.fishMoveLabel(domain.Blue))
+		assert.Equal(t, "unknown", presenter.fishMoveLabel(domain.Move(999)))
+		assert.Equal(t, "empate", presenter.roundOutcomeLabel(domain.Draw))
+		assert.Equal(t, "unknown", presenter.roundOutcomeLabel(domain.RoundOutcome(999)))
+		assert.Equal(t, "pez capturado", presenter.encounterOutcomeLabel(encounter.StatusCaptured))
+		assert.Equal(t, "unknown", presenter.encounterOutcomeLabel(encounter.Status("unknown")))
+		assert.Equal(t, "escape por chapoteo en superficie", presenter.endReasonLabel(encounter.EndReasonSplashEscape))
+		assert.Equal(t, "unknown", presenter.endReasonLabel(encounter.EndReason("unknown")))
+	})
+
+	t.Run("run helpers cover fallback branches", func(t *testing.T) {
+		assert.Equal(t, "run retirada", presenter.runStatusLabel(run.StatusRetired))
+		assert.Equal(t, "mystery", presenter.runStatusLabel(run.Status("mystery")))
+		assert.Equal(t, "captura confirmada: Lubina", presenter.runEncounterOutcomeLabel(run.EncounterResult{Outcome: run.EncounterOutcomeCaptured, Capture: &run.CaptureRecord{FishName: "Lubina"}}))
+		assert.Equal(t, "weird", presenter.runEncounterOutcomeLabel(run.EncounterResult{Outcome: run.EncounterOutcome("weird")}))
+		assert.Equal(t, "odd-node", presenter.runNodeLabel(run.NodeState{NodeID: "odd-node", Kind: run.NodeKind("weird")}))
+	})
+
+	t.Run("preset names resolve or fallback", func(t *testing.T) {
+		assert.Equal(t, playerprofiles.DefaultPresets()[0].Name, playerDeckPresetName(playerprofiles.DefaultPresets()[0].ID))
+		assert.Equal(t, rodpresets.DefaultPresets()[0].Name, rodPresetName(rodpresets.DefaultPresets()[0].ID))
+		assert.Equal(t, attachmentpresets.DefaultPresets()[0].Name, attachmentPresetName(attachmentpresets.DefaultPresets()[0].ID))
+		assert.Equal(t, "unknown-preset", playerDeckPresetName("unknown-preset"))
+		assert.Equal(t, "unknown-preset", rodPresetName("unknown-preset"))
+		assert.Equal(t, "unknown-preset", attachmentPresetName("unknown-preset"))
+	})
+
+	t.Run("discard labels cover unknown visibility and fallback names", func(t *testing.T) {
+		assert.Equal(t, "Carta vista", presenter.fishDiscardEntryLabel(match.FishDiscardEntryState{Name: "Carta vista", Visibility: cards.DiscardVisibility("mystery")}))
+		assert.Equal(t, "Embestir", presenter.fishDiscardEntryLabel(match.FishDiscardEntryState{Move: domain.Blue, Visibility: cards.DiscardVisibility("shadow")}))
+	})
+
+	t.Run("trigger and effect labels cover defaults", func(t *testing.T) {
+		assert.Equal(t, "draw", triggerLabel(cards.TriggerOnDraw))
+		assert.Equal(t, "efecto", triggerLabel(cards.Trigger(999)))
+		assert.Equal(t, "avance horizontal", effectTypeLabel(cards.EffectTypeAdvanceHorizontal))
+		assert.Equal(t, "custom", effectTypeLabel(cards.EffectType("custom")))
+	})
+
+	t.Run("splash renders non-escape event", func(t *testing.T) {
+		view := presenter.Splash(match.EncounterEventSnapshot{LastEvent: encounter.Event{Kind: encounter.EventKindSplash, Escaped: false}}, 1)
+		assert.Contains(t, view.EventLabel, "permanece sujeto")
+	})
 }
