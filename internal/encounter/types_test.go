@@ -7,6 +7,81 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestSplashStateCurrentJump(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name     string
+		splash   SplashState
+		wantJump int
+	}{
+		{
+			name:     "returns 1 when no jumps resolved",
+			splash:   SplashState{ResolvedJumps: 0, TotalJumps: 3},
+			wantJump: 1,
+		},
+		{
+			name:     "returns 2 when one jump resolved",
+			splash:   SplashState{ResolvedJumps: 1, TotalJumps: 3},
+			wantJump: 2,
+		},
+		{
+			name:     "returns total when all jumps resolved",
+			splash:   SplashState{ResolvedJumps: 3, TotalJumps: 3},
+			wantJump: 3,
+		},
+		{
+			name:     "returns total when more jumps resolved than total",
+			splash:   SplashState{ResolvedJumps: 5, TotalJumps: 3},
+			wantJump: 3,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			got := tt.splash.CurrentJump()
+			assert.Equal(t, tt.wantJump, got)
+		})
+	}
+}
+
+func TestSplashStatePending(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name   string
+		splash SplashState
+		want   bool
+	}{
+		{
+			name:   "pending when resolved is less than total",
+			splash: SplashState{ResolvedJumps: 1, TotalJumps: 3},
+			want:   true,
+		},
+		{
+			name:   "not pending when resolved equals total",
+			splash: SplashState{ResolvedJumps: 3, TotalJumps: 3},
+			want:   false,
+		},
+		{
+			name:   "not pending when resolved exceeds total",
+			splash: SplashState{ResolvedJumps: 5, TotalJumps: 3},
+			want:   false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			got := tt.splash.Pending()
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
 func TestNewState(t *testing.T) {
 	validCases := []struct {
 		title     string

@@ -48,11 +48,29 @@ func TestResolveEncounterOpeningWrapsErrors(t *testing.T) {
 		assert.EqualError(t, err, "opening ui is required")
 	})
 
+	t.Run("returns an error when presenter is missing", func(t *testing.T) {
+		playerLoadout := sampleLoadout(t)
+
+		_, err := app.ResolveEncounterOpening("Pesca", encounter.DefaultConfig(), playerLoadout, watercontexts.DefaultPresets(), &mockOpeningUI{}, nil)
+
+		require.Error(t, err)
+		assert.EqualError(t, err, "opening presenter is required")
+	})
+
 	t.Run("returns an error when player loadout is invalid", func(t *testing.T) {
 		_, err := app.ResolveEncounterOpening("Pesca", encounter.DefaultConfig(), loadout.State{Rod: rod.State{TrackMaxDistance: 0, TrackMaxDepth: 3}}, watercontexts.DefaultPresets(), &mockOpeningUI{}, presentation.NewPresenter(presentation.DefaultCatalog()))
 
 		require.Error(t, err)
 		assert.EqualError(t, err, "player loadout: rod: track max distance must be greater than 0")
+	})
+
+	t.Run("returns an error when presets are empty", func(t *testing.T) {
+		playerLoadout := sampleLoadout(t)
+
+		_, err := app.ResolveEncounterOpening("Pesca", encounter.DefaultConfig(), playerLoadout, nil, &mockOpeningUI{}, presentation.NewPresenter(presentation.DefaultCatalog()))
+
+		require.Error(t, err)
+		assert.EqualError(t, err, "at least one water context preset is required")
 	})
 
 	t.Run("wraps selection errors", func(t *testing.T) {
@@ -66,6 +84,73 @@ func TestResolveEncounterOpeningWrapsErrors(t *testing.T) {
 
 		require.Error(t, err)
 		assert.EqualError(t, err, "choose water context: selection failed")
+		ui.AssertExpectations(t)
+	})
+}
+
+func TestResolveEncounterOpeningWithPreset(t *testing.T) {
+	t.Run("returns error when ui is nil", func(t *testing.T) {
+		playerLoadout := sampleLoadout(t)
+		preset := watercontexts.DefaultPresets()[0]
+
+		_, err := app.ResolveEncounterOpeningWithPreset("Pesca", encounter.DefaultConfig(), playerLoadout, preset, nil, presentation.NewPresenter(presentation.DefaultCatalog()))
+
+		require.Error(t, err)
+		assert.EqualError(t, err, "opening ui is required")
+	})
+
+	t.Run("returns error when presenter is nil", func(t *testing.T) {
+		playerLoadout := sampleLoadout(t)
+		preset := watercontexts.DefaultPresets()[0]
+		ui := &mockOpeningUI{}
+
+		_, err := app.ResolveEncounterOpeningWithPreset("Pesca", encounter.DefaultConfig(), playerLoadout, preset, ui, nil)
+
+		require.Error(t, err)
+		assert.EqualError(t, err, "opening presenter is required")
+	})
+
+	t.Run("returns error when loadout is invalid", func(t *testing.T) {
+		preset := watercontexts.DefaultPresets()[0]
+		ui := &mockOpeningUI{}
+
+		_, err := app.ResolveEncounterOpeningWithPreset("Pesca", encounter.DefaultConfig(), loadout.State{Rod: rod.State{TrackMaxDistance: 0, TrackMaxDepth: 3}}, preset, ui, presentation.NewPresenter(presentation.DefaultCatalog()))
+
+		require.Error(t, err)
+		assert.EqualError(t, err, "player loadout: rod: track max distance must be greater than 0")
+	})
+
+	t.Run("resolves opening successfully", func(t *testing.T) {
+		playerLoadout := sampleLoadout(t)
+		preset := watercontexts.DefaultPresets()[0]
+		resolvedContext := preset.BuildContext()
+		castResult := encounter.CastResult{Band: encounter.CastBandMedium}
+		ui := &mockOpeningUI{}
+		presenter := presentation.NewPresenter(presentation.DefaultCatalog())
+
+		ui.On("ResolveCast", "Pesca", resolvedContext, mock.Anything).Return(castResult, nil).Once()
+		ui.On("ShowEncounterOpening", "Pesca", mock.Anything).Return(nil).Once()
+
+		opening, err := app.ResolveEncounterOpeningWithPreset("Pesca", encounter.DefaultConfig(), playerLoadout, preset, ui, presenter)
+
+		require.NoError(t, err)
+		assert.Equal(t, 2, opening.InitialDistance)
+		ui.AssertExpectations(t)
+	})
+
+	t.Run("wraps resolve cast errors", func(t *testing.T) {
+		playerLoadout := sampleLoadout(t)
+		preset := watercontexts.DefaultPresets()[0]
+		resolvedContext := preset.BuildContext()
+		ui := &mockOpeningUI{}
+		presenter := presentation.NewPresenter(presentation.DefaultCatalog())
+
+		ui.On("ResolveCast", "Pesca", resolvedContext, mock.Anything).Return(encounter.CastResult{}, errors.New("cast failed")).Once()
+
+		_, err := app.ResolveEncounterOpeningWithPreset("Pesca", encounter.DefaultConfig(), playerLoadout, preset, ui, presenter)
+
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "resolve cast:")
 		ui.AssertExpectations(t)
 	})
 }

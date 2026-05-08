@@ -94,3 +94,39 @@ func sampleState(t *testing.T) State {
 		Lifecycle: LifecycleState{Stats: Stats{PlayerWins: 2, FishWins: 1, Draws: 3}},
 	}
 }
+
+func TestNewEncounterEventSnapshot(t *testing.T) {
+	t.Run("creates snapshot from encounter state", func(t *testing.T) {
+		encounterState, err := encounter.NewState(encounter.DefaultConfig())
+		require.NoError(t, err)
+		encounterState.LastEvent = encounter.Event{Kind: encounter.EventKindSplash, Escaped: false}
+
+		snapshot := NewEncounterEventSnapshot(encounterState)
+
+		assert.Equal(t, encounter.EventKindSplash, snapshot.LastEvent.Kind)
+		assert.False(t, snapshot.LastEvent.Escaped)
+	})
+
+	t.Run("creates snapshot with splash state", func(t *testing.T) {
+		encounterState, err := encounter.NewState(encounter.DefaultConfig())
+		require.NoError(t, err)
+		encounterState.LastEvent = encounter.Event{Kind: encounter.EventKindSplash, Escaped: false}
+		encounterState.Splash = &encounter.SplashState{TotalJumps: 3, ResolvedJumps: 1, TimeLimit: 5000}
+
+		snapshot := NewEncounterEventSnapshot(encounterState)
+
+		require.NotNil(t, snapshot.Splash)
+		assert.Equal(t, 3, snapshot.Splash.TotalJumps)
+		assert.Equal(t, 1, snapshot.Splash.ResolvedJumps)
+		assert.Equal(t, 2, snapshot.Splash.CurrentJump)
+	})
+
+	t.Run("returns nil splash when state has no splash", func(t *testing.T) {
+		encounterState, err := encounter.NewState(encounter.DefaultConfig())
+		require.NoError(t, err)
+
+		snapshot := NewEncounterEventSnapshot(encounterState)
+
+		assert.Nil(t, snapshot.Splash)
+	})
+}

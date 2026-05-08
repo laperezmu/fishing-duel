@@ -19,11 +19,12 @@ type RunUI interface {
 }
 
 type RunSession struct {
-	title     string
-	rng       Randomizer
-	ui        RunUI
-	presenter presentation.Presenter
-	route     []run.NodeState
+	title      string
+	rng        Randomizer
+	ui         RunUI
+	presenter  presentation.Presenter
+	route      []run.NodeState
+	loopConfig *RunLoopConfig
 }
 
 func NewRunSession(title string, rng Randomizer, ui RunUI, presenter presentation.Presenter) (*RunSession, error) {
@@ -42,7 +43,27 @@ func NewRunSession(title string, rng Randomizer, ui RunUI, presenter presentatio
 		return nil, fmt.Errorf("run route is required")
 	}
 
-	return &RunSession{title: title, rng: rng, ui: ui, presenter: presenter, route: route}, nil
+	session := &RunSession{
+		title:      title,
+		rng:        rng,
+		ui:         ui,
+		presenter:  presenter,
+		route:      route,
+		loopConfig: nil,
+	}
+
+	session.loopConfig = session.createDefaultLoopConfig()
+
+	return session, nil
+}
+
+func (session *RunSession) createDefaultLoopConfig() *RunLoopConfig {
+	return &RunLoopConfig{
+		StateProvider:    &defaultRunLoopConfig{},
+		EncounterHandler: &defaultEncounterHandler{},
+		NodeRenderer:     &defaultNodeRenderer{ui: session.ui, presenter: session.presenter},
+		LoopCallbacks:    &noopLoopCallbacks{},
+	}
 }
 
 func (session *RunSession) Run() error {
@@ -56,13 +77,13 @@ func (session *RunSession) Run() error {
 		return err
 	}
 
-	for state.Status == run.StatusInProgress {
+	for session.loopConfig.StateProvider.CurrentStatus(&state) == run.StatusInProgress {
 		if err := session.playCurrentNode(&state, resolvedStart); err != nil {
 			return err
 		}
 	}
 
-	if err := session.ui.ShowRunSummary(session.presenter.RunSummary(session.title, state)); err != nil {
+	if err := session.loopConfig.NodeRenderer.ShowSummary(session.title, state); err != nil {
 		return fmt.Errorf("show run summary: %w", err)
 	}
 
@@ -70,11 +91,11 @@ func (session *RunSession) Run() error {
 }
 
 func (session *RunSession) initializeRunState(resolvedStart anglerprofiles.ResolvedStart) (run.State, error) {
-	state, err := run.NewState(resolvedStart.Loadout, session.route, resolvedStart.StartingThread)
+	state, err := session.loopConfig.StateProvider.Initialize(resolvedStart.Loadout, session.route, resolvedStart.StartingThread)
 	if err != nil {
 		return run.State{}, fmt.Errorf("initialize run state: %w", err)
 	}
-	if err := session.ui.ShowRunIntro(session.presenter.RunIntro(session.title, state, session.route)); err != nil {
+	if err := session.loopConfig.NodeRenderer.ShowIntro(session.title, state, session.route); err != nil {
 		return run.State{}, fmt.Errorf("show run intro: %w", err)
 	}
 
@@ -82,27 +103,38 @@ func (session *RunSession) initializeRunState(resolvedStart anglerprofiles.Resol
 }
 
 func (session *RunSession) playCurrentNode(state *run.State, resolvedStart anglerprofiles.ResolvedStart) error {
-	if err := session.ui.ShowRunNode(session.presenter.RunNode(session.title, *state)); err != nil {
+	currentNode := session.loopConfig.StateProvider.CurrentNode(state)
+
+	if err := session.loopConfig.NodeRenderer.ShowNode(session.title, *state); err != nil {
 		return fmt.Errorf("show run node: %w", err)
 	}
 
-	switch state.Progress.Current.Kind {
+	if err := session.loopConfig.LoopCallbacks.OnNodeStart(currentNode, state); err != nil {
+		return err
+	}
+
+	switch currentNode.Kind {
 	case run.NodeKindStart, run.NodeKindService, run.NodeKindCheckpoint:
-		return session.advanceRunNode(state)
+		if err := session.advanceRunNode(state); err != nil {
+			return err
+		}
 	case run.NodeKindFishing, run.NodeKindBoss:
-		return session.playEncounterNode(state, resolvedStart)
+		if err := session.playEncounterNode(state, resolvedStart); err != nil {
+			return err
+		}
 	case run.NodeKindEnd:
-		if err := run.Complete(state); err != nil {
+		if err := session.loopConfig.StateProvider.Complete(state); err != nil {
 			return fmt.Errorf("complete run: %w", err)
 		}
-		return nil
 	default:
-		return fmt.Errorf("unsupported node kind %q", state.Progress.Current.Kind)
+		return fmt.Errorf("unsupported node kind %q", currentNode.Kind)
 	}
+
+	return nil
 }
 
 func (session *RunSession) advanceRunNode(state *run.State) error {
-	if err := run.Advance(state, session.route); err != nil {
+	if err := session.loopConfig.StateProvider.Advance(state, session.route); err != nil {
 		return fmt.Errorf("advance run node: %w", err)
 	}
 
@@ -110,22 +142,32 @@ func (session *RunSession) advanceRunNode(state *run.State) error {
 }
 
 func (session *RunSession) playEncounterNode(state *run.State, resolvedStart anglerprofiles.ResolvedStart) error {
-	currentNode := state.Progress.Current
-	nextNode := state.Progress.Next
-	title := fmt.Sprintf("%s - %s", session.title, state.Progress.Current.NodeID)
-	waterPreset, err := run.ResolveWaterPreset(state.Progress.Current.WaterPresetID)
+	currentNode := session.loopConfig.StateProvider.CurrentNode(state)
+	nextNode := session.loopConfig.StateProvider.NextNode(state)
+	title := fmt.Sprintf("%s - %s", session.title, currentNode.NodeID)
+	waterPreset, err := run.ResolveWaterPreset(currentNode.WaterPresetID)
 	if err != nil {
 		return fmt.Errorf("resolve node water preset: %w", err)
 	}
-	bootstrap, err := BootstrapEncounterForRun(title, session.rng, session.ui, session.ui, session.presenter, resolvedStart.DeckPreset, state.Loadout, RunEncounterBootstrapConfig{
-		Encounter: session.buildEncounterConfig(*state),
-		Water:     waterPreset,
-	})
+
+	resolvedEncounter, err := session.loopConfig.EncounterHandler.Resolve(
+		title,
+		session.rng,
+		session.ui,
+		session.ui,
+		session.presenter,
+		resolvedStart.DeckPreset,
+		state.Loadout,
+		RunEncounterBootstrapConfig{
+			Encounter: session.buildEncounterConfig(*state),
+			Water:     waterPreset,
+		},
+	)
 	if err != nil {
 		return fmt.Errorf("bootstrap encounter: %w", err)
 	}
 
-	encounterSession, err := NewSession(bootstrap.Engine, session.ui, session.presenter)
+	encounterSession, err := NewSession(resolvedEncounter.Engine, session.ui, session.presenter)
 	if err != nil {
 		return fmt.Errorf("initialize encounter session: %w", err)
 	}
@@ -133,19 +175,26 @@ func (session *RunSession) playEncounterNode(state *run.State, resolvedStart ang
 		return fmt.Errorf("run encounter session: %w", err)
 	}
 
-	encounterResult, err := ResolveEncounterResult(bootstrap.Engine.State(), bootstrap.Spawn)
+	encounterResult, err := ResolveEncounterResult(resolvedEncounter.Engine.State(), resolvedEncounter.Spawn)
 	if err != nil {
 		return fmt.Errorf("resolve encounter result: %w", err)
 	}
-	if err := run.ApplyEncounterResult(state, encounterResult); err != nil {
+	if err := session.loopConfig.StateProvider.ApplyResult(state, encounterResult); err != nil {
 		return fmt.Errorf("apply encounter result: %w", err)
 	}
-	if state.Status != run.StatusInProgress {
+
+	if session.loopConfig.StateProvider.CurrentStatus(state) != run.StatusInProgress {
 		return nil
 	}
-	if err := session.ui.ShowRunNodeSummary(session.presenter.RunNodeSummary(session.title, currentNode, encounterResult, *state, nextNode)); err != nil {
+
+	if err := session.loopConfig.NodeRenderer.ShowNodeSummary(session.title, currentNode, encounterResult, *state, nextNode); err != nil {
 		return fmt.Errorf("show run node summary: %w", err)
 	}
+
+	if err := session.loopConfig.LoopCallbacks.OnNodeComplete(currentNode, encounterResult, state); err != nil {
+		return err
+	}
+
 	return session.advanceRunNode(state)
 }
 
@@ -155,4 +204,8 @@ func (session *RunSession) buildEncounterConfig(state run.State) EncounterBootst
 	}
 
 	return EncounterBootstrapConfig{FishPoolID: fishprofiles.DefaultEncounterFishPoolID}
+}
+
+func (session *RunSession) setLoopConfig(config *RunLoopConfig) {
+	session.loopConfig = config
 }

@@ -84,3 +84,36 @@ func TestCastControllerResolveBand(t *testing.T) {
 		assert.NotEmpty(t, band)
 	})
 }
+
+func TestCastControllerAdvance(t *testing.T) {
+	t.Run("advances to next position", func(t *testing.T) {
+		positions := []int{1, 3, 5}
+		controller := encounter.NewCastController(1, positions)
+
+		assert.Equal(t, 1, controller.CurrentPosition())
+
+		next := controller.Advance()
+
+		assert.Equal(t, 3, next)
+	})
+
+	t.Run("advances to next position with default positions", func(t *testing.T) {
+		controller := encounter.NewCastController(1, nil)
+
+		assert.Equal(t, 0, controller.CurrentPosition())
+
+		next := controller.Advance()
+
+		assert.Equal(t, 1, next)
+	})
+
+	t.Run("wraps around to start", func(t *testing.T) {
+		positions := []int{1, 3}
+		controller := encounter.NewCastController(1, positions)
+
+		controller.Advance()
+		next := controller.Advance()
+
+		assert.Equal(t, 1, next)
+	})
+}

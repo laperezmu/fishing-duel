@@ -433,3 +433,53 @@ func samplePlayerDeckPresets() []playerprofiles.DeckPreset {
 		},
 	}
 }
+
+func TestColorizeEncounterStatus(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name         string
+		status       encounter.Status
+		outcomeLabel string
+		wantContains string
+	}{
+		{"captured is green", encounter.StatusCaptured, "capturado", "\033[32m"},
+		{"escaped is red", encounter.StatusEscaped, "escapado", "\033[31m"},
+		{"ongoing is yellow", encounter.StatusOngoing, "en curso", "\033[33m"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			result := colorizeEncounterStatus(tt.status, tt.outcomeLabel)
+			assert.Contains(t, result, tt.wantContains)
+			assert.Contains(t, result, tt.outcomeLabel)
+		})
+	}
+}
+
+func TestColorizeRoundOutcome(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name         string
+		outcome      domain.RoundOutcome
+		label        string
+		wantContains string
+	}{
+		{"player win is green", domain.PlayerWin, "gana jugador", "\033[32m"},
+		{"fish win is red", domain.FishWin, "gana pez", "\033[31m"},
+		{"draw is yellow", domain.Draw, "empate", "\033[33m"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			result := colorizeRoundOutcome(tt.outcome, tt.label)
+			assert.Contains(t, result, tt.wantContains)
+			assert.Contains(t, result, tt.label)
+		})
+	}
+}

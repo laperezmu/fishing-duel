@@ -112,6 +112,31 @@ func TestPresenterRunIntro(t *testing.T) {
 
 		assert.Equal(t, "Test Run", view.Title)
 	})
+
+	t.Run("renders run intro with route nodes", func(t *testing.T) {
+		presenter := presentation.NewPresenter(presentation.DefaultCatalog())
+		state := run.State{Thread: run.ThreadState{Current: 5}}
+		route := []run.NodeState{
+			{NodeID: "start", Kind: run.NodeKindStart, ZoneID: "coast"},
+			{NodeID: "fishing-1", Kind: run.NodeKindFishing, ZoneID: "coast"},
+		}
+
+		view := presenter.RunIntro("Test Run", state, route)
+
+		assert.Equal(t, "Test Run", view.Title)
+		assert.Equal(t, 5, view.Thread)
+		assert.Len(t, view.RouteLabels, 2)
+	})
+
+	t.Run("renders run intro with thread state", func(t *testing.T) {
+		presenter := presentation.NewPresenter(presentation.DefaultCatalog())
+		state := run.State{Thread: run.ThreadState{Current: 7, Maximum: 10}}
+		route := []run.NodeState{}
+
+		view := presenter.RunIntro("Test Run", state, route)
+
+		assert.Equal(t, 7, view.Thread)
+	})
 }
 
 func TestPresenterRunNode(t *testing.T) {
@@ -122,6 +147,41 @@ func TestPresenterRunNode(t *testing.T) {
 		view := presenter.RunNode("Test Run", state)
 
 		assert.Equal(t, "Test Run", view.Title)
+	})
+
+	t.Run("renders run node with progress state", func(t *testing.T) {
+		presenter := presentation.NewPresenter(presentation.DefaultCatalog())
+		state := run.State{
+			Progress: run.ProgressState{
+				Current: run.NodeState{NodeID: "fishing-1", Kind: run.NodeKindFishing, ZoneID: "coast"},
+			},
+			Thread: run.ThreadState{Current: 5, Maximum: 10},
+		}
+
+		view := presenter.RunNode("Test Run", state)
+
+		assert.Equal(t, "Test Run", view.Title)
+		assert.Equal(t, run.NodeKindFishing, view.NodeKind)
+		assert.Equal(t, 5, view.Thread)
+		assert.Equal(t, 10, view.ThreadMax)
+		assert.Equal(t, 0, view.CaptureCount)
+	})
+
+	t.Run("renders run node with captures", func(t *testing.T) {
+		presenter := presentation.NewPresenter(presentation.DefaultCatalog())
+		state := run.State{
+			Progress: run.ProgressState{
+				Current: run.NodeState{NodeID: "fishing-1", Kind: run.NodeKindFishing, ZoneID: "coast"},
+			},
+			Captures: []run.CaptureRecord{
+				{FishID: "bass-1", FishName: "Lubina"},
+				{FishID: "mackerel-1", FishName: "Caballa"},
+			},
+		}
+
+		view := presenter.RunNode("Test Run", state)
+
+		assert.Equal(t, 2, view.CaptureCount)
 	})
 }
 
@@ -141,6 +201,42 @@ func TestPresenterRunNodeSummary(t *testing.T) {
 		presenter := presentation.NewPresenter(presentation.DefaultCatalog())
 		currentNode := run.NodeState{NodeID: "fishing-1"}
 		result := run.EncounterResult{Outcome: run.EncounterOutcomeCaptured}
+		state := run.State{}
+		nextNode := &run.NodeState{NodeID: "fishing-2"}
+
+		view := presenter.RunNodeSummary("Test Run", currentNode, result, state, nextNode)
+
+		assert.Equal(t, "Test Run", view.Title)
+	})
+
+	t.Run("renders escaped outcome", func(t *testing.T) {
+		presenter := presentation.NewPresenter(presentation.DefaultCatalog())
+		currentNode := run.NodeState{NodeID: "fishing-1"}
+		result := run.EncounterResult{Outcome: run.EncounterOutcomeEscaped}
+		state := run.State{}
+		nextNode := &run.NodeState{NodeID: "fishing-2"}
+
+		view := presenter.RunNodeSummary("Test Run", currentNode, result, state, nextNode)
+
+		assert.Equal(t, "Test Run", view.Title)
+	})
+
+	t.Run("renders defeated outcome", func(t *testing.T) {
+		presenter := presentation.NewPresenter(presentation.DefaultCatalog())
+		currentNode := run.NodeState{NodeID: "boss-1"}
+		result := run.EncounterResult{Outcome: run.EncounterOutcomeDefeated}
+		state := run.State{}
+		nextNode := &run.NodeState{NodeID: "fishing-2"}
+
+		view := presenter.RunNodeSummary("Test Run", currentNode, result, state, nextNode)
+
+		assert.Equal(t, "Test Run", view.Title)
+	})
+
+	t.Run("renders escaped with thread damage", func(t *testing.T) {
+		presenter := presentation.NewPresenter(presentation.DefaultCatalog())
+		currentNode := run.NodeState{NodeID: "fishing-1"}
+		result := run.EncounterResult{Outcome: run.EncounterOutcomeEscaped, ThreadDamage: 3, Capture: nil}
 		state := run.State{}
 		nextNode := &run.NodeState{NodeID: "fishing-2"}
 
