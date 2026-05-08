@@ -101,7 +101,7 @@ func TestFilterEffects(t *testing.T) {
 	filteredEffects := FilterEffects(effects, EffectContext{Owner: OwnerFish, Phase: PhaseOutcome, Outcome: domain.PlayerWin})
 
 	require.Len(t, filteredEffects, 1)
-	assert.Equal(t, effects[1], filteredEffects[0])
+	assert.Equal(t, effects[1].Normalize(), filteredEffects[0])
 }
 
 func TestFilterEffectsForDrawPhase(t *testing.T) {
@@ -116,7 +116,58 @@ func TestFilterEffectsForDrawPhase(t *testing.T) {
 	filteredEffects := FilterEffects(effects, EffectContext{Owner: OwnerFish, Phase: PhaseDraw})
 
 	require.Len(t, filteredEffects, 1)
-	assert.Equal(t, effects[0], filteredEffects[0])
+	assert.Equal(t, effects[0].Normalize(), filteredEffects[0])
+}
+
+func TestCardEffectNormalizeInfersTypeAndPriority(t *testing.T) {
+	effect := CardEffect{Trigger: TriggerOnOwnerWin, DistanceShift: 1}
+
+	normalized := effect.Normalize()
+
+	assert.Equal(t, EffectTypeAdvanceHorizontal, normalized.Type)
+	assert.Equal(t, 50, normalized.Priority)
+}
+
+func TestOrderOwnedEffectsPrefersHigherPriorityAndFishTies(t *testing.T) {
+	effects := []OwnedEffect{{
+		Owner:  OwnerPlayer,
+		Effect: CardEffect{Trigger: TriggerOnOwnerWin, DistanceShift: -1, Priority: 40},
+	}, {
+		Owner:  OwnerFish,
+		Effect: CardEffect{Trigger: TriggerOnOwnerWin, DepthShift: 1, Priority: 40},
+	}, {
+		Owner:  OwnerPlayer,
+		Effect: CardEffect{Trigger: TriggerOnDraw, CaptureDistanceBonus: 1, Priority: 60},
+	}}
+
+	ordered := OrderOwnedEffects(effects)
+
+	require.Len(t, ordered, 3)
+	assert.Equal(t, 60, ordered[0].Effect.Priority)
+	assert.Equal(t, OwnerFish, ordered[1].Owner)
+	assert.Equal(t, OwnerPlayer, ordered[2].Owner)
+}
+
+func TestCardEffectAppliesColorSpecificTriggers(t *testing.T) {
+	effect := CardEffect{Trigger: TriggerOnOwnerColorWin, DistanceShift: 1}
+	context := EffectContext{
+		Owner:          OwnerPlayer,
+		Phase:          PhaseOutcome,
+		Outcome:        domain.PlayerWin,
+		CardMove:       domain.Red,
+		TriggerMove:    domain.Red,
+		HasTriggerMove: true,
+	}
+
+	assert.True(t, effect.Applies(context))
+	assert.False(t, effect.Applies(EffectContext{
+		Owner:          OwnerPlayer,
+		Phase:          PhaseOutcome,
+		Outcome:        domain.PlayerWin,
+		CardMove:       domain.Blue,
+		TriggerMove:    domain.Red,
+		HasTriggerMove: true,
+	}))
 }
 
 func TestNewFishCard(t *testing.T) {
@@ -125,7 +176,7 @@ func TestNewFishCard(t *testing.T) {
 
 	require.Len(t, card.Effects, 1)
 	assert.Equal(t, domain.Red, card.Move)
-	assert.Equal(t, effect, card.Effects[0])
+	assert.Equal(t, effect.Normalize(), card.Effects[0])
 }
 
 func TestNewPlayerCard(t *testing.T) {
@@ -134,7 +185,7 @@ func TestNewPlayerCard(t *testing.T) {
 
 	require.Len(t, card.Effects, 1)
 	assert.Equal(t, domain.Blue, card.Move)
-	assert.Equal(t, effect, card.Effects[0])
+	assert.Equal(t, effect.Normalize(), card.Effects[0])
 }
 
 func TestNewNamedPlayerCard(t *testing.T) {

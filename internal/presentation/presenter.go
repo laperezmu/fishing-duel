@@ -118,6 +118,7 @@ func (p Presenter) Round(snapshot match.RoundSnapshot) RoundView {
 		Outcome:      snapshot.Outcome,
 		OutcomeLabel: p.roundOutcomeLabel(snapshot.Outcome),
 		EventLabel:   p.eventLabel(snapshot.Encounter.LastEvent),
+		Resolved:     p.resolvedEffectLabels(snapshot.ResolvedEffects),
 	}
 }
 
@@ -354,22 +355,8 @@ func (p Presenter) playerCardHint(moveState match.MoveResourceSnapshot) string {
 
 	parts := make([]string, 0, len(topCard.Effects))
 	for _, effect := range topCard.Effects {
-		impactParts := make([]string, 0, 5)
-		if effect.DistanceShift != 0 {
-			impactParts = append(impactParts, fmt.Sprintf("dist %+d", effect.DistanceShift))
-		}
-		if effect.DepthShift != 0 {
-			impactParts = append(impactParts, fmt.Sprintf("prof %+d", effect.DepthShift))
-		}
-		if effect.CaptureDistanceBonus != 0 {
-			impactParts = append(impactParts, fmt.Sprintf("capt %+d", effect.CaptureDistanceBonus))
-		}
-		if effect.SurfaceDepthBonus != 0 {
-			impactParts = append(impactParts, fmt.Sprintf("sup %+d", effect.SurfaceDepthBonus))
-		}
-		if effect.ExhaustionCaptureDistanceBonus != 0 {
-			impactParts = append(impactParts, fmt.Sprintf("baraja %+d", effect.ExhaustionCaptureDistanceBonus))
-		}
+		effect = effect.Normalize()
+		impactParts := effectImpactParts(effect)
 		if len(impactParts) == 0 {
 			continue
 		}
@@ -378,6 +365,32 @@ func (p Presenter) playerCardHint(moveState match.MoveResourceSnapshot) string {
 	}
 
 	return strings.Join(parts, " | ")
+}
+
+func effectImpactParts(effect cards.CardEffect) []string {
+	parts := make([]string, 0, 5)
+	if effect.DistanceShift != 0 {
+		parts = append(parts, fmt.Sprintf("dist %+d", effect.DistanceShift))
+	}
+	if effect.DepthShift != 0 {
+		parts = append(parts, fmt.Sprintf("prof %+d", effect.DepthShift))
+	}
+	if effect.CaptureDistanceBonus != 0 {
+		parts = append(parts, fmt.Sprintf("capt %+d", effect.CaptureDistanceBonus))
+	}
+	if effect.SurfaceDepthBonus != 0 {
+		parts = append(parts, fmt.Sprintf("sup %+d", effect.SurfaceDepthBonus))
+	}
+	if effect.ExhaustionCaptureDistanceBonus != 0 {
+		parts = append(parts, fmt.Sprintf("baraja %+d", effect.ExhaustionCaptureDistanceBonus))
+	}
+	if effect.Type == cards.EffectTypeHideDiscardTemporary {
+		parts = append(parts, "desc oculto")
+	}
+	if effect.Type == cards.EffectTypeSuccessfulSplashApproach {
+		parts = append(parts, "splash acerca")
+	}
+	return parts
 }
 
 func (p Presenter) runStatusLabel(status run.Status) string {
@@ -524,16 +537,57 @@ func (p Presenter) fishDiscardEntryLabel(entry match.FishDiscardEntryState) stri
 }
 
 func triggerLabel(trigger cards.Trigger) string {
-	switch trigger {
-	case cards.TriggerOnDraw:
-		return "draw"
-	case cards.TriggerOnOwnerWin:
-		return "si gana"
-	case cards.TriggerOnOwnerLose:
-		return "si pierde"
-	case cards.TriggerOnRoundDraw:
-		return "empate"
+	if label, ok := triggerLabels[trigger]; ok {
+		return label
+	}
+	return "efecto"
+}
+
+var triggerLabels = map[cards.Trigger]string{
+	cards.TriggerOnDraw:           "draw",
+	cards.TriggerOnOwnerWin:       "si gana",
+	cards.TriggerOnOwnerLose:      "si pierde",
+	cards.TriggerOnRoundDraw:      "empate",
+	cards.TriggerOnCardUsed:       "al usar",
+	cards.TriggerOnFishSplash:     "si splash",
+	cards.TriggerOnDiscard:        "descarte",
+	cards.TriggerOnFishReshuffle:  "si reshuffle",
+	cards.TriggerOnFishExhausted:  "si fatiga",
+	cards.TriggerOnColorDraw:      "empate color",
+	cards.TriggerOnOwnerColorWin:  "si gana color",
+	cards.TriggerOnOwnerColorLose: "si pierde color",
+}
+
+func (p Presenter) resolvedEffectLabels(effects []match.ResolvedEffectState) []string {
+	labels := make([]string, 0, len(effects))
+	for _, effect := range effects {
+		owner := "jugador"
+		if effect.Owner == cards.OwnerFish {
+			owner = "pez"
+		}
+		labels = append(labels, fmt.Sprintf("%s | %s | p%d", owner, effectTypeLabel(effect.Type), effect.Priority))
+	}
+
+	return labels
+}
+
+func effectTypeLabel(effectType cards.EffectType) string {
+	switch effectType {
+	case cards.EffectTypeAdvanceHorizontal:
+		return "avance horizontal"
+	case cards.EffectTypeAdvanceVertical:
+		return "avance vertical"
+	case cards.EffectTypeLegacyCaptureWindow:
+		return "ventana captura"
+	case cards.EffectTypeLegacySurfaceWindow:
+		return "ventana superficie"
+	case cards.EffectTypeLegacyExhaustionWindow:
+		return "ventana agotamiento"
+	case cards.EffectTypeHideDiscardTemporary:
+		return "oculta descarte"
+	case cards.EffectTypeSuccessfulSplashApproach:
+		return "splash acerca"
 	default:
-		return "efecto"
+		return string(effectType)
 	}
 }

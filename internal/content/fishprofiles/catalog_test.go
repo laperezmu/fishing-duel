@@ -1,6 +1,7 @@
 package fishprofiles
 
 import (
+	"pesca/internal/cards"
 	"pesca/internal/content/habitats"
 	"pesca/internal/content/waterpools"
 	"testing"
@@ -129,4 +130,60 @@ func TestResolveSpawnCanUseClosedPoolSubset(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, ProfileID("surface-control"), spawn.Profile.ID)
 	assert.Equal(t, 3, spawn.CandidateCount)
+}
+
+func TestDefaultCatalogUsesNormalizedEffects(t *testing.T) {
+	for _, profile := range DefaultProfiles() {
+		for _, pattern := range profile.Cards {
+			for _, effect := range pattern.Effects {
+				assert.NotEqual(t, cards.EffectTypeUnknown, effect.Type)
+				assert.Positive(t, effect.Priority)
+			}
+		}
+	}
+}
+
+func TestDefaultCatalogCoversLegacyMappings(t *testing.T) {
+	hasCaptureWindow := false
+	hasSurfaceWindow := false
+	hasExhaustionWindow := false
+	hasHorizontal := false
+	hasVertical := false
+
+	for _, profile := range DefaultProfiles() {
+		for _, pattern := range profile.Cards {
+			for _, effect := range pattern.Effects {
+				switch effect.Type {
+				case cards.EffectTypeLegacyCaptureWindow:
+					hasCaptureWindow = true
+				case cards.EffectTypeLegacySurfaceWindow:
+					hasSurfaceWindow = true
+				case cards.EffectTypeLegacyExhaustionWindow:
+					hasExhaustionWindow = true
+				case cards.EffectTypeAdvanceHorizontal:
+					hasHorizontal = true
+				case cards.EffectTypeAdvanceVertical:
+					hasVertical = true
+				}
+			}
+		}
+	}
+
+	assert.True(t, hasCaptureWindow)
+	assert.True(t, hasSurfaceWindow)
+	assert.True(t, hasExhaustionWindow)
+	assert.True(t, hasHorizontal)
+	assert.True(t, hasVertical)
+}
+
+func TestDefaultCatalogJSONUsesExplicitEffectMetadata(t *testing.T) {
+	profiles := DefaultProfiles()
+	for _, profile := range profiles {
+		for _, card := range profile.Cards {
+			for _, effect := range card.Effects {
+				assert.NotZero(t, effect.Priority)
+				assert.NotEqual(t, cards.EffectTypeUnknown, effect.Type)
+			}
+		}
+	}
 }

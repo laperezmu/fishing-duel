@@ -151,6 +151,34 @@ func TestTrackPolicyApplyUsesRoundThresholdBonuses(t *testing.T) {
 	assert.Equal(t, 1, state.Lifecycle.Stats.PlayerWins)
 }
 
+func TestTrackPolicyApplyResolvesOutcomeEffectsSequentially(t *testing.T) {
+	state := newMatchState(t)
+	state.Encounter.Depth = 1
+	state.Encounter.Distance = 3
+	progressionState := state.ProgressionState()
+
+	TrackPolicy{}.Apply(&progressionState, match.ResolvedRound{
+		PlayerMove: domain.Blue,
+		FishCard:   cards.NewFishCard(domain.Red),
+		OutcomeEffects: []cards.CardEffect{{
+			Trigger:    cards.TriggerOnOwnerLose,
+			Type:       cards.EffectTypeAdvanceVertical,
+			Priority:   50,
+			DepthShift: -2,
+		}, {
+			Trigger:       cards.TriggerOnOwnerLose,
+			Type:          cards.EffectTypeAdvanceHorizontal,
+			Priority:      40,
+			DistanceShift: -1,
+		}},
+		Outcome: domain.PlayerWin,
+	})
+
+	assert.Equal(t, 1, state.Encounter.Distance)
+	assert.Equal(t, 0, state.Encounter.Depth)
+	assert.Equal(t, encounter.Event{Kind: encounter.EventKindSplash, Escaped: false}, state.Encounter.LastEvent)
+}
+
 func TestAccumulateCardEffects(t *testing.T) {
 	tests := []struct {
 		title        string

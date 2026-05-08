@@ -115,37 +115,59 @@ func (engine *Engine) PlayRound(playerMove domain.Move) (match.RoundResult, erro
 	}
 
 	engine.state.Round.Number++
-	drawEffects := cards.FilterEffects(playerCard.Effects, cards.EffectContext{
-		Owner: cards.OwnerPlayer,
-		Phase: cards.PhaseDraw,
-	})
-	drawEffects = append(drawEffects, cards.FilterEffects(fishCard.Effects, cards.EffectContext{
-		Owner: cards.OwnerFish,
-		Phase: cards.PhaseDraw,
+	drawEffects := cards.OrderOwnedEffects(cards.FilterOwnedEffects(playerCard.Effects, cards.EffectContext{
+		Owner:    cards.OwnerPlayer,
+		Phase:    cards.PhaseDraw,
+		CardMove: playerCard.Move,
+	}))
+	drawEffects = append(drawEffects, cards.FilterOwnedEffects(fishCard.Effects, cards.EffectContext{
+		Owner:    cards.OwnerFish,
+		Phase:    cards.PhaseDraw,
+		CardMove: fishCard.Move,
 	})...)
-	encounter.ApplyThresholdEffects(&engine.state.Round.Thresholds, drawEffects)
+	orderedDrawEffects := cards.FlattenOwnedEffects(cards.OrderOwnedEffects(drawEffects))
+	encounter.ApplyThresholdEffects(&engine.state.Round.Thresholds, orderedDrawEffects)
 
 	roundOutcome := engine.roundEvaluator.Evaluate(playerMove, fishCard.Move)
 	playerMoveRuntime = engine.state.PlayerMoveRuntime()
 	engine.playerMoves.ConsumeMove(&playerMoveRuntime, playerMove)
-	outcomeEffects := cards.FilterEffects(playerCard.Effects, cards.EffectContext{
-		Owner:   cards.OwnerPlayer,
-		Phase:   cards.PhaseOutcome,
-		Outcome: roundOutcome,
+	preProgressionEncounter := engine.state.Encounter
+	preProgressionDeck := engine.state.Deck
+	outcomeEffects := cards.FilterOwnedEffects(playerCard.Effects, cards.EffectContext{
+		Owner:          cards.OwnerPlayer,
+		Phase:          cards.PhaseOutcome,
+		Outcome:        roundOutcome,
+		CardMove:       playerCard.Move,
+		TriggerMove:    playerMove,
+		HasTriggerMove: true,
+		FishDidSplash:  preProgressionEncounter.LastEvent.Kind == encounter.EventKindSplash || preProgressionEncounter.Splash != nil,
+		FishReshuffled: preProgressionDeck.RecycleCount > 0,
+		FishExhausted:  preProgressionDeck.Exhausted,
 	})
-	outcomeEffects = append(outcomeEffects, cards.FilterEffects(fishCard.Effects, cards.EffectContext{
-		Owner:   cards.OwnerFish,
-		Phase:   cards.PhaseOutcome,
-		Outcome: roundOutcome,
+	outcomeEffects = append(outcomeEffects, cards.FilterOwnedEffects(fishCard.Effects, cards.EffectContext{
+		Owner:          cards.OwnerFish,
+		Phase:          cards.PhaseOutcome,
+		Outcome:        roundOutcome,
+		CardMove:       fishCard.Move,
+		TriggerMove:    fishCard.Move,
+		HasTriggerMove: true,
+		FishDidSplash:  preProgressionEncounter.LastEvent.Kind == encounter.EventKindSplash || preProgressionEncounter.Splash != nil,
+		FishReshuffled: preProgressionDeck.RecycleCount > 0,
+		FishExhausted:  preProgressionDeck.Exhausted,
 	})...)
-	encounter.ApplyThresholdEffects(&engine.state.Round.Thresholds, outcomeEffects)
+	orderedOutcomeEffects := cards.FlattenOwnedEffects(cards.OrderOwnedEffects(outcomeEffects))
+	encounter.ApplyThresholdEffects(&engine.state.Round.Thresholds, orderedOutcomeEffects)
+	orderedDrawOwned := cards.OrderOwnedEffects(drawEffects)
+	orderedOutcomeOwned := cards.OrderOwnedEffects(outcomeEffects)
 	progressionState := engine.state.ProgressionState()
 	engine.progressionPolicy.Apply(&progressionState, match.ResolvedRound{
 		PlayerMove:     playerMove,
 		PlayerCard:     playerCard,
 		FishCard:       fishCard,
-		DrawEffects:    append([]cards.CardEffect(nil), drawEffects...),
-		OutcomeEffects: append([]cards.CardEffect(nil), outcomeEffects...),
+		DrawOwned:      append([]cards.OwnedEffect(nil), orderedDrawOwned...),
+		OutcomeOwned:   append([]cards.OwnedEffect(nil), orderedOutcomeOwned...),
+		DrawEffects:    append([]cards.CardEffect(nil), orderedDrawEffects...),
+		OutcomeEffects: append([]cards.CardEffect(nil), orderedOutcomeEffects...),
 		Outcome:        roundOutcome,
 	})
 
@@ -160,15 +182,31 @@ func (engine *Engine) PlayRound(playerMove domain.Move) (match.RoundResult, erro
 	}
 
 	return match.RoundResult{
-		Round:      engine.state.Round.Number,
-		PlayerMove: playerMove,
-		PlayerCard: playerCard,
-		FishMove:   fishCard.Move,
-		FishCard:   fishCard,
-		Outcome:    roundOutcome,
-		Status:     match.NewStatusSnapshot(engine.state),
-		Encounter:  match.NewEncounterEventSnapshot(engine.state.Encounter),
+		Round:           engine.state.Round.Number,
+		PlayerMove:      playerMove,
+		PlayerCard:      playerCard,
+		FishMove:        fishCard.Move,
+		FishCard:        fishCard,
+		Outcome:         roundOutcome,
+		ResolvedEffects: append(buildResolvedEffectStates(orderedDrawOwned), buildResolvedEffectStates(orderedOutcomeOwned)...),
+		Status:          match.NewStatusSnapshot(engine.state),
+		Encounter:       match.NewEncounterEventSnapshot(engine.state.Encounter),
 	}, nil
+}
+
+func buildResolvedEffectStates(effects []cards.OwnedEffect) []match.ResolvedEffectState {
+	resolved := make([]match.ResolvedEffectState, 0, len(effects))
+	for _, effect := range effects {
+		normalized := effect.Effect.Normalize()
+		resolved = append(resolved, match.ResolvedEffectState{
+			Owner:    effect.Owner,
+			Trigger:  normalized.Trigger,
+			Type:     normalized.Type,
+			Priority: normalized.Priority,
+		})
+	}
+
+	return resolved
 }
 
 func (engine *Engine) ResolveSplash(resolution encounter.SplashResolution) error {

@@ -53,12 +53,15 @@ type cardPatternRecord struct {
 }
 
 type cardEffectRecord struct {
-	Trigger                        string `json:"trigger"`
-	DistanceShift                  int    `json:"distance_shift,omitempty"`
-	DepthShift                     int    `json:"depth_shift,omitempty"`
-	CaptureDistanceBonus           int    `json:"capture_distance_bonus,omitempty"`
-	ExhaustionCaptureDistanceBonus int    `json:"exhaustion_capture_distance_bonus,omitempty"`
-	SurfaceDepthBonus              int    `json:"surface_depth_bonus,omitempty"`
+	Trigger                        string           `json:"trigger"`
+	Type                           cards.EffectType `json:"effect_type,omitempty"`
+	Priority                       int              `json:"priority,omitempty"`
+	TargetMove                     string           `json:"target_move,omitempty"`
+	DistanceShift                  int              `json:"distance_shift,omitempty"`
+	DepthShift                     int              `json:"depth_shift,omitempty"`
+	CaptureDistanceBonus           int              `json:"capture_distance_bonus,omitempty"`
+	ExhaustionCaptureDistanceBonus int              `json:"exhaustion_capture_distance_bonus,omitempty"`
+	SurfaceDepthBonus              int              `json:"surface_depth_bonus,omitempty"`
 }
 
 type poolRecord struct {
@@ -187,25 +190,54 @@ func parseMove(value string) (domain.Move, error) {
 
 func (record cardEffectRecord) toDomain() (cards.CardEffect, error) {
 	effect := cards.CardEffect{
+		Type:                           record.Type,
+		Priority:                       record.Priority,
 		DistanceShift:                  record.DistanceShift,
 		DepthShift:                     record.DepthShift,
 		CaptureDistanceBonus:           record.CaptureDistanceBonus,
 		ExhaustionCaptureDistanceBonus: record.ExhaustionCaptureDistanceBonus,
 		SurfaceDepthBonus:              record.SurfaceDepthBonus,
 	}
-
-	switch record.Trigger {
-	case "on_draw":
-		effect.Trigger = cards.TriggerOnDraw
-	case "on_owner_win":
-		effect.Trigger = cards.TriggerOnOwnerWin
-	case "on_owner_lose":
-		effect.Trigger = cards.TriggerOnOwnerLose
-	case "on_round_draw":
-		effect.Trigger = cards.TriggerOnRoundDraw
-	default:
-		return cards.CardEffect{}, fmt.Errorf("unknown trigger %s", record.Trigger)
+	if record.TargetMove != "" {
+		targetMove, err := parseMove(record.TargetMove)
+		if err != nil {
+			return cards.CardEffect{}, fmt.Errorf("target move: %w", err)
+		}
+		effect.TargetMove = targetMove
 	}
 
-	return effect, nil
+	trigger, err := parseTrigger(record.Trigger)
+	if err != nil {
+		return cards.CardEffect{}, err
+	}
+	effect.Trigger = trigger
+
+	if err := effect.Validate(); err != nil {
+		return cards.CardEffect{}, err
+	}
+
+	return effect.Normalize(), nil
+}
+
+func parseTrigger(value string) (cards.Trigger, error) {
+	trigger, ok := triggerRecords[value]
+	if !ok {
+		return 0, fmt.Errorf("unknown trigger %s", value)
+	}
+	return trigger, nil
+}
+
+var triggerRecords = map[string]cards.Trigger{
+	"on_draw":             cards.TriggerOnDraw,
+	"on_card_used":        cards.TriggerOnCardUsed,
+	"on_owner_win":        cards.TriggerOnOwnerWin,
+	"on_owner_lose":       cards.TriggerOnOwnerLose,
+	"on_round_draw":       cards.TriggerOnRoundDraw,
+	"on_fish_splash":      cards.TriggerOnFishSplash,
+	"on_discard":          cards.TriggerOnDiscard,
+	"on_fish_reshuffle":   cards.TriggerOnFishReshuffle,
+	"on_fish_exhausted":   cards.TriggerOnFishExhausted,
+	"on_color_draw":       cards.TriggerOnColorDraw,
+	"on_owner_color_win":  cards.TriggerOnOwnerColorWin,
+	"on_owner_color_lose": cards.TriggerOnOwnerColorLose,
 }

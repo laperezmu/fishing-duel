@@ -1,6 +1,7 @@
 package encounter
 
 import (
+	"pesca/internal/cards"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -78,6 +79,25 @@ func TestApplySplashResolution(t *testing.T) {
 	assert.Equal(t, Event{Kind: EventKindSplash, Escaped: true}, state.LastEvent)
 	assert.Equal(t, StatusEscaped, state.Status)
 	assert.Equal(t, EndReasonSplashEscape, state.EndReason)
+}
+
+func TestApplyMovementEffectsResolvesInOrder(t *testing.T) {
+	state := newEncounterState(t)
+	state.Depth = 1
+
+	ApplyMovementEffects(&state, []cards.CardEffect{{
+		Type:       cards.EffectTypeAdvanceVertical,
+		Priority:   50,
+		DepthShift: -2,
+	}, {
+		Type:          cards.EffectTypeAdvanceHorizontal,
+		Priority:      40,
+		DistanceShift: -1,
+	}})
+
+	assert.Equal(t, 2, state.Distance)
+	assert.Equal(t, 0, state.Depth)
+	assert.Equal(t, Event{Kind: EventKindSplash, Escaped: false}, state.LastEvent)
 }
 
 func newEncounterState(t *testing.T) State {

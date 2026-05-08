@@ -49,6 +49,11 @@ func (config Config) Validate() error {
 			if playerCard.Move != move {
 				return fmt.Errorf("initial deck for move %s contains a card for move %s", move, playerCard.Move)
 			}
+			for index, effect := range playerCard.Effects {
+				if err := effect.Validate(); err != nil {
+					return fmt.Errorf("initial deck for move %s contains invalid effect %d: %w", move, index, err)
+				}
+			}
 		}
 		if len(initialDeck) == 0 {
 			return fmt.Errorf("initial deck for move %s must contain at least one card", move)

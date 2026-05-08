@@ -93,6 +93,10 @@ func TestSessionRun(t *testing.T) {
 	t.Run("resolves pending splash before showing the round", func(t *testing.T) {
 		fixture := newSessionFixture(t)
 		fixture.ongoingState.Player.Loadout = fixture.finishedState.Player.Loadout
+		fixture.roundResult.ResolvedEffects = []match.ResolvedEffectState{{
+			Owner:    "fish",
+			Priority: 60,
+		}}
 		fixture.roundResult.Encounter = match.EncounterEventSnapshot{
 			LastEvent: encounter.Event{Kind: encounter.EventKindSplash},
 			Splash: &match.SplashSnapshot{
@@ -116,7 +120,9 @@ func TestSessionRun(t *testing.T) {
 		fixture.ui.On("ShowIntro", fixture.intro).Return(nil).Once()
 		fixture.presenter.On("Status", fixture.statusSnapshot).Return(fixture.status).Once()
 		fixture.ui.On("ChooseMove", fixture.status, fixture.status.MoveOptions).Return(domain.Blue, nil).Once()
-		fixture.presenter.On("Round", mock.AnythingOfType("match.RoundSnapshot")).Return(fixture.round).Once()
+		fixture.presenter.On("Round", mock.MatchedBy(func(snapshot match.RoundSnapshot) bool {
+			return len(snapshot.ResolvedEffects) == 1 && snapshot.ResolvedEffects[0].Priority == 60
+		})).Return(fixture.round).Once()
 		fixture.ui.On("ShowRound", fixture.round).Return(nil).Once()
 		fixture.presenter.On("Summary", fixture.summarySnapshot).Return(fixture.summary).Once()
 		fixture.ui.On("ShowGameOver", fixture.summary).Return(nil).Once()

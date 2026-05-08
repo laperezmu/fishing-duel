@@ -140,8 +140,13 @@ func TestPresenterRound(t *testing.T) {
 		PlayerMove: domain.Blue,
 		FishMove:   domain.Red,
 		Outcome:    domain.PlayerWin,
-		Status:     match.NewStatusSnapshot(match.State{Encounter: encounterState}),
-		Encounter:  match.EncounterEventSnapshot{LastEvent: encounterState.LastEvent},
+		ResolvedEffects: []match.ResolvedEffectState{{
+			Owner:    cards.OwnerFish,
+			Type:     cards.EffectTypeLegacyCaptureWindow,
+			Priority: 60,
+		}},
+		Status:    match.NewStatusSnapshot(match.State{Encounter: encounterState}),
+		Encounter: match.EncounterEventSnapshot{LastEvent: encounterState.LastEvent},
 	}))
 
 	assert.Equal(t, "Lanzar", round.PlayerLabel)
@@ -149,6 +154,8 @@ func TestPresenterRound(t *testing.T) {
 	assert.Equal(t, domain.PlayerWin, round.Outcome)
 	assert.Equal(t, "aventaja el jugador", round.OutcomeLabel)
 	assert.Equal(t, "chapotea: sigue enganchado", round.EventLabel)
+	require.Len(t, round.Resolved, 1)
+	assert.Equal(t, "pez | ventana captura | p60", round.Resolved[0])
 }
 
 func TestPresenterSummary(t *testing.T) {

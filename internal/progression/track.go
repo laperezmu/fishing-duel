@@ -10,32 +10,32 @@ import (
 type TrackPolicy struct{}
 
 func (policy TrackPolicy) Apply(state *match.ProgressionState, round match.ResolvedRound) {
-	delta := encounter.Delta{}
 	captureDistance := encounter.EffectiveCaptureDistance(state.Encounter.Config, state.Round.Thresholds)
 	surfaceDepth := encounter.EffectiveSurfaceDepth(state.Encounter.Config, state.Round.Thresholds)
+	baseDelta := encounter.Delta{}
 
 	switch round.Outcome {
 	case domain.PlayerWin:
 		state.Lifecycle.Stats.PlayerWins++
 		if state.Encounter.Distance <= captureDistance && state.Encounter.Depth > surfaceDepth {
-			delta.DepthShift--
+			baseDelta.DepthShift--
 		} else {
-			delta.DistanceShift -= state.Encounter.Config.PlayerWinStep
+			baseDelta.DistanceShift -= state.Encounter.Config.PlayerWinStep
 		}
 	case domain.FishWin:
 		state.Lifecycle.Stats.FishWins++
-		delta.DistanceShift += state.Encounter.Config.FishWinStep
+		baseDelta.DistanceShift += state.Encounter.Config.FishWinStep
 	default:
 		state.Lifecycle.Stats.Draws++
 	}
 
-	delta = accumulateCardEffects(delta, round.OutcomeEffects)
-
-	encounter.ApplyDelta(state.Encounter, delta)
+	encounter.ApplyDelta(state.Encounter, baseDelta)
+	encounter.ApplyMovementEffects(state.Encounter, round.OutcomeEffects)
 }
 
 func accumulateCardEffects(delta encounter.Delta, effects []cards.CardEffect) encounter.Delta {
 	for _, effect := range effects {
+		effect = effect.Normalize()
 		delta.DistanceShift += effect.DistanceShift
 		delta.DepthShift += effect.DepthShift
 	}

@@ -372,6 +372,9 @@ func renderLastRoundSection(view presentation.RoundView) string {
 	if view.EventLabel != "" {
 		lines = append(lines, "  Evento    : "+view.EventLabel)
 	}
+	if len(view.Resolved) > 0 {
+		lines = append(lines, "  Efectos   : "+strings.Join(view.Resolved, " -> "))
+	}
 
 	return strings.Join(lines, "\n")
 }
