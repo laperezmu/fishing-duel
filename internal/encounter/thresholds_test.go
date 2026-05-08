@@ -36,3 +36,53 @@ func TestEffectiveThresholdHelpers(t *testing.T) {
 	assert.True(t, IsTrackCapture(state, thresholds))
 	assert.True(t, IsDeckExhaustionCapture(state, thresholds))
 }
+
+func TestIsTrackCaptureWithDifferentDistances(t *testing.T) {
+	state, err := NewState(DefaultConfig())
+	require.NoError(t, err)
+
+	t.Run("returns true when distance is at capture distance with bonus", func(t *testing.T) {
+		state.Distance = 1
+		state.Depth = 0
+		thresholds := RoundThresholds{CaptureDistanceBonus: 1}
+		assert.True(t, IsTrackCapture(state, thresholds))
+	})
+
+	t.Run("returns false when distance is above capture distance", func(t *testing.T) {
+		state.Distance = 2
+		state.Depth = 0
+		thresholds := RoundThresholds{}
+		assert.False(t, IsTrackCapture(state, thresholds))
+	})
+
+	t.Run("returns false when depth is above surface depth", func(t *testing.T) {
+		state.Distance = 0
+		state.Depth = 1
+		thresholds := RoundThresholds{}
+		assert.False(t, IsTrackCapture(state, thresholds))
+	})
+}
+
+func TestIsDeckExhaustionCaptureWithDifferentStates(t *testing.T) {
+	state, err := NewState(DefaultConfig())
+	require.NoError(t, err)
+	thresholds := RoundThresholds{}
+
+	t.Run("returns true when distance and depth are low", func(t *testing.T) {
+		state.Distance = 1
+		state.Depth = 0
+		assert.True(t, IsDeckExhaustionCapture(state, thresholds))
+	})
+
+	t.Run("returns false when distance is too high", func(t *testing.T) {
+		state.Distance = 3
+		state.Depth = 0
+		assert.False(t, IsDeckExhaustionCapture(state, thresholds))
+	})
+
+	t.Run("returns false when depth is too high", func(t *testing.T) {
+		state.Distance = 1
+		state.Depth = 2
+		assert.False(t, IsDeckExhaustionCapture(state, thresholds))
+	})
+}
