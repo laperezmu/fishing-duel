@@ -7,6 +7,17 @@
 
 ## User Scenarios & Testing *(mandatory)*
 
+### User Story 0 - Framing de comando (Priority: P0)
+
+Como usuario existente, quiero que el comando `fishing-duel` mantenga su nombre para no romper scripts o integraciones, pero la UX muestre un framing actualizado que indique que es un sandbox de encounters para QA y testing.
+
+**Rationale**: Mantener el comando `fishing-duel` evita cambios en scripts, integraciones CI y habitos existentes. El cambio es solo de framing (texto, ayuda, prompts).
+
+**Acceptance Scenarios**:
+
+1. **Given** un usuario que ejecuta `fishing-duel`, **When** ve la ayuda o los prompts, **Then** observa framing de "encounter sandbox" o similar en lugar de "fishing duel".
+2. **Given** un script existente que llama a `fishing-duel`, **When** se ejecuta, **Then** funciona sin cambios.
+
 ### User Story 1 - Configurar encounters de forma explicita (Priority: P1)
 
 Como disenador o tester, quiero abrir un sandbox de encounters con seleccion directa de presets, cartas concretas y parametros clave para reproducir combinaciones concretas sin depender de filtros implicitos del flujo actual.
@@ -71,11 +82,12 @@ Como QA o desarrollador, quiero lanzar escenarios guardados o configuraciones no
 - **FR-001**: El sistema MUST reemplazar el framing actual de `fishing-duel` por un sandbox formal de encounters orientado a exploracion, QA, debugging, balance y regresion.
 - **FR-002**: El sandbox MUST ofrecer un modo guiado compatible con el flujo actual para usuarios que no necesiten control total del setup.
 - **FR-003**: El sandbox MUST ofrecer un modo manual con seleccion explicita de preset de baraja del jugador, preset de cana, preset de aditamentos, preset de pez y contexto de agua.
-- **FR-003a**: El modo manual MUST permitir seleccionar cartas concretas del jugador y del pez para construir encuentros de prueba sin limitarse al orden o composicion completa de los presets base.
+- **FR-003a**: El modo manual MUST permitir seleccionar cartas concretas del jugador y del pez para construir encuentros de prueba sin limitarse al orden o composicion completa de los presets base. La identificacion de cartas se realiza por efecto y tipo de trigger (ej. "avance horizontal 2", "avance vertical 1 con reshuffle"), buscando en el catalogo del preset base. Se debe indicar claramente el origen de cada carta: preset_base, manual_replacement, o scenario_defined.
 - **FR-004**: El sandbox MUST permitir fijar una seed reproducible para repetir la misma configuracion derivada y el mismo comportamiento observable bajo las mismas entradas.
 - **FR-005**: El sandbox MUST permitir definir o sobrescribir al menos el resultado de apertura o cast band, la distancia inicial y la profundidad inicial del encounter.
 - **FR-006**: El sandbox MUST permitir controlar si las barajas relevantes usan orden fijo o barajado cuando el escenario de prueba lo requiera.
 - **FR-007**: El sandbox MUST permitir configurar o sobrescribir estados de prueba relevantes, incluyendo al menos thresholds del round, recycle count, exhaustion state, visibilidad de descarte y estado previo al splash.
+- **FR-007-MVP**: Como subconjunto MVP de FR-007, el sandbox MUST permitir sobrescribir: (a) distancia inicial y profundidad inicial del encounter, (b) capture distance base del Config, y (c) recycle count del deck. Otros overrides de estado (exhaustion capture distance, visibilidad de descarte, estado previo a splash) quedan fuera del alcance inicial y pueden añadirse en iteraciones futuras.
 - **FR-007a**: El sandbox MUST permitir que la seleccion manual de cartas concretas conviva con presets base y overrides, indicando claramente cuando una carta fue tomada del preset, reemplazada manualmente o definida por escenario.
 - **FR-008**: El sandbox MUST validar las combinaciones seleccionadas y comunicar de forma clara cuando una configuracion manual sea incompatible o invalida.
 - **FR-009**: El sandbox MUST mostrar la traza de resolucion de cada ronda con triggers activados, efectos resueltos, prioridad y desempates aplicados.
@@ -84,6 +96,7 @@ Como QA o desarrollador, quiero lanzar escenarios guardados o configuraciones no
 - **FR-012**: El sandbox MUST permitir ejecutar escenarios guardados o configuraciones reutilizables para QA y regresion.
 - **FR-012a**: Los escenarios guardados MUST poder fijar cartas concretas del jugador y del pez cuando la prueba requiera validar triggers, efectos o combinaciones puntuales.
 - **FR-013**: El sandbox MUST ofrecer al menos un camino no interactivo o semi-reproducible para lanzar una configuracion completa sin recorrer prompts manuales.
+- **FR-013-MVP**: Como subconjunto MVP de FR-013, el sandbox DEBE soportar escenarios reutilizables con seed fija (semi-reproducble) como camino baseline, permitiendo que un QA ejecute la misma configuracion多次 y obtenga el mismo resultado. El modo no interactivo (sin prompts) puede diferirse a una iteracion futura.
 - **FR-014**: El sandbox MUST permitir exportar o presentar una evidencia util de ejecucion para debugging o comparacion, como resumen textual estructurado o snapshot estructurado.
 - **FR-015**: El sistema MUST mantener la separacion actual de responsabilidades entre runtime, contenido, presentacion y CLI.
 - **FR-016**: El sistema MUST mantener `fishing-run` como flujo jugable diferenciado del sandbox y evitar mezclar sus objetivos de uso.

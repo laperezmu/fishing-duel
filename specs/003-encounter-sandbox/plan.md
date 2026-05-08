@@ -16,6 +16,7 @@ Formalizar `fishing-duel` como un sandbox de encounters con setup guiado y manua
 **Target Platform**: CLI on macOS/Linux/Windows  
 **Project Type**: modular Go application with CLI entrypoints under `cmd/`  
 **Constraints**: respetar division de responsabilidades y paquetes; seguir Effective Go y principios SOLID pragmaticos; mantener `internal/game`, `internal/encounter`, `internal/progression` y `internal/content/*` UI-agnostic; no afectar el flujo de `fishing-run`; agregar o actualizar tests unitarios cuando cambie comportamiento; alcanzar cobertura minima del 90% sobre los paquetes tocados por la feature; realizar cambios minimos necesarios para entregar el sandbox  
+**Rename Decision**: El comando se mantiene como `fishing-duel` para evitar romper scripts o integraciones existentes. La UX framing cambia de "fishing duel" a "encounter sandbox" o "sandbox de encounters" en los textos y ayuda del comando. Esta division permite cambiar el framing sin cambiar el nombre del binario.  
 **Scale/Scope**: single feature slice over the encounter sandbox surface, with guided/manual setup, richer inspection, and reproducible scenarios
 
 ## Constitution Check

@@ -26,8 +26,10 @@
 - Key fields:
   - `owner_scope`: jugador o pez.
   - `source_preset_id`: preset o perfil base del que se parte.
-  - `selected_cards`: lista ordenada de cartas concretas elegidas.
+  - `selected_cards`: lista de identificadores de cartas concretos.
   - `selection_mode`: mantener preset, reemplazar parcialmente o definir escenario completo.
+- Card identity mechanism: Cada carta se identifica por su efecto(s) y tipo de trigger. Por ejemplo, una carta de "avance horizontal 2" o "avance vertical 1 con reshuffle". El lookup busca en el catalogo de perfiles del preset las cartas que coincidan con los efectos y triggers especificados. Si no existe coincidencia exacta, se devuelve un error claro indicando que la carta solicitada no existe en el preset base.
+- Source tracking: Cada carta debe indicar su origen: preset_base, manual_replacement, o scenario_defined.
 - Validation rules:
   - Debe conservar consistencia con el dominio del owner correspondiente.
   - Debe indicar si cada carta viene del preset base o de un reemplazo de escenario.
@@ -40,6 +42,7 @@
   - `round_threshold_overrides`: thresholds efectivos del round.
   - `deck_state_overrides`: recycle count, exhaustion state, visibilidad de descarte.
   - `encounter_state_overrides`: estado previo al splash u otras condiciones iniciales soportadas.
+- MVP scope (FR-007-MVP): En la primera iteracion, solo se soportan overrides de distancia inicial, profundidad inicial, capture distance base del Config, initial round thresholds (CaptureDistanceBonus, ExhaustionCaptureDistanceBonus, SurfaceDepthBonus), y recycle count. Los overrides de exhaustion capture distance, visibilidad de descarte y estado previo a splash se diferiran a iteraciones futuras.
 - Validation rules:
   - Debe respetar limites del sandbox para evitar estados imposibles o incoherentes.
   - Debe generar mensajes claros cuando contradiga una combinacion base invalida.
