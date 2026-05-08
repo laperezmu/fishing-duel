@@ -129,11 +129,22 @@ func (ui *UI) ResolveSplash(view presentation.SplashView) (encounter.SplashResol
 		positions = buildSplashPositions(view.TotalSlots)
 	}
 
+	timeLimit := view.TimeLimit
+	if timeLimit <= 0 {
+		timeLimit = 30 * time.Second
+	}
+
 	inputCh, errCh := ui.startSplashInputWatcher()
 
-	currentPosition := 0
-	for _, position := range positions {
-		currentPosition = position
+	timer := time.NewTimer(timeLimit)
+	defer timer.Stop()
+	ticker := time.NewTicker(ui.castDelay)
+	defer ticker.Stop()
+
+	currentPosition := positions[0]
+	positionIndex := 0
+	for {
+		currentPosition = positions[positionIndex]
 		if _, err := io.WriteString(ui.out, renderSplashScreen(view, currentPosition, "")); err != nil {
 			return encounter.SplashResolution{}, err
 		}
@@ -141,19 +152,21 @@ func (ui *UI) ResolveSplash(view presentation.SplashView) (encounter.SplashResol
 		select {
 		case err := <-errCh:
 			return encounter.SplashResolution{}, err
+		case <-timer.C:
+			if _, err := io.WriteString(ui.out, clearSequence); err != nil {
+				return encounter.SplashResolution{}, err
+			}
+			return encounter.SplashResolution{Escaped: true}, nil
 		case <-inputCh:
 			return ui.resolveSplashStop(view, currentPosition)
-		default:
+		case <-ticker.C:
 		}
 
-		time.Sleep(ui.castDelay)
+		positionIndex++
+		if positionIndex >= len(positions) {
+			positionIndex = 0
+		}
 	}
-
-	if _, err := io.WriteString(ui.out, clearSequence); err != nil {
-		return encounter.SplashResolution{}, err
-	}
-
-	return encounter.SplashResolution{Escaped: true}, nil
 }
 
 func (ui *UI) startSplashInputWatcher() (<-chan struct{}, <-chan error) {

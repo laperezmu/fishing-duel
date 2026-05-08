@@ -563,3 +563,67 @@ type mockEndCondition struct {
 func (mockCondition *mockEndCondition) Apply(state *match.EndingState) {
 	mockCondition.Called(state)
 }
+
+func TestEngineResolveSplash(t *testing.T) {
+	t.Run("returns an error when the game is already finished", func(t *testing.T) {
+		fixture := newEngineFixture(t, match.State{Lifecycle: match.LifecycleState{Finished: true}, Player: match.PlayerState{Loadout: samplePlayerLoadoutState(t)}})
+
+		err := fixture.engine.ResolveSplash(encounter.SplashResolution{})
+
+		assert.ErrorIs(t, err, game.ErrGameFinished)
+	})
+
+	t.Run("applies the resolution and finishes the game when splash escape occurs", func(t *testing.T) {
+		fixture := newEngineFixture(t, match.State{
+			Player: match.PlayerState{Loadout: samplePlayerLoadoutState(t)},
+			Encounter: encounter.State{
+				Config:    encounter.DefaultConfig(),
+				Splash:    &encounter.SplashState{TotalJumps: 1},
+				LastEvent: encounter.Event{Kind: encounter.EventKindSplash},
+			},
+		})
+		fixture.fishDeck.visibilitySnapshots = append(fixture.fishDeck.visibilitySnapshots, deck.VisibilitySnapshot{Exhausted: false, ShufflesOnRecycle: true}, deck.VisibilitySnapshot{Exhausted: false, ShufflesOnRecycle: true})
+		fixture.fishDeck.On("ActiveCount").Return(7).Once()
+		fixture.fishDeck.On("DiscardCount").Return(2).Once()
+		fixture.fishDeck.On("RecycleCount").Return(1).Once()
+		fixture.fishDeck.On("Exhausted").Return(false).Once()
+		fixture.endCondition.On("Apply", mock.AnythingOfType("*match.EndingState")).Run(func(arguments mock.Arguments) {
+			state := arguments.Get(0).(*match.EndingState)
+			state.Lifecycle.Finished = true
+			state.Encounter.Status = encounter.StatusEscaped
+			state.Encounter.EndReason = encounter.EndReasonSplashEscape
+		}).Once()
+
+		err := fixture.engine.ResolveSplash(encounter.SplashResolution{Escaped: true})
+
+		assert.NoError(t, err)
+		assert.True(t, fixture.engine.State().Lifecycle.Finished)
+		assert.Equal(t, encounter.StatusEscaped, fixture.engine.State().Encounter.Status)
+		assert.Equal(t, encounter.EndReasonSplashEscape, fixture.engine.State().Encounter.EndReason)
+		fixture.assertExpectations(t)
+	})
+
+	t.Run("applies the resolution and continues when splash succeeds", func(t *testing.T) {
+		fixture := newEngineFixture(t, match.State{
+			Player: match.PlayerState{Loadout: samplePlayerLoadoutState(t)},
+			Encounter: encounter.State{
+				Config:    encounter.DefaultConfig(),
+				Splash:    &encounter.SplashState{TotalJumps: 1},
+				LastEvent: encounter.Event{Kind: encounter.EventKindSplash},
+			},
+		})
+		fixture.fishDeck.visibilitySnapshots = append(fixture.fishDeck.visibilitySnapshots, deck.VisibilitySnapshot{Exhausted: false, ShufflesOnRecycle: true}, deck.VisibilitySnapshot{Exhausted: false, ShufflesOnRecycle: true})
+		fixture.fishDeck.On("ActiveCount").Return(7).Once()
+		fixture.fishDeck.On("DiscardCount").Return(2).Once()
+		fixture.fishDeck.On("RecycleCount").Return(1).Once()
+		fixture.fishDeck.On("Exhausted").Return(false).Once()
+		fixture.endCondition.On("Apply", mock.AnythingOfType("*match.EndingState")).Once()
+
+		err := fixture.engine.ResolveSplash(encounter.SplashResolution{SuccessfulJumps: 1})
+
+		assert.NoError(t, err)
+		assert.False(t, fixture.engine.State().Lifecycle.Finished)
+		assert.Nil(t, fixture.engine.State().Encounter.Splash)
+		fixture.assertExpectations(t)
+	})
+}

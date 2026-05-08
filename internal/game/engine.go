@@ -180,6 +180,9 @@ func (engine *Engine) ResolveSplash(resolution encounter.SplashResolution) error
 	engine.refreshState()
 	endingState := engine.state.EndingState()
 	engine.endCondition.Apply(&endingState)
+	if engine.state.Lifecycle.Finished {
+		return nil
+	}
 	if engine.state.Encounter.Splash == nil {
 		engine.resetRoundState()
 	}

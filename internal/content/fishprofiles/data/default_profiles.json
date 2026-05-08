@@ -19,7 +19,7 @@
         "max_initial_depth": 2,
         "required_habitat_tags": []
       },
-      "splash": {"jump_count": 1, "time_limit_millis": 1000},
+      "splash": {"jump_count": 1, "time_limit_millis": 30000},
       "cards": [{"move": "blue"}, {"move": "blue"}, {"move": "blue"}, {"move": "red"}, {"move": "red"}, {"move": "red"}, {"move": "yellow"}, {"move": "yellow"}, {"move": "yellow"}],
       "cards_to_remove": 3,
       "shuffle": true
@@ -132,7 +132,7 @@
         "max_initial_depth": 1,
         "required_habitat_tags": ["surface"]
       },
-      "splash": {"jump_count": 3, "time_limit_millis": 800},
+      "splash": {"jump_count": 3, "time_limit_millis": 30000},
       "cards": [
         {"name": "Rebote de espuma", "summary": "Si pierde, sube un nivel hacia la superficie.", "move": "blue", "effects": [{"trigger": "on_owner_lose", "depth_shift": -1}]},
         {"name": "Marea calma", "summary": "En empate el pez cuenta como un nivel mas cerca de la superficie.", "move": "red", "effects": [{"trigger": "on_round_draw", "surface_depth_bonus": 1}], "discard_visibility": "move_only"},

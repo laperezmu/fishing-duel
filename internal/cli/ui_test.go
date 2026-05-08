@@ -2,6 +2,7 @@ package cli
 
 import (
 	"bytes"
+	"io"
 	"pesca/internal/cards"
 	"pesca/internal/content/anglerprofiles"
 	"pesca/internal/content/fishprofiles"
@@ -18,6 +19,7 @@ import (
 	"pesca/internal/presentation"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -276,6 +278,48 @@ func TestPresetSelectionScreensHideCardDetailsFromTheList(t *testing.T) {
 	assert.Contains(t, fishConfirmation, "Rojo - Tiron de apertura")
 	assert.Contains(t, fishConfirmation, "Arquetipo   : Tempo de apertura")
 	assert.NotContains(t, fishConfirmation, string(sampleFishDeckPresets()[1].ArchetypeID))
+}
+
+func TestResolveSplashWaitsForConfiguredTimeLimit(t *testing.T) {
+	reader, writer := io.Pipe()
+	defer writer.Close()
+
+	var out bytes.Buffer
+	ui := NewUI(reader, &out)
+	ui.castDelay = 5 * time.Millisecond
+	ui.castFrames = []int{0, 1}
+
+	view := presentation.SplashView{
+		TimeLimit:   40 * time.Millisecond,
+		TotalSlots:  2,
+		TargetStart: 1,
+		TargetWidth: 1,
+	}
+
+	type splashResult struct {
+		resolution encounter.SplashResolution
+		err        error
+		elapsed    time.Duration
+	}
+	resultCh := make(chan splashResult, 1)
+
+	go func() {
+		startedAt := time.Now()
+		resolution, err := ui.ResolveSplash(view)
+		resultCh <- splashResult{resolution: resolution, err: err, elapsed: time.Since(startedAt)}
+	}()
+
+	select {
+	case resolved := <-resultCh:
+		require.NoError(t, resolved.err)
+		assert.True(t, resolved.resolution.Escaped)
+		assert.GreaterOrEqual(t, resolved.elapsed, view.TimeLimit)
+	case <-time.After(200 * time.Millisecond):
+		writer.Close()
+		t.Fatal("ResolveSplash did not finish within the expected time")
+	}
+
+	assert.Contains(t, out.String(), clearSequence)
 }
 
 func samplePromptState(t *testing.T) match.State {

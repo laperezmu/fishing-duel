@@ -75,6 +75,9 @@ func (s *Session) Run() error {
 		}
 
 		for result.Encounter.Splash != nil {
+			if s.engine.State().Lifecycle.Finished {
+				break
+			}
 			state := s.engine.State()
 			resolution, err := s.ui.ResolveSplash(s.presenter.Splash(result.Encounter, state.Player.Loadout.SplashSuccessDistanceBonus()))
 			if err != nil {

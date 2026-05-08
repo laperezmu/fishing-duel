@@ -45,7 +45,7 @@ type SplashProfile struct {
 func DefaultSplashProfile() SplashProfile {
 	return SplashProfile{
 		JumpCount: 1,
-		TimeLimit: time.Second,
+		TimeLimit: 30 * time.Second,
 	}
 }
 

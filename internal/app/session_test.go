@@ -104,7 +104,7 @@ func TestSessionRun(t *testing.T) {
 		}
 		splashView := presentation.SplashView{CurrentJump: 1, TotalJumps: 1}
 
-		fixture.engine.On("State").Return(fixture.ongoingState).Twice()
+		fixture.engine.On("State").Return(fixture.ongoingState).Times(3)
 		fixture.engine.On("PlayRound", domain.Blue).Return(fixture.roundResult, nil).Once()
 		fixture.engine.On("State").Return(fixture.ongoingState).Once()
 		fixture.presenter.On("Splash", fixture.roundResult.Encounter, fixture.ongoingState.Player.Loadout.SplashSuccessDistanceBonus()).Return(splashView).Once()
