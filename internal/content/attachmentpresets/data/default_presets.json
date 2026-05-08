@@ -1,0 +1,76 @@
+{
+  "presets": [
+    {
+      "id": "no-attachments",
+      "name": "Sin aditamentos",
+      "description": "Usa solo la rod base, sin sesgos extra en apertura o track.",
+      "details": [
+        "No modifica distancia ni profundidad.",
+        "Sirve como referencia limpia para comparar rods."
+      ],
+      "attachments": []
+    },
+    {
+      "id": "bottom-kit",
+      "name": "Kit de fondo",
+      "description": "Empuja la pesca hacia capas profundas a cambio de recortar algo de alcance horizontal.",
+      "details": [
+        "Apertura: -1 distancia, +1 profundidad.",
+        "Track: +1 profundidad.",
+        "Habitats: fondo, canal."
+      ],
+      "attachments": [
+        {
+          "id": "sinker-heavy",
+          "name": "Plomada pesada",
+          "description": "Ayuda a abrir la pesca mas abajo y sostener profundidad.",
+          "opening_distance_modifier": -1,
+          "opening_depth_modifier": 1,
+          "track_depth_modifier": 1,
+          "habitat_tags": ["bottom", "channel"]
+        }
+      ]
+    },
+    {
+      "id": "long-cast-kit",
+      "name": "Kit de lance largo",
+      "description": "Gana margen horizontal para abrir y sostener distancia, pero pierde acceso vertical temprano.",
+      "details": [
+        "Apertura: +1 distancia, -1 profundidad.",
+        "Track: +1 distancia.",
+        "Habitats: costa abierta, superficie."
+      ],
+      "attachments": [
+        {
+          "id": "spool-long-cast",
+          "name": "Bobina de lance",
+          "description": "Premia aguas abiertas con mas recorrido horizontal.",
+          "opening_distance_modifier": 1,
+          "opening_depth_modifier": -1,
+          "track_distance_modifier": 1,
+          "habitat_tags": ["open-water", "surface"]
+        }
+      ]
+    },
+    {
+      "id": "stability-kit",
+      "name": "Kit de estabilidad",
+      "description": "No abre mas lejos, pero amplia el margen defensivo del track en ambos ejes.",
+      "details": [
+        "Apertura: sin cambios.",
+        "Track: +1 distancia, +1 profundidad.",
+        "Habitats: maleza, roca."
+      ],
+      "attachments": [
+        {
+          "id": "line-reinforced",
+          "name": "Linea reforzada",
+          "description": "Aguanta mejor la presion del pez en el tablero.",
+          "track_distance_modifier": 1,
+          "track_depth_modifier": 1,
+          "habitat_tags": ["weed", "rock"]
+        }
+      ]
+    }
+  ]
+}

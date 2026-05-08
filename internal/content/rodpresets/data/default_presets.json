@@ -1,0 +1,53 @@
+{
+  "presets": [
+    {
+      "id": "coastal-control",
+      "name": "Control costero",
+      "description": "Abre cerca y con poca profundidad, pero deja margen para sostener el duelo en el tablero.",
+      "details": [
+        "Apertura: distancia 3, profundidad 1.",
+        "Track: distancia 5, profundidad 2.",
+        "Pensada para aguas cerradas, lectura cercana y cierres rapidos."
+      ],
+      "config": {
+        "opening_max_distance": 3,
+        "opening_max_depth": 1,
+        "track_max_distance": 5,
+        "track_max_depth": 2,
+        "splash_bonus_distance": 1
+      }
+    },
+    {
+      "id": "versatile-standard",
+      "name": "Versatil estandar",
+      "description": "Preset equilibrado para probar el loop base sin sesgo fuerte hacia costa o fondo.",
+      "details": [
+        "Apertura: distancia 5, profundidad 3.",
+        "Track: distancia 5, profundidad 3.",
+        "Sirve como referencia general del sistema."
+      ],
+      "config": {
+        "opening_max_distance": 5,
+        "opening_max_depth": 3,
+        "track_max_distance": 5,
+        "track_max_depth": 3
+      }
+    },
+    {
+      "id": "bottom-pressure",
+      "name": "Presion de fondo",
+      "description": "Pierde algo de margen horizontal, pero abre y sostiene mejor pescas profundas.",
+      "details": [
+        "Apertura: distancia 4, profundidad 4.",
+        "Track: distancia 4, profundidad 5.",
+        "Pensada para priorizar capas profundas antes que mar abierto lejano."
+      ],
+      "config": {
+        "opening_max_distance": 4,
+        "opening_max_depth": 4,
+        "track_max_distance": 4,
+        "track_max_depth": 5
+      }
+    }
+  ]
+}

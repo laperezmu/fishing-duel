@@ -1,0 +1,176 @@
+{
+  "presets": [
+    {
+      "id": "shoreline-cove",
+      "name": "Ensenada cercana",
+      "description": "Las marcas del agua se rompen cerca de la orilla y la actividad util aparece antes de forzar un lance largo.",
+      "signals": [
+        "Espuma corta pegada a la costa.",
+        "Destellos y remolinos en la primera mitad del agua."
+      ],
+      "pool_tag": "shoreline",
+      "distances": {
+        "very_short": 0,
+        "short": 1,
+        "medium": 2,
+        "long": 3,
+        "very_long": 4
+      },
+      "initial_depth": 1
+    },
+    {
+      "id": "open-channel",
+      "name": "Canal abierto",
+      "description": "La corriente empuja la actividad hacia fuera y conviene sostener el lance hasta la parte media o larga del agua.",
+      "signals": [
+        "La corriente principal tira mar adentro.",
+        "Las ondas vivas aparecen lejos de la orilla."
+      ],
+      "pool_tag": "offshore",
+      "distances": {
+        "very_short": 1,
+        "short": 2,
+        "medium": 3,
+        "long": 4,
+        "very_long": 5
+      },
+      "initial_depth": 1
+    },
+    {
+      "id": "broken-current",
+      "name": "Corriente irregular",
+      "description": "Las marcas del agua cambian rapido y el lance mas extremo pierde consistencia aunque el centro del canal siga siendo util.",
+      "signals": [
+        "La espuma cruza en diagonales y corta el agua en dos.",
+        "Hay actividad intermitente a media distancia."
+      ],
+      "pool_tag": "mixed-current",
+      "distances": {
+        "very_short": 0,
+        "short": 1,
+        "medium": 2,
+        "long": 3,
+        "very_long": 4
+      },
+      "initial_depth": 1
+    },
+    {
+      "id": "reef-shadow",
+      "name": "Sombra de arrecife",
+      "description": "La actividad se pega a estructuras medias y castiga los lances demasiado cortos con ventanas menos limpias.",
+      "signals": [
+        "Manchas oscuras cortan el brillo del agua a media distancia.",
+        "Hay vibracion irregular alrededor de piedra sumergida."
+      ],
+      "pool_tag": "mixed-current",
+      "distances": {
+        "very_short": 1,
+        "short": 2,
+        "medium": 3,
+        "long": 4,
+        "very_long": 5
+      },
+      "initial_depth": 2
+    },
+    {
+      "id": "tidal-gate",
+      "name": "Paso de marea",
+      "description": "La marea abre un pasillo estrecho donde los peces empujan entre profundidad media y corriente viva.",
+      "signals": [
+        "La corriente se acelera entre dos franjas mas calmas.",
+        "Burbujas largas marcan un corredor hacia fuera."
+      ],
+      "pool_tag": "offshore",
+      "distances": {
+        "very_short": 2,
+        "short": 3,
+        "medium": 4,
+        "long": 5,
+        "very_long": 6
+      },
+      "initial_depth": 2
+    },
+    {
+      "id": "weed-pocket",
+      "name": "Bolsillo de maleza",
+      "description": "El agua parece retenida por vegetacion sumergida y favorece lances cortos con pelea mas vertical.",
+      "signals": [
+        "La superficie respira despacio entre parches verdes.",
+        "Las ondulaciones cortas se frenan antes del canal central."
+      ],
+      "pool_tag": "shoreline",
+      "distances": {
+        "very_short": 0,
+        "short": 1,
+        "medium": 2,
+        "long": 3,
+        "very_long": 4
+      },
+      "initial_depth": 2
+    },
+    {
+      "id": "stone-drop",
+      "name": "Caida de piedra",
+      "description": "El fondo rompe en un escalon brusco y la lectura premia sostener profundidad sin ceder toda la distancia.",
+      "signals": [
+        "El color del agua se oscurece de golpe despues del primer tercio.",
+        "Pequenos golpes en superficie delatan actividad sobre la caida."
+      ],
+      "pool_tag": "mixed-current",
+      "distances": {
+        "very_short": 1,
+        "short": 2,
+        "medium": 3,
+        "long": 4,
+        "very_long": 5
+      },
+      "initial_depth": 3
+    },
+    {
+      "id": "wind-lane",
+      "name": "Calle de viento",
+      "description": "El viento ordena una via larga de espuma y la actividad buena aparece donde la deriva se estabiliza mar adentro.",
+      "signals": [
+        "Una linea continua de espuma apunta fuera de la costa.",
+        "Las crestas rompen siempre en la misma direccion."
+      ],
+      "pool_tag": "offshore",
+      "distances": {
+        "very_short": 2,
+        "short": 3,
+        "medium": 4,
+        "long": 5,
+        "very_long": 6
+      },
+      "initial_depth": 1
+    },
+    {
+      "id": "deep-ledge",
+      "name": "Cornisa profunda",
+      "description": "La actividad rota por una pared lejana y obliga a probar aperturas largas con margen vertical desde el inicio.",
+      "signals": [
+        "El agua plana se corta en un borde oscuro mar adentro.",
+        "Las burbujas suben aisladas desde una misma linea profunda."
+      ],
+      "pool_tag": "offshore",
+      "distances": {
+        "very_short": 3,
+        "short": 4,
+        "medium": 5,
+        "long": 6,
+        "very_long": 7
+      },
+      "initial_depth": 3
+    }
+  ],
+  "phase_order": [
+    "shoreline-cove",
+    "open-channel",
+    "broken-current",
+    "reef-shadow",
+    "tidal-gate",
+    "weed-pocket",
+    "stone-drop",
+    "deep-ledge"
+  ]
+}

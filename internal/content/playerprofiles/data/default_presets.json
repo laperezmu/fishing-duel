@@ -1,0 +1,120 @@
+{
+  "presets": [
+    {
+      "id": "classic",
+      "name": "Clasico",
+      "description": "Tres cartas lisas por color, sin efectos, para reproducir la experiencia base.",
+      "details": [
+        "Azul: 3 cartas lisas sin efectos.",
+        "Rojo: 3 cartas lisas sin efectos.",
+        "Amarillo: 3 cartas lisas sin efectos.",
+        "Recuperacion: 1 ronda tras vaciar una baraja de color."
+      ],
+      "recovery_delay_rounds": 1,
+      "cards": {
+        "blue": [
+          {"move": "blue"},
+          {"move": "blue"},
+          {"move": "blue"}
+        ],
+        "red": [
+          {"move": "red"},
+          {"move": "red"},
+          {"move": "red"}
+        ],
+        "yellow": [
+          {"move": "yellow"},
+          {"move": "yellow"},
+          {"move": "yellow"}
+        ]
+      }
+    },
+    {
+      "id": "hooked-opening",
+      "name": "Apertura preparada",
+      "description": "Barajas del jugador pensadas para abrir el round con ventajas temporales al revelar la carta.",
+      "details": [
+        "Azul - Anzuelo tenso: al revelar la carta permite capturar desde un paso mas lejos ese round.",
+        "Rojo - Giro de superficie: al revelar la carta deja al pez contar como un nivel mas cerca de la superficie ese round.",
+        "Amarillo - Reserva final: al revelar la carta amplia el margen de captura cuando se agota la baraja ese round.",
+        "Objetivo: validar aperturas iniciales del jugador sin alterar la UX actual."
+      ],
+      "recovery_delay_rounds": 1,
+      "cards": {
+        "blue": [
+          {"name": "Anzuelo tenso", "summary": "Capturas desde un paso mas lejos este round.", "move": "blue", "effects": [{"trigger": "on_draw", "effect_type": "legacy_capture_window", "priority": 60, "capture_distance_bonus": 1}]},
+          {"move": "blue"},
+          {"move": "blue"}
+        ],
+        "red": [
+          {"name": "Giro de superficie", "summary": "El pez cuenta como un nivel mas cerca de la superficie este round.", "move": "red", "effects": [{"trigger": "on_draw", "effect_type": "legacy_surface_window", "priority": 60, "surface_depth_bonus": 1}]},
+          {"move": "red"},
+          {"move": "red"}
+        ],
+        "yellow": [
+          {"name": "Reserva final", "summary": "Amplia el margen de captura por agotamiento durante este round.", "move": "yellow", "effects": [{"trigger": "on_draw", "effect_type": "legacy_exhaustion_window", "priority": 60, "exhaustion_capture_distance_bonus": 1}]},
+          {"move": "yellow"},
+          {"move": "yellow"}
+        ]
+      }
+    },
+    {
+      "id": "vertical-pressure",
+      "name": "Respuesta vertical",
+      "description": "Cartas del jugador que castigan resultados con cambios de profundidad.",
+      "details": [
+        "Azul - Tiron certero: sin importar el resultado, subes al pez un nivel hacia la superficie.",
+        "Rojo - Recobro paciente: sin importar el resultado, subes al pez un nivel hacia la superficie.",
+        "Amarillo - Tregua corta: sin importar el resultado, subes al pez un nivel hacia la superficie.",
+        "Objetivo: forzar splashes sin depender del resultado del round."
+      ],
+      "recovery_delay_rounds": 1,
+      "cards": {
+        "blue": [
+          {"name": "Tiron certero", "summary": "Subes al pez un nivel hacia la superficie sin importar el resultado.", "move": "blue", "effects": [{"trigger": "on_owner_win", "effect_type": "advance_vertical", "priority": 50, "depth_shift": -1}, {"trigger": "on_owner_lose", "effect_type": "advance_vertical", "priority": 50, "depth_shift": -1}, {"trigger": "on_round_draw", "effect_type": "advance_vertical", "priority": 50, "depth_shift": -1}]},
+          {"name": "Tiron certero", "summary": "Subes al pez un nivel hacia la superficie sin importar el resultado.", "move": "blue", "effects": [{"trigger": "on_owner_win", "effect_type": "advance_vertical", "priority": 50, "depth_shift": -1}, {"trigger": "on_owner_lose", "effect_type": "advance_vertical", "priority": 50, "depth_shift": -1}, {"trigger": "on_round_draw", "effect_type": "advance_vertical", "priority": 50, "depth_shift": -1}]},
+          {"name": "Tiron certero", "summary": "Subes al pez un nivel hacia la superficie sin importar el resultado.", "move": "blue", "effects": [{"trigger": "on_owner_win", "effect_type": "advance_vertical", "priority": 50, "depth_shift": -1}, {"trigger": "on_owner_lose", "effect_type": "advance_vertical", "priority": 50, "depth_shift": -1}, {"trigger": "on_round_draw", "effect_type": "advance_vertical", "priority": 50, "depth_shift": -1}]}
+        ],
+        "red": [
+          {"name": "Recobro paciente", "summary": "Subes al pez un nivel hacia la superficie sin importar el resultado.", "move": "red", "effects": [{"trigger": "on_owner_win", "effect_type": "advance_vertical", "priority": 50, "depth_shift": -1}, {"trigger": "on_owner_lose", "effect_type": "advance_vertical", "priority": 50, "depth_shift": -1}, {"trigger": "on_round_draw", "effect_type": "advance_vertical", "priority": 50, "depth_shift": -1}]},
+          {"name": "Recobro paciente", "summary": "Subes al pez un nivel hacia la superficie sin importar el resultado.", "move": "red", "effects": [{"trigger": "on_owner_win", "effect_type": "advance_vertical", "priority": 50, "depth_shift": -1}, {"trigger": "on_owner_lose", "effect_type": "advance_vertical", "priority": 50, "depth_shift": -1}, {"trigger": "on_round_draw", "effect_type": "advance_vertical", "priority": 50, "depth_shift": -1}]},
+          {"name": "Recobro paciente", "summary": "Subes al pez un nivel hacia la superficie sin importar el resultado.", "move": "red", "effects": [{"trigger": "on_owner_win", "effect_type": "advance_vertical", "priority": 50, "depth_shift": -1}, {"trigger": "on_owner_lose", "effect_type": "advance_vertical", "priority": 50, "depth_shift": -1}, {"trigger": "on_round_draw", "effect_type": "advance_vertical", "priority": 50, "depth_shift": -1}]}
+        ],
+        "yellow": [
+          {"name": "Tregua corta", "summary": "Subes al pez un nivel hacia la superficie sin importar el resultado.", "move": "yellow", "effects": [{"trigger": "on_owner_win", "effect_type": "advance_vertical", "priority": 50, "depth_shift": -1}, {"trigger": "on_owner_lose", "effect_type": "advance_vertical", "priority": 50, "depth_shift": -1}, {"trigger": "on_round_draw", "effect_type": "advance_vertical", "priority": 50, "depth_shift": -1}]},
+          {"name": "Tregua corta", "summary": "Subes al pez un nivel hacia la superficie sin importar el resultado.", "move": "yellow", "effects": [{"trigger": "on_owner_win", "effect_type": "advance_vertical", "priority": 50, "depth_shift": -1}, {"trigger": "on_owner_lose", "effect_type": "advance_vertical", "priority": 50, "depth_shift": -1}, {"trigger": "on_round_draw", "effect_type": "advance_vertical", "priority": 50, "depth_shift": -1}]},
+          {"name": "Tregua corta", "summary": "Subes al pez un nivel hacia la superficie sin importar el resultado.", "move": "yellow", "effects": [{"trigger": "on_owner_win", "effect_type": "advance_vertical", "priority": 50, "depth_shift": -1}, {"trigger": "on_owner_lose", "effect_type": "advance_vertical", "priority": 50, "depth_shift": -1}, {"trigger": "on_round_draw", "effect_type": "advance_vertical", "priority": 50, "depth_shift": -1}]}
+        ]
+      }
+    },
+    {
+      "id": "mixed-current",
+      "name": "Corriente mixta",
+      "description": "Barajas del jugador que mezclan ventajas al revelarse con respuestas segun el resultado.",
+      "details": [
+        "Azul - Carrera corta: al revelarse acerca la captura y, si ganas, arrastra al pez un paso mas hacia la orilla.",
+        "Rojo - Rescate profundo: si pierdes, haces subir al pez un nivel hacia la superficie.",
+        "Amarillo - Calma tensa: en empate el pez cuenta como un nivel mas cerca de la superficie ese round.",
+        "Objetivo: validar convivencia entre fases y triggers del jugador."
+      ],
+      "recovery_delay_rounds": 1,
+      "cards": {
+        "blue": [
+          {"name": "Carrera corta", "summary": "Acerca la captura al revelarse y tira del pez si ganas.", "move": "blue", "effects": [{"trigger": "on_draw", "effect_type": "legacy_capture_window", "priority": 60, "capture_distance_bonus": 1}, {"trigger": "on_owner_win", "effect_type": "advance_horizontal", "priority": 50, "distance_shift": -1}]},
+          {"move": "blue"},
+          {"move": "blue"}
+        ],
+        "red": [
+          {"name": "Rescate profundo", "summary": "Si pierdes, haces subir al pez un nivel.", "move": "red", "effects": [{"trigger": "on_owner_lose", "effect_type": "advance_vertical", "priority": 50, "depth_shift": -1}]},
+          {"move": "red"},
+          {"move": "red"}
+        ],
+        "yellow": [
+          {"name": "Calma tensa", "summary": "En empate el pez cuenta como un nivel mas cerca de la superficie.", "move": "yellow", "effects": [{"trigger": "on_round_draw", "effect_type": "legacy_surface_window", "priority": 60, "surface_depth_bonus": 1}]},
+          {"move": "yellow"},
+          {"move": "yellow"}
+        ]
+      }
+    }
+  ]
+}

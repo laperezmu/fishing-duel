@@ -101,3 +101,30 @@ func TestResolvePresetCard(t *testing.T) {
 	require.Error(t, err)
 	assert.EqualError(t, err, "unknown player card ref \"red-9\" for preset \"hooked-opening\"")
 }
+
+func TestLoadPresets(t *testing.T) {
+	data := []byte(`{
+	  "presets": [{
+	    "id": "test",
+	    "name": "Test",
+	    "description": "Preset de prueba",
+	    "details": ["detalle"],
+	    "recovery_delay_rounds": 2,
+	    "cards": {
+	      "blue": [{"move": "blue"}],
+	      "red": [{"move": "red", "name": "Roja", "summary": "Algo", "effects": [{"trigger": "on_draw", "effect_type": "legacy_capture_window", "priority": 60, "capture_distance_bonus": 1}]}],
+	      "yellow": [{"move": "yellow"}]
+	    }
+	  }]
+	}`)
+
+	presets, err := LoadPresets(data)
+
+	require.NoError(t, err)
+	require.Len(t, presets, 1)
+	assert.Equal(t, "test", presets[0].ID)
+	assert.Equal(t, 2, presets[0].Config.RecoveryDelayRounds)
+	assert.Equal(t, "Roja", presets[0].Config.InitialDecks[domain.Red][0].Name)
+	require.Len(t, presets[0].Config.InitialDecks[domain.Red][0].Effects, 1)
+	assert.Equal(t, cards.EffectTypeLegacyCaptureWindow, presets[0].Config.InitialDecks[domain.Red][0].Effects[0].Type)
+}
