@@ -1,8 +1,12 @@
 package encounter
 
+import "pesca/internal/cards"
+
 func ApplyDelta(state *State, delta Delta) {
 	state.Distance += delta.DistanceShift
-	state.LastEvent = Event{}
+	if state.Splash == nil {
+		state.LastEvent = Event{}
+	}
 
 	if delta.DepthShift == 0 {
 		return
@@ -26,6 +30,19 @@ func ApplyDelta(state *State, delta Delta) {
 	}
 
 	state.Depth = targetDepth
+}
+
+func ApplyMovementEffects(state *State, effects []cards.CardEffect) {
+	for _, effect := range effects {
+		effect = effect.Normalize()
+		if effect.DistanceShift == 0 && effect.DepthShift == 0 {
+			continue
+		}
+		ApplyDelta(state, Delta{
+			DistanceShift: effect.DistanceShift,
+			DepthShift:    effect.DepthShift,
+		})
+	}
 }
 
 func ApplySplashResolution(state *State, resolution SplashResolution) {

@@ -45,14 +45,22 @@ func TestNewRoundAndSummarySnapshot(t *testing.T) {
 		PlayerMove: domain.Blue,
 		FishMove:   domain.Red,
 		Outcome:    domain.PlayerWin,
-		Status:     NewStatusSnapshot(state),
-		Encounter:  EncounterEventSnapshot{LastEvent: state.Encounter.LastEvent},
+		ResolvedEffects: []ResolvedEffectState{{
+			Owner:    cards.OwnerFish,
+			Trigger:  cards.TriggerOnDraw,
+			Type:     cards.EffectTypeLegacyCaptureWindow,
+			Priority: 60,
+		}},
+		Status:    NewStatusSnapshot(state),
+		Encounter: EncounterEventSnapshot{LastEvent: state.Encounter.LastEvent},
 	})
 	summarySnapshot := NewSummarySnapshot(state)
 
 	assert.Equal(t, domain.Blue, roundSnapshot.PlayerMove)
 	assert.Equal(t, domain.Red, roundSnapshot.FishMove)
 	assert.Equal(t, encounter.EventKindSplash, roundSnapshot.Encounter.LastEvent.Kind)
+	require.Len(t, roundSnapshot.ResolvedEffects, 1)
+	assert.Equal(t, cards.OwnerFish, roundSnapshot.ResolvedEffects[0].Owner)
 	assert.Equal(t, encounter.StatusCaptured, summarySnapshot.Encounter.Status)
 	assert.Equal(t, encounter.EndReasonTrackCapture, summarySnapshot.Encounter.EndReason)
 	assert.Equal(t, 2, summarySnapshot.Stats.PlayerWins)

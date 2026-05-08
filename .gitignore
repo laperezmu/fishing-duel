@@ -1,4 +1,5 @@
 .DS_Store
+Thumbs.db
 
 # Go build artifacts
 bin/
@@ -13,6 +14,9 @@ dist/
 *.test
 *.out
 coverage.out
+vendor/
+*.tmp
+*.swp
 
 # IDE files
 .idea/

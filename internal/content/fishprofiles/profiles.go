@@ -54,6 +54,16 @@ func (pattern CardPattern) BuildCard() cards.FishCard {
 	return card
 }
 
+func (pattern CardPattern) Validate() error {
+	for index, effect := range pattern.Effects {
+		if err := effect.Validate(); err != nil {
+			return fmt.Errorf("effect %d: %w", index, err)
+		}
+	}
+
+	return nil
+}
+
 type Profile struct {
 	ID            ProfileID
 	ArchetypeID   ArchetypeID
@@ -90,6 +100,11 @@ func (profile Profile) Validate() error {
 	}
 	if err := profile.Splash.Validate(); err != nil {
 		return fmt.Errorf("splash: %w", err)
+	}
+	for index, cardPattern := range profile.Cards {
+		if err := cardPattern.Validate(); err != nil {
+			return fmt.Errorf("card pattern %d: %w", index, err)
+		}
 	}
 
 	return nil

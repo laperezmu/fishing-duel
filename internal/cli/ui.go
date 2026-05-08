@@ -141,10 +141,9 @@ func (ui *UI) ResolveSplash(view presentation.SplashView) (encounter.SplashResol
 	ticker := time.NewTicker(ui.castDelay)
 	defer ticker.Stop()
 
-	currentPosition := positions[0]
 	positionIndex := 0
 	for {
-		currentPosition = positions[positionIndex]
+		currentPosition := positions[positionIndex]
 		if _, err := io.WriteString(ui.out, renderSplashScreen(view, currentPosition, "")); err != nil {
 			return encounter.SplashResolution{}, err
 		}

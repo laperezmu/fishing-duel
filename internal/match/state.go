@@ -104,20 +104,30 @@ type ResolvedRound struct {
 	PlayerMove     domain.Move
 	PlayerCard     cards.PlayerCard
 	FishCard       cards.FishCard
+	DrawOwned      []cards.OwnedEffect
+	OutcomeOwned   []cards.OwnedEffect
 	DrawEffects    []cards.CardEffect
 	OutcomeEffects []cards.CardEffect
 	Outcome        domain.RoundOutcome
 }
 
+type ResolvedEffectState struct {
+	Owner    cards.Owner
+	Trigger  cards.Trigger
+	Type     cards.EffectType
+	Priority int
+}
+
 type RoundResult struct {
-	Round      int
-	PlayerMove domain.Move
-	PlayerCard cards.PlayerCard
-	FishMove   domain.Move
-	FishCard   cards.FishCard
-	Outcome    domain.RoundOutcome
-	Status     StatusSnapshot
-	Encounter  EncounterEventSnapshot
+	Round           int
+	PlayerMove      domain.Move
+	PlayerCard      cards.PlayerCard
+	FishMove        domain.Move
+	FishCard        cards.FishCard
+	Outcome         domain.RoundOutcome
+	ResolvedEffects []ResolvedEffectState
+	Status          StatusSnapshot
+	Encounter       EncounterEventSnapshot
 }
 
 func (state *State) ProgressionState() ProgressionState {

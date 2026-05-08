@@ -67,11 +67,12 @@ type StatusSnapshot struct {
 }
 
 type RoundSnapshot struct {
-	Status     StatusSnapshot
-	Encounter  EncounterEventSnapshot
-	PlayerMove domain.Move
-	FishMove   domain.Move
-	Outcome    domain.RoundOutcome
+	Status          StatusSnapshot
+	Encounter       EncounterEventSnapshot
+	PlayerMove      domain.Move
+	FishMove        domain.Move
+	Outcome         domain.RoundOutcome
+	ResolvedEffects []ResolvedEffectState
 }
 
 type SummarySnapshot struct {
@@ -110,11 +111,12 @@ func NewStatusSnapshot(state State) StatusSnapshot {
 
 func NewRoundSnapshot(result RoundResult) RoundSnapshot {
 	return RoundSnapshot{
-		Status:     result.Status,
-		Encounter:  result.Encounter,
-		PlayerMove: result.PlayerMove,
-		FishMove:   result.FishMove,
-		Outcome:    result.Outcome,
+		Status:          result.Status,
+		Encounter:       result.Encounter,
+		PlayerMove:      result.PlayerMove,
+		FishMove:        result.FishMove,
+		Outcome:         result.Outcome,
+		ResolvedEffects: append([]ResolvedEffectState(nil), result.ResolvedEffects...),
 	}
 }
 

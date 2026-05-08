@@ -30,6 +30,8 @@ func TestProfileBuildCards(t *testing.T) {
 	assert.Equal(t, domain.Red, builtCards[0].Move)
 	assert.Equal(t, cards.DiscardVisibilityMoveOnly, builtCards[0].DiscardVisibility)
 	assert.Equal(t, 1, builtCards[0].Effects[0].CaptureDistanceBonus)
+	assert.Equal(t, cards.EffectTypeLegacyCaptureWindow, builtCards[0].Effects[0].Type)
+	assert.Equal(t, 60, builtCards[0].Effects[0].Priority)
 }
 
 func TestDefaultProfiles(t *testing.T) {

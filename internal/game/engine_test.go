@@ -122,6 +122,46 @@ func TestEnginePlayRound(t *testing.T) {
 		fixture.assertExpectations(t)
 	})
 
+	t.Run("orders resolved effects by priority and favors fish on ties", func(t *testing.T) {
+		fixture := newEngineFixture(t, match.State{Player: match.PlayerState{Loadout: samplePlayerLoadoutState(t)}})
+		playerCard := cards.NewPlayerCard(domain.Blue,
+			cards.CardEffect{Trigger: cards.TriggerOnDraw, Type: cards.EffectTypeLegacyCaptureWindow, Priority: 40, CaptureDistanceBonus: 1},
+			cards.CardEffect{Trigger: cards.TriggerOnOwnerWin, Type: cards.EffectTypeAdvanceHorizontal, Priority: 50, DistanceShift: -1},
+		)
+		fishCard := cards.NewFishCard(domain.Red,
+			cards.CardEffect{Trigger: cards.TriggerOnDraw, Type: cards.EffectTypeLegacySurfaceWindow, Priority: 60, SurfaceDepthBonus: 1},
+			cards.CardEffect{Trigger: cards.TriggerOnOwnerLose, Type: cards.EffectTypeAdvanceVertical, Priority: 50, DepthShift: -1},
+		)
+
+		fixture.playerMoveController.On("PrepareRound", mock.AnythingOfType("*match.PlayerMoveRuntime")).Twice()
+		fixture.playerMoveController.On("ValidateMove", mock.Anything, domain.Blue).Return(nil).Once()
+		fixture.playerMoveController.On("PeekMoveCard", mock.Anything, domain.Blue).Return(playerCard, nil).Once()
+		fixture.fishDeck.On("Draw").Return(fishCard, nil).Once()
+		fixture.roundEvaluator.On("Evaluate", domain.Blue, domain.Red).Return(domain.PlayerWin).Once()
+		fixture.playerMoveController.On("ConsumeMove", mock.AnythingOfType("*match.PlayerMoveRuntime"), domain.Blue).Return(playerCard).Once()
+		fixture.progressionPolicy.On("Apply", mock.AnythingOfType("*match.ProgressionState"), mock.AnythingOfType("match.ResolvedRound")).Once()
+		fixture.fishDeck.On("PrepareNextRound").Once()
+		fixture.fishDeck.On("ActiveCount").Return(6).Once()
+		fixture.fishDeck.On("DiscardCount").Return(3).Once()
+		fixture.fishDeck.On("RecycleCount").Return(1).Once()
+		fixture.fishDeck.On("Exhausted").Return(false).Once()
+		fixture.endCondition.On("Apply", mock.AnythingOfType("*match.EndingState")).Once()
+
+		result, err := fixture.engine.PlayRound(domain.Blue)
+
+		require.NoError(t, err)
+		require.Len(t, result.ResolvedEffects, 4)
+		assert.Equal(t, cards.OwnerFish, result.ResolvedEffects[0].Owner)
+		assert.Equal(t, 60, result.ResolvedEffects[0].Priority)
+		assert.Equal(t, cards.OwnerPlayer, result.ResolvedEffects[1].Owner)
+		assert.Equal(t, 40, result.ResolvedEffects[1].Priority)
+		assert.Equal(t, cards.OwnerFish, result.ResolvedEffects[2].Owner)
+		assert.Equal(t, 50, result.ResolvedEffects[2].Priority)
+		assert.Equal(t, cards.OwnerPlayer, result.ResolvedEffects[3].Owner)
+		assert.Equal(t, 50, result.ResolvedEffects[3].Priority)
+		fixture.assertExpectations(t)
+	})
+
 	t.Run("returns a validation error when the player move controller rejects the move", func(t *testing.T) {
 		fixture := newEngineFixture(t, match.State{Player: match.PlayerState{Loadout: samplePlayerLoadoutState(t)}})
 		prepareRoundCall := fixture.playerMoveController.On("PrepareRound", mock.AnythingOfType("*match.PlayerMoveRuntime")).Once()
@@ -207,16 +247,33 @@ func TestEnginePlayRound(t *testing.T) {
 			PlayerMove: domain.Blue,
 			PlayerCard: playerCard,
 			FishCard:   fishCard,
-			DrawEffects: []cards.CardEffect{{
-				Trigger:           cards.TriggerOnDraw,
-				SurfaceDepthBonus: 1,
+			DrawOwned: []cards.OwnedEffect{{
+				Owner:  cards.OwnerFish,
+				Effect: cards.CardEffect{Trigger: cards.TriggerOnDraw, Type: cards.EffectTypeLegacyCaptureWindow, Priority: 60, CaptureDistanceBonus: 1},
 			}, {
+				Owner:  cards.OwnerPlayer,
+				Effect: cards.CardEffect{Trigger: cards.TriggerOnDraw, Type: cards.EffectTypeLegacySurfaceWindow, Priority: 60, SurfaceDepthBonus: 1},
+			}},
+			OutcomeOwned: []cards.OwnedEffect{{
+				Owner:  cards.OwnerFish,
+				Effect: cards.CardEffect{Trigger: cards.TriggerOnOwnerLose, Type: cards.EffectTypeAdvanceVertical, Priority: 50, DepthShift: -1},
+			}},
+			DrawEffects: []cards.CardEffect{{
 				Trigger:              cards.TriggerOnDraw,
 				CaptureDistanceBonus: 1,
+				Type:                 cards.EffectTypeLegacyCaptureWindow,
+				Priority:             60,
+			}, {
+				Trigger:           cards.TriggerOnDraw,
+				SurfaceDepthBonus: 1,
+				Type:              cards.EffectTypeLegacySurfaceWindow,
+				Priority:          60,
 			}},
 			OutcomeEffects: []cards.CardEffect{{
 				Trigger:    cards.TriggerOnOwnerLose,
 				DepthShift: -1,
+				Type:       cards.EffectTypeAdvanceVertical,
+				Priority:   50,
 			}},
 			Outcome: domain.PlayerWin,
 		}).Run(func(arguments mock.Arguments) {

@@ -32,10 +32,50 @@ func TestDeckPresetBuildConfig(t *testing.T) {
 	require.Len(t, config.InitialDecks[domain.Blue], 3)
 	require.Len(t, config.InitialDecks[domain.Blue][0].Effects, 2)
 	assert.Equal(t, cards.TriggerOnDraw, config.InitialDecks[domain.Blue][0].Effects[0].Trigger)
+	assert.Equal(t, cards.EffectTypeLegacyCaptureWindow, config.InitialDecks[domain.Blue][0].Effects[0].Type)
+	assert.Equal(t, 60, config.InitialDecks[domain.Blue][0].Effects[0].Priority)
 
 	preset.Config.InitialDecks[domain.Blue][0].Effects[0].CaptureDistanceBonus = 99
 	assert.Equal(t, 1, config.InitialDecks[domain.Blue][0].Effects[0].CaptureDistanceBonus)
 
 	config.DeckShuffler(config.InitialDecks[domain.Blue])
 	assert.Equal(t, 1, shuffleCalls)
+}
+
+func TestDefaultPresetsUseNormalizedEffects(t *testing.T) {
+	hasCaptureWindow := false
+	hasSurfaceWindow := false
+	hasExhaustionWindow := false
+	hasHorizontal := false
+	hasVertical := false
+
+	for _, preset := range DefaultPresets() {
+		for move, cardsForMove := range preset.Config.InitialDecks {
+			for _, card := range cardsForMove {
+				assert.Equal(t, move, card.Move)
+				for _, effect := range card.Effects {
+					assert.NotEqual(t, cards.EffectTypeUnknown, effect.Type)
+					assert.Positive(t, effect.Priority)
+					switch effect.Type {
+					case cards.EffectTypeLegacyCaptureWindow:
+						hasCaptureWindow = true
+					case cards.EffectTypeLegacySurfaceWindow:
+						hasSurfaceWindow = true
+					case cards.EffectTypeLegacyExhaustionWindow:
+						hasExhaustionWindow = true
+					case cards.EffectTypeAdvanceHorizontal:
+						hasHorizontal = true
+					case cards.EffectTypeAdvanceVertical:
+						hasVertical = true
+					}
+				}
+			}
+		}
+	}
+
+	assert.True(t, hasCaptureWindow)
+	assert.True(t, hasSurfaceWindow)
+	assert.True(t, hasExhaustionWindow)
+	assert.True(t, hasHorizontal)
+	assert.True(t, hasVertical)
 }

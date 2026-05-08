@@ -10,6 +10,7 @@ type RoundThresholds struct {
 
 func ApplyThresholdEffects(thresholds *RoundThresholds, effects []cards.CardEffect) {
 	for _, effect := range effects {
+		effect = effect.Normalize()
 		thresholds.CaptureDistanceBonus += effect.CaptureDistanceBonus
 		thresholds.ExhaustionCaptureDistanceBonus += effect.ExhaustionCaptureDistanceBonus
 		thresholds.SurfaceDepthBonus += effect.SurfaceDepthBonus

@@ -149,6 +149,19 @@ func TestEncounterEndConditionApply(t *testing.T) {
 	}
 }
 
+func TestEncounterEndConditionPreservesCaptureAfterMigratedThresholdEffects(t *testing.T) {
+	state := newMatchState(t, 0, 1)
+	state.Round.Thresholds.SurfaceDepthBonus = 1
+	state.Round.Thresholds.CaptureDistanceBonus = 0
+	endingState := state.EndingState()
+
+	EncounterEndCondition{}.Apply(&endingState)
+
+	assert.True(t, state.Lifecycle.Finished)
+	assert.Equal(t, encounter.StatusCaptured, state.Encounter.Status)
+	assert.Equal(t, encounter.EndReasonTrackCapture, state.Encounter.EndReason)
+}
+
 func newMatchState(t *testing.T, distance, depth int) match.State {
 	t.Helper()
 

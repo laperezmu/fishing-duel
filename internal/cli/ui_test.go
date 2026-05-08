@@ -77,6 +77,7 @@ func TestChooseMoveShowsLastRoundSummary(t *testing.T) {
 		Outcome:      domain.PlayerWin,
 		OutcomeLabel: "gana el jugador",
 		EventLabel:   "chapotea: permanece sujeto",
+		Resolved:     []string{"pez | ventana captura | p60", "jugador | avance vertical | p50"},
 	})
 	require.NoError(t, err)
 
@@ -99,6 +100,7 @@ func TestChooseMoveShowsLastRoundSummary(t *testing.T) {
 	assert.Contains(t, printed, "Distancia : 2")
 	assert.Contains(t, printed, "Profundidad : 1")
 	assert.Contains(t, printed, "Evento    : chapotea: permanece sujeto")
+	assert.Contains(t, printed, "Efectos   : pez | ventana captura | p60 -> jugador | avance vertical | p50")
 	assert.Contains(t, printed, "Historial del pez")
 }
 
@@ -315,7 +317,7 @@ func TestResolveSplashWaitsForConfiguredTimeLimit(t *testing.T) {
 		assert.True(t, resolved.resolution.Escaped)
 		assert.GreaterOrEqual(t, resolved.elapsed, view.TimeLimit)
 	case <-time.After(200 * time.Millisecond):
-		writer.Close()
+		require.NoError(t, writer.Close())
 		t.Fatal("ResolveSplash did not finish within the expected time")
 	}
 

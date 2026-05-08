@@ -158,6 +158,7 @@ type RoundView struct {
 	Outcome      domain.RoundOutcome
 	OutcomeLabel string
 	EventLabel   string
+	Resolved     []string
 }
 
 type SummaryView struct {
