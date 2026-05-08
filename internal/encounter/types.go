@@ -1,6 +1,9 @@
 package encounter
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 type Status string
 
@@ -34,6 +37,66 @@ type Event struct {
 	Escaped bool
 }
 
+type SplashProfile struct {
+	JumpCount int
+	TimeLimit time.Duration
+}
+
+func DefaultSplashProfile() SplashProfile {
+	return SplashProfile{
+		JumpCount: 1,
+		TimeLimit: 30 * time.Second,
+	}
+}
+
+func (profile SplashProfile) WithDefaults() SplashProfile {
+	resolved := profile
+	if resolved.JumpCount == 0 {
+		resolved.JumpCount = DefaultSplashProfile().JumpCount
+	}
+	if resolved.TimeLimit == 0 {
+		resolved.TimeLimit = DefaultSplashProfile().TimeLimit
+	}
+
+	return resolved
+}
+
+func (profile SplashProfile) Validate() error {
+	resolved := profile.WithDefaults()
+	if resolved.JumpCount < 1 || resolved.JumpCount > 5 {
+		return fmt.Errorf("splash jump count must be between 1 and 5")
+	}
+	if resolved.TimeLimit <= 0 {
+		return fmt.Errorf("splash time limit must be greater than 0")
+	}
+
+	return nil
+}
+
+type SplashState struct {
+	TotalJumps    int
+	ResolvedJumps int
+	TimeLimit     time.Duration
+}
+
+func (state SplashState) Pending() bool {
+	return state.ResolvedJumps < state.TotalJumps
+}
+
+func (state SplashState) CurrentJump() int {
+	if !state.Pending() {
+		return state.TotalJumps
+	}
+
+	return state.ResolvedJumps + 1
+}
+
+type SplashResolution struct {
+	Escaped               bool
+	SuccessfulJumps       int
+	DistanceRewardApplied int
+}
+
 type Config struct {
 	InitialDistance           int
 	InitialDepth              int
@@ -42,7 +105,7 @@ type Config struct {
 	ExhaustionCaptureDistance int
 	PlayerWinStep             int
 	FishWinStep               int
-	SplashEscapeChance        float64
+	SplashProfile             SplashProfile
 }
 
 func DefaultConfig() Config {
@@ -54,7 +117,7 @@ func DefaultConfig() Config {
 		ExhaustionCaptureDistance: 2,
 		PlayerWinStep:             1,
 		FishWinStep:               1,
-		SplashEscapeChance:        0.5,
+		SplashProfile:             DefaultSplashProfile(),
 	}
 }
 
@@ -74,11 +137,7 @@ func (c Config) Validate() error {
 	if c.ExhaustionCaptureDistance < c.CaptureDistance {
 		return fmt.Errorf("exhaustion capture distance must be at least the capture distance")
 	}
-	if c.SplashEscapeChance < 0 || c.SplashEscapeChance > 1 {
-		return fmt.Errorf("splash escape chance must be between 0 and 1")
-	}
-
-	return nil
+	return c.SplashProfile.Validate()
 }
 
 type Delta struct {
@@ -93,6 +152,7 @@ type State struct {
 	Status    Status
 	EndReason EndReason
 	LastEvent Event
+	Splash    *SplashState
 }
 
 func NewState(config Config) (State, error) {

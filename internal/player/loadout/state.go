@@ -15,6 +15,7 @@ type Attachment struct {
 	OpeningDepthModifier    int
 	TrackDistanceModifier   int
 	TrackDepthModifier      int
+	SplashBonusDistance     int
 	HabitatTags             []habitats.Tag
 }
 
@@ -75,10 +76,11 @@ func (state State) Validate() error {
 
 func (state State) EffectiveRod() (rod.State, error) {
 	effectiveConfig := rod.Config{
-		OpeningMaxDistance: state.Rod.OpeningMaxDistance,
-		OpeningMaxDepth:    state.Rod.OpeningMaxDepth,
-		TrackMaxDistance:   state.Rod.TrackMaxDistance,
-		TrackMaxDepth:      state.Rod.TrackMaxDepth,
+		OpeningMaxDistance:  state.Rod.OpeningMaxDistance,
+		OpeningMaxDepth:     state.Rod.OpeningMaxDepth,
+		TrackMaxDistance:    state.Rod.TrackMaxDistance,
+		TrackMaxDepth:       state.Rod.TrackMaxDepth,
+		SplashBonusDistance: state.Rod.SplashBonusDistance,
 	}
 
 	for _, attachment := range state.Attachments {
@@ -86,9 +88,19 @@ func (state State) EffectiveRod() (rod.State, error) {
 		effectiveConfig.OpeningMaxDepth += attachment.OpeningDepthModifier
 		effectiveConfig.TrackMaxDistance += attachment.TrackDistanceModifier
 		effectiveConfig.TrackMaxDepth += attachment.TrackDepthModifier
+		effectiveConfig.SplashBonusDistance += attachment.SplashBonusDistance
 	}
 
 	return rod.NewState(effectiveConfig)
+}
+
+func (state State) SplashSuccessDistanceBonus() int {
+	effectiveRod, err := state.EffectiveRod()
+	if err != nil {
+		return 0
+	}
+
+	return effectiveRod.SplashBonusDistance
 }
 
 func (state State) OpeningLimits() encounter.OpeningLimits {

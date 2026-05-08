@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"pesca/internal/cards"
 	"pesca/internal/domain"
+	"pesca/internal/encounter"
+	"time"
 )
 
 type ProfileID string
@@ -14,6 +16,27 @@ type CardPattern struct {
 	Move              domain.Move
 	Effects           []cards.CardEffect
 	DiscardVisibility cards.DiscardVisibility
+}
+
+type SplashProfile struct {
+	JumpCount       int
+	TimeLimitMillis int
+}
+
+func (profile SplashProfile) BuildEncounterProfile() encounter.SplashProfile {
+	resolved := encounter.DefaultSplashProfile()
+	if profile.JumpCount > 0 {
+		resolved.JumpCount = profile.JumpCount
+	}
+	if profile.TimeLimitMillis > 0 {
+		resolved.TimeLimit = time.Duration(profile.TimeLimitMillis) * time.Millisecond
+	}
+
+	return resolved
+}
+
+func (profile SplashProfile) Validate() error {
+	return profile.BuildEncounterProfile().Validate()
 }
 
 func (pattern CardPattern) BuildCard() cards.FishCard {
@@ -38,6 +61,7 @@ type Profile struct {
 	Description   string
 	Details       []string
 	Appearance    Appearance
+	Splash        SplashProfile
 	Cards         []CardPattern
 	CardsToRemove int
 	Shuffle       bool
@@ -63,6 +87,9 @@ func (profile Profile) Validate() error {
 	}
 	if err := profile.Appearance.Validate(); err != nil {
 		return fmt.Errorf("appearance: %w", err)
+	}
+	if err := profile.Splash.Validate(); err != nil {
+		return fmt.Errorf("splash: %w", err)
 	}
 
 	return nil

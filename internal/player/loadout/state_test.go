@@ -127,12 +127,14 @@ func TestEffectiveTrackAndHabitats(t *testing.T) {
 		Name:                  "Linea reforzada",
 		TrackDistanceModifier: 1,
 		TrackDepthModifier:    2,
+		SplashBonusDistance:   1,
 		HabitatTags:           []habitats.Tag{habitats.Rock, habitats.Weed, habitats.Rock},
 	}})
 	require.NoError(t, err)
 
 	assert.Equal(t, 6, state.TrackMaxDistance())
 	assert.Equal(t, 5, state.TrackMaxDepth())
+	assert.Equal(t, 2, state.SplashSuccessDistanceBonus())
 	assert.Equal(t, []habitats.Tag{habitats.Rock, habitats.Weed}, state.HabitatTags())
 }
 
@@ -153,9 +155,10 @@ func TestNewStateClonesAttachmentHabitatTags(t *testing.T) {
 
 func sampleRodState() rod.State {
 	return rod.State{
-		OpeningMaxDistance: 4,
-		OpeningMaxDepth:    2,
-		TrackMaxDistance:   5,
-		TrackMaxDepth:      3,
+		OpeningMaxDistance:  4,
+		OpeningMaxDepth:     2,
+		TrackMaxDistance:    5,
+		TrackMaxDepth:       3,
+		SplashBonusDistance: 1,
 	}
 }

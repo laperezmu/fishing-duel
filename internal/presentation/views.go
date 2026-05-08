@@ -4,6 +4,7 @@ import (
 	"pesca/internal/domain"
 	"pesca/internal/encounter"
 	"pesca/internal/run"
+	"time"
 )
 
 type AnglerProfileView struct {
@@ -79,6 +80,17 @@ type CastView struct {
 	Position     int
 	TotalSlots   int
 	SectionWidth int
+}
+
+type SplashView struct {
+	EventLabel            string
+	CurrentJump           int
+	TotalJumps            int
+	TimeLimit             time.Duration
+	SuccessRewardDistance int
+	TotalSlots            int
+	TargetStart           int
+	TargetWidth           int
 }
 
 type MoveOption struct {

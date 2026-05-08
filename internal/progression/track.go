@@ -7,9 +7,7 @@ import (
 	"pesca/internal/match"
 )
 
-type TrackPolicy struct {
-	SplashEscapeDecider encounter.SplashEscapeDecider
-}
+type TrackPolicy struct{}
 
 func (policy TrackPolicy) Apply(state *match.ProgressionState, round match.ResolvedRound) {
 	delta := encounter.Delta{}
@@ -33,7 +31,7 @@ func (policy TrackPolicy) Apply(state *match.ProgressionState, round match.Resol
 
 	delta = accumulateCardEffects(delta, round.OutcomeEffects)
 
-	encounter.ApplyDelta(state.Encounter, delta, policy.SplashEscapeDecider)
+	encounter.ApplyDelta(state.Encounter, delta)
 }
 
 func accumulateCardEffects(delta encounter.Delta, effects []cards.CardEffect) encounter.Delta {

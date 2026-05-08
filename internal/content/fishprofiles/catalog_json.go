@@ -24,9 +24,15 @@ type profileRecord struct {
 	Description   string              `json:"description"`
 	Details       []string            `json:"details"`
 	Appearance    appearanceRecord    `json:"appearance"`
+	Splash        splashProfileRecord `json:"splash,omitempty"`
 	Cards         []cardPatternRecord `json:"cards"`
 	CardsToRemove int                 `json:"cards_to_remove"`
 	Shuffle       bool                `json:"shuffle"`
+}
+
+type splashProfileRecord struct {
+	JumpCount       int `json:"jump_count,omitempty"`
+	TimeLimitMillis int `json:"time_limit_millis,omitempty"`
 }
 
 type appearanceRecord struct {
@@ -109,6 +115,10 @@ func (record profileRecord) toDomain() (Profile, error) {
 			MinInitialDepth:     record.Appearance.MinInitialDepth,
 			MaxInitialDepth:     record.Appearance.MaxInitialDepth,
 			RequiredHabitatTags: append([]habitats.Tag(nil), record.Appearance.RequiredHabitatTags...),
+		},
+		Splash: SplashProfile{
+			JumpCount:       record.Splash.JumpCount,
+			TimeLimitMillis: record.Splash.TimeLimitMillis,
 		},
 		CardsToRemove: record.CardsToRemove,
 		Shuffle:       record.Shuffle,
