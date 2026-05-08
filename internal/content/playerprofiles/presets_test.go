@@ -79,3 +79,25 @@ func TestDefaultPresetsUseNormalizedEffects(t *testing.T) {
 	assert.True(t, hasHorizontal)
 	assert.True(t, hasVertical)
 }
+
+func TestListPresetCards(t *testing.T) {
+	listed, err := ListPresetCards("hooked-opening")
+
+	require.NoError(t, err)
+	require.NotEmpty(t, listed)
+	assert.Equal(t, CardRef("blue-1"), listed[0].Ref)
+	assert.Equal(t, domain.Blue, listed[0].Move)
+	assert.Equal(t, "Anzuelo tenso", listed[0].Card.Name)
+}
+
+func TestResolvePresetCard(t *testing.T) {
+	card, err := ResolvePresetCard("hooked-opening", CardRef("red-1"))
+
+	require.NoError(t, err)
+	assert.Equal(t, domain.Red, card.Move)
+	assert.Equal(t, "Giro de superficie", card.Name)
+
+	_, err = ResolvePresetCard("hooked-opening", CardRef("red-9"))
+	require.Error(t, err)
+	assert.EqualError(t, err, "unknown player card ref \"red-9\" for preset \"hooked-opening\"")
+}

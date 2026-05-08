@@ -76,6 +76,7 @@ type SpawnView struct {
 }
 
 type CastView struct {
+	Title        string
 	WaterLabel   string
 	Position     int
 	TotalSlots   int
@@ -83,6 +84,7 @@ type CastView struct {
 }
 
 type SplashView struct {
+	Title                 string
 	EventLabel            string
 	CurrentJump           int
 	TotalJumps            int
@@ -151,6 +153,8 @@ type StatusView struct {
 
 type RoundView struct {
 	Status       StatusView
+	BeforeStatus StatusView
+	AfterStatus  StatusView
 	PlayerMove   domain.Move
 	FishMove     domain.Move
 	PlayerLabel  string
@@ -159,6 +163,7 @@ type RoundView struct {
 	OutcomeLabel string
 	EventLabel   string
 	Resolved     []string
+	TraceSummary []string
 }
 
 type SummaryView struct {

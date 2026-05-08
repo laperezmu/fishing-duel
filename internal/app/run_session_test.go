@@ -2,6 +2,8 @@ package app
 
 import (
 	"errors"
+	"testing"
+
 	"pesca/internal/content/anglerprofiles"
 	"pesca/internal/content/attachmentpresets"
 	"pesca/internal/content/fishprofiles"
@@ -14,7 +16,6 @@ import (
 	"pesca/internal/player/rod"
 	"pesca/internal/presentation"
 	"pesca/internal/run"
-	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -345,24 +346,6 @@ func (m *mockRunStateProvider) NextNode(state *run.State) *run.NodeState {
 		return nil
 	}
 	return args.Get(0).(*run.NodeState)
-}
-
-type mockEncounterHandler struct {
-	mock.Mock
-}
-
-func (m *mockEncounterHandler) Resolve(
-	title string,
-	rng Randomizer,
-	ui EncounterBootstrapUI,
-	spawnUI SpawnUI,
-	presenter presentation.Presenter,
-	deckPreset playerprofiles.DeckPreset,
-	playerLoadout loadout.State,
-	config RunEncounterBootstrapConfig,
-) (ResolvedEncounter, error) {
-	args := m.Called(title, rng, ui, spawnUI, presenter, deckPreset, playerLoadout, config)
-	return args.Get(0).(ResolvedEncounter), args.Error(1)
 }
 
 type mockNodeRenderer struct {

@@ -3,6 +3,7 @@ package cli
 import (
 	"bytes"
 	"io"
+	"pesca/internal/app"
 	"pesca/internal/cards"
 	"pesca/internal/content/anglerprofiles"
 	"pesca/internal/content/fishprofiles"
@@ -70,6 +71,8 @@ func TestChooseMoveShowsLastRoundSummary(t *testing.T) {
 
 	err := ui.ShowRound(presentation.RoundView{
 		Status:       presentation.StatusView{FishDistance: 2, FishDepth: 1},
+		BeforeStatus: presentation.StatusView{FishDistance: 3, FishDepth: 2, CaptureDistance: 0},
+		AfterStatus:  presentation.StatusView{FishDistance: 2, FishDepth: 1, CaptureDistance: 1},
 		PlayerMove:   domain.Blue,
 		FishMove:     domain.Yellow,
 		PlayerLabel:  "Tirar",
@@ -78,6 +81,7 @@ func TestChooseMoveShowsLastRoundSummary(t *testing.T) {
 		OutcomeLabel: "gana el jugador",
 		EventLabel:   "chapotea: permanece sujeto",
 		Resolved:     []string{"pez | ventana captura | p60", "jugador | avance vertical | p50"},
+		TraceSummary: []string{"antes dist 3 prof 2", "despues dist 2 prof 1", "umbral capt 0 -> 1"},
 	})
 	require.NoError(t, err)
 
@@ -101,6 +105,7 @@ func TestChooseMoveShowsLastRoundSummary(t *testing.T) {
 	assert.Contains(t, printed, "Profundidad : 1")
 	assert.Contains(t, printed, "Evento    : chapotea: permanece sujeto")
 	assert.Contains(t, printed, "Efectos   : pez | ventana captura | p60 -> jugador | avance vertical | p50")
+	assert.Contains(t, printed, "Traza     : antes dist")
 	assert.Contains(t, printed, "Historial del pez")
 }
 
@@ -187,6 +192,30 @@ func TestChooseFishDeckPreset(t *testing.T) {
 	assert.Contains(t, out.String(), "Apertura")
 	assert.Contains(t, out.String(), "Rojo - Tiron de apertura")
 	assert.Contains(t, out.String(), clearSequence)
+}
+
+func TestChooseSandboxMode(t *testing.T) {
+	var out bytes.Buffer
+	ui := NewUI(strings.NewReader("2\ns\n"), &out)
+
+	mode, err := ui.ChooseSandboxMode("Pesca: sandbox de encounters", app.DefaultSandboxModeOptions())
+
+	require.NoError(t, err)
+	assert.Equal(t, app.SandboxModeManual, mode.Mode)
+	assert.Contains(t, out.String(), "Modo del sandbox")
+	assert.Contains(t, out.String(), "Confirmar modo")
+}
+
+func TestChooseSandboxScenario(t *testing.T) {
+	var out bytes.Buffer
+	ui := NewUI(strings.NewReader("2\ns\n"), &out)
+
+	scenario, err := ui.ChooseSandboxScenario("Pesca: sandbox de encounters", app.DefaultSandboxScenarios())
+
+	require.NoError(t, err)
+	assert.Equal(t, "draw-tempo-open-channel", scenario.ID)
+	assert.Contains(t, out.String(), "Escenarios")
+	assert.Contains(t, out.String(), "Confirmar escenario")
 }
 
 func TestChooseFishDeckPresetReturnsToSelectionAfterCancellingConfirmation(t *testing.T) {

@@ -73,6 +73,7 @@ type RoundSnapshot struct {
 	FishMove        domain.Move
 	Outcome         domain.RoundOutcome
 	ResolvedEffects []ResolvedEffectState
+	Trace           ResolutionTraceSnapshot
 }
 
 type SummarySnapshot struct {
@@ -117,6 +118,7 @@ func NewRoundSnapshot(result RoundResult) RoundSnapshot {
 		FishMove:        result.FishMove,
 		Outcome:         result.Outcome,
 		ResolvedEffects: append([]ResolvedEffectState(nil), result.ResolvedEffects...),
+		Trace:           result.Trace,
 	}
 }
 

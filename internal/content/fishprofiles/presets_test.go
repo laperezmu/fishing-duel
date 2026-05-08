@@ -67,3 +67,23 @@ func TestDefaultPresets(t *testing.T) {
 
 	assert.True(t, hasDrawEffect)
 }
+
+func TestListPresetCards(t *testing.T) {
+	listed, err := ListPresetCards(ProfileID("surface-control"))
+
+	require.NoError(t, err)
+	require.NotEmpty(t, listed)
+	assert.Equal(t, CardRef("blue-1"), listed[0].Ref)
+	assert.Equal(t, domain.Blue, listed[0].Move)
+}
+
+func TestResolvePresetCard(t *testing.T) {
+	card, err := ResolvePresetCard(ProfileID("surface-control"), CardRef("red-1"))
+
+	require.NoError(t, err)
+	assert.Equal(t, domain.Red, card.Move)
+
+	_, err = ResolvePresetCard(ProfileID("surface-control"), CardRef("red-9"))
+	require.Error(t, err)
+	assert.EqualError(t, err, "unknown fish card ref \"red-9\" for preset \"surface-control\"")
+}

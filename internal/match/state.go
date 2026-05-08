@@ -126,6 +126,7 @@ type RoundResult struct {
 	FishCard        cards.FishCard
 	Outcome         domain.RoundOutcome
 	ResolvedEffects []ResolvedEffectState
+	Trace           ResolutionTraceSnapshot
 	Status          StatusSnapshot
 	Encounter       EncounterEventSnapshot
 }
