@@ -136,6 +136,7 @@ func (ui *mockSandboxUI) ResolveSplash(view presentation.SplashView) (encounter.
 
 func (ui *mockSandboxUI) ShowRound(_ presentation.RoundView) error      { return nil }
 func (ui *mockSandboxUI) ShowGameOver(_ presentation.SummaryView) error { return nil }
+func (ui *mockSandboxUI) ShowNotice(message string) error             { return nil }
 
 var (
 	_ = match.StatusSnapshot{}

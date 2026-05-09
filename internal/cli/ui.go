@@ -255,6 +255,21 @@ func (ui *UI) ShowFishSpawn(_ string, spawn presentation.SpawnView) error {
 	return nil
 }
 
+func (ui *UI) ShowNotice(message string) error {
+	_, err := io.WriteString(ui.out, renderNoticeScreen(message))
+	if err != nil {
+		return err
+	}
+	if !ui.scanner.Scan() {
+		if err := ui.scanner.Err(); err != nil {
+			return err
+		}
+		return fmt.Errorf("entrada finalizada")
+	}
+	_, err = io.WriteString(ui.out, clearSequence)
+	return err
+}
+
 func (ui *UI) confirmPlayerDeckPreset(title string, preset playerprofiles.DeckPreset) (bool, error) {
 	return confirmSelection(ui, func(message string) string {
 		return renderPlayerDeckConfirmationScreen(title, preset, message)

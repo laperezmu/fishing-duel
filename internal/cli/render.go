@@ -823,6 +823,16 @@ func renderCastScreen(view presentation.CastView, message string) string {
 	return clearSequence + strings.Join(sections, "\n\n") + "\n\n"
 }
 
+func renderNoticeScreen(message string) string {
+	sections := []string{
+		renderHeader("Aviso"),
+		accent("Aviso") + "\n  " + message,
+		"\nPulsa Enter para continuar...",
+	}
+
+	return clearSequence + strings.Join(sections, "\n\n") + "\n\n"
+}
+
 func renderSplashScreen(view presentation.SplashView, position int, message string) string {
 	sections := []string{
 		renderHeader(view.Title),
